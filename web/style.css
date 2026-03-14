@@ -89,10 +89,9 @@ header .logo span {
 }
 
 .home .content {
-    z-index: 10;
+    z-index: 50; /* Higher than image to 'override' it */
     max-width: 80rem;
-    margin-left: 25%; /* Shift right to balance with the new image */
-    text-align: left;
+    text-align: center;
     opacity: 0;
     transform: translateY(3rem);
     animation: revealUp 1.2s forwards 0.2s;
@@ -112,12 +111,14 @@ header .logo span {
     margin-bottom: 3.5rem;
     font-weight: 400;
     max-width: 60rem;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .cta-group {
     display: flex;
     gap: 2rem;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 }
 
