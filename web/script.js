@@ -30,10 +30,10 @@ videoBtn.forEach(btn => {
         btn.classList.add('active');
 
         const src = btn.getAttribute('data-src');
-        
+
         // Dynamic opacity transition
         videoSlider.style.opacity = '0';
-        
+
         setTimeout(() => {
             videoSlider.src = src;
             videoSlider.play().catch(() => {
