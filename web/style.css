@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --apple-black: #1d1d1f;
+    --apple-gray-dark: #333336;
+    --apple-gray: #86868b;
+    --apple-gray-light: #f5f5f7;
+    --apple-blue: #0066cc;
+    --apple-white: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-blur: blur(20px);
+    --transition-smooth: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+    background: var(--apple-white);
+}
+
+body {
+    color: var(--apple-black);
+    overflow-x: hidden;
+}
+
+/* Typography Overhaul */
+h1, h2, h3 {
+    letter-spacing: -0.015em;
+    font-weight: 600;
+}
+
+section {
+    padding: 12rem 9%;
+}
+
+/* Apple-style Navigation */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4.8rem;
+    z-index: 9999;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+header .logo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffa500;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+}
+
+header .logo span {
+    font-weight: 700;
+    color: #000000;
+    margin-left: 1px;
+}
+
+/* Hero Section - Apple Pro Aesthetic */
+.home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    background: var(--apple-white);
+    padding-top: 4.8rem;
+}
+
+.home .content {
+    z-index: 10;
+    max-width: 80rem;
+    opacity: 0;
+    transform: translateY(3rem);
+    animation: revealUp 1.2s forwards 0.2s;
+}
+
+.home .content h3 {
+    font-size: clamp(4rem, 8vw, 8.5rem);
+    line-height: 1.05;
+    margin-bottom: 2rem;
+    color: var(--apple-black);
+    font-weight: 700;
+}
+
+.home .content p {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    color: var(--apple-gray);
+    margin-bottom: 3.5rem;
+    font-weight: 400;
+    max-width: 60rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-group {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 1.2rem 2.8rem;
+    font-size: 1.7rem;
+    font-weight: 500;
+    border-radius: 98rem;
+    background: var(--apple-blue);
+    color: var(--apple-white);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--apple-blue);
+    font-size: 1.9rem;
+}
+
+.btn-secondary:hover {
+    text-decoration: underline;
+}
+
+.btn:hover:not(.btn-secondary) {
+    background: #0077ed;
+}
+
+/* Video/Background Container */
+.video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.2;
+}
+
+/* Controls - Minimal Dots */
+.home .controls {
+    position: absolute;
+    bottom: 4rem;
+    display: flex;
+    gap: 1.2rem;
+    z-index: 20;
+}
+
+.vid-btn {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.vid-btn.active {
+    background: var(--apple-black);
+    transform: scale(1.2);
+}
+
+/* Footer - Apple Style Grid */
+.footer {
+    padding: 8rem 9% 4rem;
+    background: var(--apple-gray-light);
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.footer .box-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 4rem;
+    margin-bottom: 6rem;
+}
+
+.footer .box h3 {
+    font-size: 1.4rem;
+    color: var(--apple-black);
+    margin-bottom: 1.5rem;
+    text-transform: capitalize;
+}
+
+.footer .box p, .footer .box a {
+    font-size: 1.2rem;
+    color: #a1a1a6;
+    line-height: 1.8;
+    display: block;
+    margin-bottom: 0.8rem;
+    transition: color 0.3s;
+}
+
+.footer .box a:hover {
+    color: var(--apple-white);
+    text-decoration: underline;
+}
+
+.footer .credit {
+    font-size: 1.2rem;
+    color: #86868b;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.footer .credit span {
+    color: var(--apple-blue);
+    font-weight: 700;
+}
+
+/* Animations */
+@keyframes revealUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Global Branding Boldness */
+.brand {
+    font-weight: 700;
+}
+
+.brand span, .vision p span, .footer .box p span {
+    font-weight: 700;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    html { font-size: 55%; }
+    .home .content h3 { font-size: 5rem; }
+}
