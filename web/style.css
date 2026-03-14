@@ -127,8 +127,10 @@ header .logo span {
     border-radius: 98rem;
     background: var(--apple-blue);
     color: var(--apple-white);
+    border: 1px solid transparent;
     transition: var(--transition-smooth);
     cursor: pointer;
+    text-decoration: none;
 }
 
 .btn-secondary {
@@ -137,12 +139,17 @@ header .logo span {
     font-size: 1.9rem;
 }
 
-.btn-secondary:hover {
-    text-decoration: underline;
+.btn-secondary:hover, .btn-secondary:active {
+    background: var(--apple-white);
+    border: 1px solid var(--apple-blue);
+    transform: scale(0.96);
 }
 
-.btn:hover:not(.btn-secondary) {
-    background: #e69500;
+.btn:hover:not(.btn-secondary), .btn:active:not(.btn-secondary) {
+    background: var(--apple-white);
+    color: var(--apple-blue);
+    border: 1px solid var(--apple-blue);
+    transform: scale(0.96);
 }
 
 /* Video/Background Container */
