@@ -5,7 +5,7 @@
     --apple-gray-dark: #333336;
     --apple-gray: #86868b;
     --apple-gray-light: #f5f5f7;
-    --apple-blue: #0066cc;
+    --apple-blue: #ffa500;
     --apple-white: #ffffff;
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-blur: blur(20px);
@@ -142,7 +142,7 @@ header .logo span {
 }
 
 .btn:hover:not(.btn-secondary) {
-    background: #0077ed;
+    background: #e69500;
 }
 
 /* Video/Background Container */
