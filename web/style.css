@@ -73,7 +73,7 @@ header .logo {
 }
 
 header .logo img {
-    height: 3.8rem;
+    height: 2.5rem;
     width: auto;
     filter: brightness(0) saturate(100%) invert(0%); /* Ensures it matches the black text if needed, but it's already black silhouette */
 }
