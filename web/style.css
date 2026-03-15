@@ -308,6 +308,46 @@ header .logo span {
     }
 }
 
+.features-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    gap: 4rem;
+    margin-top: 10rem;
+    text-align: left;
+}
+
+.feature-item {
+    background: var(--apple-gray-light);
+    padding: 3rem;
+    border-radius: 2.4rem;
+    transition: var(--transition-smooth);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.feature-item:hover {
+    transform: translateY(-1rem);
+    background: var(--apple-white);
+    box-shadow: 0 4rem 8rem rgba(0,0,0,0.1);
+}
+
+.feature-item span {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.feature-item h3 {
+    font-size: 2rem;
+    color: var(--apple-black);
+    margin-bottom: 1rem;
+}
+
+.feature-item p {
+    font-size: 1.6rem;
+    color: var(--apple-gray);
+    line-height: 1.5;
+}
+
 /* Footer - Apple Style Grid */
 .footer {
     padding: 8rem 9% 4rem;
