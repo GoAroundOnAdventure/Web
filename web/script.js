@@ -79,3 +79,16 @@ window.addEventListener('load', startExperience);
 window.addEventListener('click', () => {
     videoSlider.muted = false; // Unmute on first click
 }, { once: true });
+
+// 5. Notify Me Form Handler
+const notifyForm = document.querySelector('.notify-form');
+if (notifyForm) {
+    notifyForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = notifyForm.querySelector('input').value;
+        if (email) {
+            alert(`Thank you! We will notify you at ${email} when the future of travel arrives.`);
+            notifyForm.reset();
+        }
+    });
+}

@@ -253,6 +253,61 @@ header .logo span {
 }
 
 
+/* Coming Soon Section */
+.coming-soon {
+    background: var(--apple-white);
+    padding: 15rem 9%;
+    text-align: center;
+}
+
+.coming-soon .content h2 {
+    font-size: clamp(4rem, 6vw, 6.5rem);
+    margin-bottom: 2rem;
+    color: var(--apple-black);
+}
+
+.coming-soon .content p {
+    font-size: 2rem;
+    color: var(--apple-gray);
+    max-width: 60rem;
+    margin: 0 auto 4rem;
+}
+
+.notify-form {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 50rem;
+    margin: 0 auto;
+}
+
+.notify-form input[type="email"] {
+    flex: 1;
+    padding: 1.4rem 2.4rem;
+    font-size: 1.7rem;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: var(--apple-gray-light);
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.notify-form input[type="email"]:focus {
+    border-color: var(--apple-blue);
+    background: var(--apple-white);
+    box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.1);
+}
+
+.notify-form .btn {
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .notify-form {
+        flex-direction: column;
+    }
+}
+
 /* Footer - Apple Style Grid */
 .footer {
     padding: 8rem 9% 4rem;
