@@ -67,6 +67,15 @@ header .logo {
     color: #ffa500;
     letter-spacing: -0.04em;
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+header .logo img {
+    height: 3.8rem;
+    width: auto;
+    filter: brightness(0) saturate(100%) invert(0%); /* Ensures it matches the black text if needed, but it's already black silhouette */
 }
 
 header .logo span {
@@ -177,12 +186,10 @@ header .logo span {
     opacity: 0.2;
 }
 
-/* Hero Floating Visual - Premium Side Element */
+/* Hero Floating Visuals - Premium Symmetrical Elements */
 .hero-image-container {
     position: absolute;
-    left: 4%;
     top: 50%;
-    transform: translateY(-50%) rotate(-2deg);
     width: 35rem;
     height: 45rem;
     z-index: 15;
@@ -191,11 +198,27 @@ header .logo span {
     box-shadow: 0 4rem 8rem rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.4);
     opacity: 0;
-    animation: revealLeft 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hero-image-container:hover {
+.hero-image-container.left {
+    left: 4%;
+    transform: translateY(-50%) rotate(-2deg);
+    animation: revealLeft 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s;
+}
+
+.hero-image-container.right {
+    right: 4%;
+    transform: translateY(-50%) rotate(2deg);
+    animation: revealRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s;
+}
+
+.hero-image-container.left:hover {
+    transform: translateY(-52%) rotate(0deg) scale(1.03);
+    box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
+}
+
+.hero-image-container.right:hover {
     transform: translateY(-52%) rotate(0deg) scale(1.03);
     box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
 }
@@ -215,6 +238,17 @@ header .logo span {
     to {
         opacity: 1;
         transform: translate(0, -50%) rotate(-2deg);
+    }
+}
+
+@keyframes revealRight {
+    from {
+        opacity: 0;
+        transform: translate(10rem, -50%) rotate(5deg);
+    }
+    to {
+        opacity: 1;
+        transform: translate(0, -50%) rotate(2deg);
     }
 }
 
