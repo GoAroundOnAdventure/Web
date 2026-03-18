@@ -1,3 +1,52 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase Configuration for GoAround
+const firebaseConfig = {
+    apiKey: 'AIzaSyBmQO-DB5vkqplj-0WUKL5Cv420ZR1jJJo',
+    appId: '1:608020950692:web:6193fdb127ae3f2dd10031',
+    messagingSenderId: '608020950692',
+    projectId: 'goaround-11',
+    authDomain: 'goaround-11.firebaseapp.com',
+    storageBucket: 'goaround-11.firebasestorage.app',
+    measurementId: 'G-B46NQZCB3P',
+};
+
+// Initialize Firebase and Firestore
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Premium Toast Notification Helper
+const showToast = (message, isError = false) => {
+    let toast = document.querySelector('.toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+    }
+    
+    const icon = isError 
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff3b30" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+    toast.innerHTML = `
+        <div class="icon">${icon}</div>
+        <div class="message">${message}</div>
+        <div class="progress-bar"></div>
+    `;
+
+    toast.classList.remove('show', 'error', 'success');
+    void toast.offsetWidth; // Force reflow for animation reset
+    
+    toast.classList.toggle('error', isError);
+    toast.classList.toggle('success', !isError);
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4500);
+};
+
 // Apple-style Interaction Logic
 const header = document.querySelector('header');
 const videoSlider = document.querySelector('#video-slider');
@@ -80,15 +129,46 @@ window.addEventListener('click', () => {
     videoSlider.muted = false; // Unmute on first click
 }, { once: true });
 
-// 5. Notify Me Form Handler
+// 5. Notify Me Form Handler with Firebase Integration
 const notifyForm = document.querySelector('.notify-form');
 if (notifyForm) {
-    notifyForm.addEventListener('submit', (e) => {
+    notifyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = notifyForm.querySelector('input').value;
+        const emailInput = notifyForm.querySelector('input');
+        const email = emailInput.value.trim();
+
         if (email) {
-            alert(`Thank you! We will notify you at ${email} when the future of travel arrives.`);
-            notifyForm.reset();
+            // 1. Strict Gmail Validation (User explicitly requested Gmail only)
+            if (!email.toLowerCase().endsWith('@gmail.com')) {
+                showToast("Please use a valid @gmail.com address.", true);
+                return;
+            }
+
+            // Optional: Loading state for button
+            const notifyBtn = notifyForm.querySelector('button');
+            const originalBtnText = notifyBtn.innerText;
+            notifyBtn.innerText = "Processing...";
+            notifyBtn.disabled = true;
+
+            try {
+                // 2. Store in Firebase Database - Collection: "pre-users"
+                await addDoc(collection(db, "pre-users"), {
+                    email: email,
+                    source: "Coming Soon Page",
+                    status: "waiting",
+                    timestamp: serverTimestamp()
+                });
+
+                // 3. User Notification
+                showToast(`Confirmed! We'll notify you here when we launch.`);
+                notifyForm.reset();
+            } catch (error) {
+                console.error("Firebase Database Error: ", error);
+                showToast("Registration error. Please try again.", true);
+            } finally {
+                notifyBtn.innerText = originalBtnText;
+                notifyBtn.disabled = false;
+            }
         }
     });
 }

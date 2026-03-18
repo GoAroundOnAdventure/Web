@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. USERS COLLECTION
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+
+      match /documents/{document=**} {
+        allow read: if true;
+        allow write: if request.auth != null;
+      }
+    }
+
+    // 2. OWNER ACCESS
+    match /Owner_Access/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 3. ADMINS COLLECTION
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == adminId;
+
+      match /documents/{document=**} {
+        allow read, write: if true;
+      }
+    }
+
+    // 4. VERIFICATION LOGIN
+    match /verification_login/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 5. DELETED FILES ARCHIVE
+    match /admin_deleted_files/{document=**} {
+      allow read, write: if true;
+    }
+
+    match /user_deleted_files/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 6. AVAILABLE CARS & admin_uploaded_cars
+    match /admin_uploaded_cars/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 7. STORED DETAILS OF CARS
+    match /stored_details_of_cars/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 8. DELETED ADMIN CARS ARCHIVE
+    match /deleted_admin_cars/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 9. LIVE CARS
+    match /live_cars/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 10. METADATA
+    match /metadata/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 11. CARS BOOKING COLLECTION
+    match /GoAround_CarRental_Bookings/{bookingId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+
+    // 12. pre-users (Coming Soon Page Sign-ups)
+    match /pre-users/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
