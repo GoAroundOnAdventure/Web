@@ -214,3 +214,53 @@ if (emailInputForSuggestions && domainShortcuts) {
         });
     });
 }
+
+// 7. Hamburger Menu Toggle Logic & Logo Reset
+const menuBar = document.querySelector('#menu-bar');
+const navbar = document.querySelector('.navbar');
+const backdrop = document.querySelector('.overlay-backdrop');
+const navLinks = document.querySelectorAll('.navbar a');
+const logo = document.querySelector('.logo');
+
+if (menuBar && navbar && backdrop) {
+    const toggleMenu = () => {
+        menuBar.classList.toggle('active');
+        navbar.classList.toggle('active');
+        backdrop.classList.toggle('active');
+        
+        // Prevent scrolling when menu is open
+        if (navbar.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+        }
+    };
+
+    menuBar.addEventListener('click', toggleMenu);
+    backdrop.addEventListener('click', toggleMenu);
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navbar.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+    });
+}
+
+// Logo Refresh/Reset Behavior
+if (logo) {
+    logo.addEventListener('click', (e) => {
+        const isAtTop = window.scrollY < 20;
+        if (isAtTop) {
+            // Already at top, so refresh
+            window.location.reload();
+        } else {
+            // Not at top, so reset view (scroll to top)
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+}
