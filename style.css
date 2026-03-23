@@ -232,12 +232,28 @@ header .logo span {
 .home .content-text,
 .home .content-cta {
     z-index: 50;
-    /* Higher than image to 'override' it */
     max-width: 80rem;
     text-align: center;
+}
+
+.home .content-text h3,
+.home .content-text p,
+.home .content-cta .cta-group {
     opacity: 0;
-    transform: translateY(3rem);
-    animation: revealUp 1.2s forwards 0.2s;
+    transform: translateY(4rem);
+    animation: revealUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.home .content-text h3 {
+    animation-delay: 0.3s;
+}
+
+.home .content-text p {
+    animation-delay: 0.5s;
+}
+
+.home .content-cta .cta-group {
+    animation-delay: 0.7s;
 }
 
 .home .content-text {
