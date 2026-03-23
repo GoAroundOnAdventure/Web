@@ -5,14 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoAround | The Future of Exploration</title>
+    <link rel="icon" type="image/png" href="images/orginal logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <header>
-        <a href="#" class="logo"><img src="../images/orginal logo.png" alt="GoAround Logo">Go<span>Around</span></a>
+        <div class="menu-btn" id="menu-btn">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <a href="#" class="logo">
+            <img src="../images/orginal logo.png" alt="" aria-hidden="true">
+            Go<span>Around</span>
+        </a>
     </header>
+
+    <nav class="side-menu" id="side-menu">
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#vision">Vision</a></li>
+            <li><a href="#coming-soon">Upcoming</a></li>
+            <li><a href="#footer">Support</a></li>
+        </ul>
+        <div class="menu-socials">
+            <a href="https://www.instagram.com/goaroundonadventure">Instagram</a>
+            <a href="https://www.facebook.com/share/15PNDshT8b/">Facebook</a>
+        </div>
+    </nav>
 
     <section class="home" id="home">
         <div class="video-container">
@@ -36,8 +58,9 @@
         </div>
         <div class="scroll-indicator">
             <a href="#vision" aria-label="Scroll down">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
                 </svg>
             </a>
         </div>
@@ -56,13 +79,13 @@
         <div class="container">
             <div class="content">
                 <h2>The App is Coming Soon.</h2>
-                <p>We're building the ultimate travel companion. Stay tuned for future updates and the next generation of exploration.</p>
+                <p>We're building the ultimate travel companion. Stay tuned for future updates and the next generation
+                    of exploration.</p>
                 <form class="notify-form" action="#">
                     <div class="input-wrapper">
-                        <input type="email" placeholder="Enter your email" required 
-                               title="Please use a valid email address in lowercase"
-                               oninput="this.value = this.value.toLowerCase()"
-                               autocomplete="off">
+                        <input type="email" placeholder="Enter your email" required
+                            title="Please use a valid email address in lowercase"
+                            oninput="this.value = this.value.toLowerCase()" autocomplete="off">
                         <div class="domain-shortcuts">
                             <span>@gmail.com</span>
                             <span>@yahoo.com</span>

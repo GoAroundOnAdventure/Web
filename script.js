@@ -214,3 +214,27 @@ if (emailInputForSuggestions && domainShortcuts) {
         });
     });
 }
+
+// 7. Hamburger Menu & Sidebar Toggle Logic
+const menuBtn = document.querySelector('#menu-btn');
+const sideMenu = document.querySelector('#side-menu');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+if (menuBtn && sideMenu) {
+    const toggleMenu = () => {
+        menuBtn.classList.toggle('active');
+        sideMenu.classList.toggle('active');
+        document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
+    };
+
+    menuBtn.addEventListener('click', toggleMenu);
+
+    // Close menu when a link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            menuBtn.classList.remove('active');
+            sideMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+}

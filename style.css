@@ -24,11 +24,15 @@ html {
     font-size: 62.5%;
     scroll-behavior: smooth;
     background: var(--apple-white);
+    overflow-x: hidden; /* Prevent horizontal movement */
 }
+
 
 body {
     color: var(--apple-black);
-    overflow-x: hidden;
+    overflow-x: hidden; /* Prevent horizontal scroll globally */
+    width: 100%;
+    position: relative;
 }
 
 /* Typography Overhaul */
@@ -50,16 +54,141 @@ header {
     left: 0;
     right: 0;
     height: 4.8rem;
+    padding: 0 4rem;
     z-index: 9999;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Keeps logo centered */
     transition: var(--transition-smooth);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+.menu-btn {
+    position: absolute;
+    left: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 2.2rem;
+    padding: 1rem 0;
+}
+
+.menu-btn .bar {
+    width: 100%;
+    height: 1.5px;
+    background: #000;
+    transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 98rem;
+}
+
+/* Perfect Hamburger to X Animation */
+.menu-btn.active .bar:nth-child(1) {
+    transform: translateY(0.65rem) rotate(45deg);
+}
+
+.menu-btn.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-btn.active .bar:nth-child(3) {
+    transform: translateY(-0.65rem) rotate(-45deg);
+}
+
+/* Premium Sidebar Menu */
+.side-menu {
+    position: fixed;
+    top: 4.8rem;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 4.8rem);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    visibility: hidden;
+}
+
+.side-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-links {
+    list-style: none;
+    margin-bottom: 5rem;
+}
+
+.nav-links li {
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 3.5rem;
+    font-weight: 600;
+    color: var(--apple-black);
+    display: block;
+    transition: transform 0.4s;
+}
+
+.nav-links a:hover {
+    color: var(--apple-blue);
+    transform: translateX(1rem);
+}
+
+/* Staggered entrance for links */
+.side-menu.active .nav-links li:nth-child(1) { transition-delay: 0.1s; }
+.side-menu.active .nav-links li:nth-child(2) { transition-delay: 0.15s; }
+.side-menu.active .nav-links li:nth-child(3) { transition-delay: 0.2s; }
+.side-menu.active .nav-links li:nth-child(4) { transition-delay: 0.25s; }
+
+.nav-links li {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.side-menu.active .nav-links li {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.menu-socials {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.menu-socials a {
+    font-size: 1.4rem;
+    color: var(--apple-gray);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.menu-socials a:hover {
+    color: var(--apple-black);
+}
+
+@media (max-width: 480px) {
+    .nav-links a {
+        font-size: 2.8rem;
+    }
+}
+
 
 header .logo {
     font-size: 2.2rem;
@@ -75,7 +204,8 @@ header .logo {
 header .logo img {
     height: 2.5rem;
     width: auto;
-    filter: brightness(0) saturate(100%) invert(0%); /* Ensures it matches the black text if needed, but it's already black silhouette */
+    filter: brightness(0) saturate(100%) invert(0%);
+    /* Ensures it matches the black text if needed, but it's already black silhouette */
 }
 
 header .logo span {
@@ -95,11 +225,14 @@ header .logo span {
     text-align: center;
     background: var(--apple-white);
     padding-top: 4.8rem;
+    overflow: hidden; /* Contain floating images and prevent overflow */
 }
+
 
 .home .content-text,
 .home .content-cta {
-    z-index: 50; /* Higher than image to 'override' it */
+    z-index: 50;
+    /* Higher than image to 'override' it */
     max-width: 80rem;
     text-align: center;
     opacity: 0;
@@ -200,8 +333,8 @@ header .logo span {
     z-index: 15;
     border-radius: 2.4rem;
     overflow: hidden;
-    box-shadow: 0 4rem 8rem rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 4rem 8rem rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     opacity: 0;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -220,12 +353,12 @@ header .logo span {
 
 .hero-image-container.left:hover {
     transform: translateY(-52%) rotate(0deg) scale(1.03);
-    box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
+    box-shadow: 0 5rem 10rem rgba(0, 0, 0, 0.35);
 }
 
 .hero-image-container.right:hover {
     transform: translateY(-52%) rotate(0deg) scale(1.03);
-    box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
+    box-shadow: 0 5rem 10rem rgba(0, 0, 0, 0.35);
 }
 
 .hero-image-container img {
@@ -240,6 +373,7 @@ header .logo span {
         opacity: 0;
         transform: translate(-10rem, -50%) rotate(-5deg);
     }
+
     to {
         opacity: 1;
         transform: translate(0, -50%) rotate(-2deg);
@@ -251,6 +385,7 @@ header .logo span {
         opacity: 0;
         transform: translate(10rem, -50%) rotate(5deg);
     }
+
     to {
         opacity: 1;
         transform: translate(0, -50%) rotate(2deg);
@@ -296,7 +431,7 @@ header .logo span {
     padding: 1.4rem 2.4rem;
     font-size: 1.7rem;
     border-radius: 1.2rem;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     background: var(--apple-gray-light);
     outline: none;
     transition: var(--transition-smooth);
@@ -321,7 +456,8 @@ header .logo span {
 }
 
 .domain-shortcuts {
-    display: none; /* Controlled by JS */
+    display: none;
+    /* Controlled by JS */
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
@@ -330,12 +466,15 @@ header .logo span {
     padding: 0.5rem 0.2rem 1.5rem;
     justify-content: flex-start;
     animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling for iOS */
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
 }
 
 .domain-shortcuts::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome/Safari */
+    display: none;
+    /* Hide scrollbar for Chrome/Safari */
 }
 
 .domain-shortcuts span {
@@ -352,7 +491,7 @@ header .logo span {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
     font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
 }
 
 .domain-shortcuts span:hover {
@@ -372,6 +511,7 @@ header .logo span {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -460,33 +600,46 @@ header .logo span {
         font-size: 55%;
     }
 
+    body {
+        position: relative;
+        overflow-x: hidden;
+    }
+
     section {
-        padding: 10rem 5%;
+        padding: 8rem 5%;
     }
 
     .home .content-text h3 {
-        font-size: 4.5rem;
+        font-size: 4.2rem;
+        position: relative;
+        z-index: 50;
     }
 
-    .home .content-text,
-    .home .content-cta {
-        padding: 0 2rem;
+    .home .content-text p {
+        position: relative;
+        z-index: 50;
     }
 
     .hero-image-container {
-        width: 25rem;
-        height: 34rem;
+        width: 18rem;
+        height: 24rem;
+        z-index: 5;
+        opacity: 0.85; /* Highly visible as requested */
+        filter: none; /* Removed blur for perfect visibility */
     }
 
     .hero-image-container.left {
-        left: -10%;
-        opacity: 0.8;
+        left: 8%; /* Closer to center, away from edges */
+        top: 35%;
+        transform: translateY(-50%) rotate(-5deg);
     }
 
     .hero-image-container.right {
-        right: -10%;
-        opacity: 0.8;
+        right: 8%; /* Closer to center, away from edges */
+        top: 65%;
+        transform: translateY(-50%) rotate(5deg);
     }
+
 
     .vision .content h2 {
         font-size: 4rem !important;
@@ -499,32 +652,38 @@ header .logo span {
     .cta-group {
         flex-direction: column;
         gap: 1.5rem;
+        width: 100%;
+        max-width: 32rem;
+        margin: 0 auto;
     }
-    
-    .btn, .btn-secondary {
+
+    .btn,
+    .btn-secondary {
         width: 100%;
         text-align: center;
+        padding: 1.4rem;
     }
 }
 
 @media (max-width: 480px) {
     html {
-        font-size: 50%;
+        font-size: 52%;
     }
 
     .hero-image-container {
-        width: 20rem;
-        height: 28rem;
+        width: 14rem;
+        height: 18rem;
+        opacity: 0.4;
     }
 
     .hero-image-container.left {
-        top: 35%;
-        left: -15%;
+        left: -2%;
+        top: 30%;
     }
 
     .hero-image-container.right {
-        top: 65%;
-        right: -15%;
+        right: -2%;
+        top: 70%;
     }
 }
 
@@ -539,13 +698,15 @@ header .logo span {
     -webkit-backdrop-filter: blur(30px);
     color: #ffffff;
     padding: 1.2rem 2.4rem;
-    border-radius: 98rem; /* Pill shape for premium feel */
+    border-radius: 98rem;
+    /* Pill shape for premium feel */
     font-size: 1.5rem;
     font-weight: 500;
     z-index: 10001;
-    box-shadow: 0 2.5rem 5rem rgba(0,0,0,0.2), 0 0 1px rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce/Spring effect */
+    box-shadow: 0 2.5rem 5rem rgba(0, 0, 0, 0.2), 0 0 1px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bounce/Spring effect */
     display: flex;
     align-items: center;
     gap: 1.4rem;
@@ -582,14 +743,24 @@ header .logo span {
     transform: scaleX(0);
 }
 
-.toast.success .progress-bar { background: #34c759; }
-.toast.error .progress-bar { background: #ff3b30; }
+.toast.success .progress-bar {
+    background: #34c759;
+}
+
+.toast.error .progress-bar {
+    background: #ff3b30;
+}
 
 .toast.show .progress-bar {
     animation: toastProgress 4.5s linear forwards;
 }
 
 @keyframes toastProgress {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
 }
