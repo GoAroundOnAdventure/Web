@@ -443,6 +443,17 @@ header .logo span {
     }
 }
 
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Global Branding Boldness & Colors */
 .brand {
     font-weight: 700 !important;
@@ -455,76 +466,82 @@ header .logo span {
 }
 
 /* Mobile Adjustments */
+@media (max-width: 900px) {
+    .hero-image-container {
+        display: none; /* Hide cluttered side images on mobile to let text breathe */
+    }
+    
+    .home .content-text {
+        mix-blend-mode: normal; /* Better legibility on mobile */
+        max-width: 90%;
+    }
+
+    .home .content-text h3 {
+        color: var(--apple-black);
+        font-size: 5rem;
+    }
+
+    .home .content-text p {
+        color: var(--apple-gray);
+    }
+
+    .video-container video {
+        opacity: 0.1; /* Fade video even more for text contrast */
+    }
+}
+
 @media (max-width: 768px) {
     html {
         font-size: 55%;
     }
 
     section {
-        padding: 10rem 5%;
+        padding: 6rem 5%; /* Reduced excessive vertical spacing */
+    }
+
+    .vision {
+        padding: 8rem 5%;
+    }
+
+    .coming-soon {
+        padding: 8rem 5%;
     }
 
     .home .content-text h3 {
-        font-size: 4.5rem;
-    }
-
-    .home .content-text,
-    .home .content-cta {
-        padding: 0 2rem;
-    }
-
-    .hero-image-container {
-        width: 25rem;
-        height: 34rem;
-    }
-
-    .hero-image-container.left {
-        left: -10%;
-        opacity: 0.8;
-    }
-
-    .hero-image-container.right {
-        right: -10%;
-        opacity: 0.8;
-    }
-
-    .vision .content h2 {
-        font-size: 4rem !important;
-    }
-
-    .vision .content p {
-        font-size: 1.8rem !important;
+        font-size: 4.2rem;
     }
 
     .cta-group {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.2rem;
+        width: 100%;
+        max-width: 30rem;
+        margin: 0 auto;
     }
     
     .btn, .btn-secondary {
         width: 100%;
         text-align: center;
+        padding: 1.4rem;
+    }
+
+    .domain-shortcuts {
+        margin-top: 1.8rem;
+        padding-bottom: 2rem;
     }
 }
 
 @media (max-width: 480px) {
     html {
-        font-size: 50%;
+        font-size: 52%;
     }
 
-    .hero-image-container {
-        width: 20rem;
-        height: 28rem;
+    header .logo {
+        font-size: 1.8rem;
     }
 
-    .hero-image-container.left {
-        top: 35%;
-        left: -15%;
-    }
-
-    .hero-image-container.right {
-        top: 65%;
-        right: -15%;
+    .home .content-text h3 {
+        font-size: 3.8rem;
     }
 }
 
