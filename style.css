@@ -24,11 +24,15 @@ html {
     font-size: 62.5%;
     scroll-behavior: smooth;
     background: var(--apple-white);
+    overflow-x: hidden; /* Prevent horizontal movement */
 }
+
 
 body {
     color: var(--apple-black);
-    overflow-x: hidden;
+    overflow-x: hidden; /* Prevent horizontal scroll globally */
+    width: 100%;
+    position: relative;
 }
 
 /* Typography Overhaul */
@@ -75,7 +79,8 @@ header .logo {
 header .logo img {
     height: 2.5rem;
     width: auto;
-    filter: brightness(0) saturate(100%) invert(0%); /* Ensures it matches the black text if needed, but it's already black silhouette */
+    filter: brightness(0) saturate(100%) invert(0%);
+    /* Ensures it matches the black text if needed, but it's already black silhouette */
 }
 
 header .logo span {
@@ -95,11 +100,14 @@ header .logo span {
     text-align: center;
     background: var(--apple-white);
     padding-top: 4.8rem;
+    overflow: hidden; /* Contain floating images and prevent overflow */
 }
+
 
 .home .content-text,
 .home .content-cta {
-    z-index: 50; /* Higher than image to 'override' it */
+    z-index: 50;
+    /* Higher than image to 'override' it */
     max-width: 80rem;
     text-align: center;
     opacity: 0;
@@ -200,8 +208,8 @@ header .logo span {
     z-index: 15;
     border-radius: 2.4rem;
     overflow: hidden;
-    box-shadow: 0 4rem 8rem rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 4rem 8rem rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     opacity: 0;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -220,12 +228,12 @@ header .logo span {
 
 .hero-image-container.left:hover {
     transform: translateY(-52%) rotate(0deg) scale(1.03);
-    box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
+    box-shadow: 0 5rem 10rem rgba(0, 0, 0, 0.35);
 }
 
 .hero-image-container.right:hover {
     transform: translateY(-52%) rotate(0deg) scale(1.03);
-    box-shadow: 0 5rem 10rem rgba(0,0,0,0.35);
+    box-shadow: 0 5rem 10rem rgba(0, 0, 0, 0.35);
 }
 
 .hero-image-container img {
@@ -240,6 +248,7 @@ header .logo span {
         opacity: 0;
         transform: translate(-10rem, -50%) rotate(-5deg);
     }
+
     to {
         opacity: 1;
         transform: translate(0, -50%) rotate(-2deg);
@@ -251,6 +260,7 @@ header .logo span {
         opacity: 0;
         transform: translate(10rem, -50%) rotate(5deg);
     }
+
     to {
         opacity: 1;
         transform: translate(0, -50%) rotate(2deg);
@@ -296,7 +306,7 @@ header .logo span {
     padding: 1.4rem 2.4rem;
     font-size: 1.7rem;
     border-radius: 1.2rem;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     background: var(--apple-gray-light);
     outline: none;
     transition: var(--transition-smooth);
@@ -321,7 +331,8 @@ header .logo span {
 }
 
 .domain-shortcuts {
-    display: none; /* Controlled by JS */
+    display: none;
+    /* Controlled by JS */
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
@@ -330,12 +341,15 @@ header .logo span {
     padding: 0.5rem 0.2rem 1.5rem;
     justify-content: flex-start;
     animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling for iOS */
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
 }
 
 .domain-shortcuts::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome/Safari */
+    display: none;
+    /* Hide scrollbar for Chrome/Safari */
 }
 
 .domain-shortcuts span {
@@ -352,7 +366,7 @@ header .logo span {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
     font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
 }
 
 .domain-shortcuts span:hover {
@@ -372,6 +386,7 @@ header .logo span {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -443,17 +458,6 @@ header .logo span {
     }
 }
 
-@keyframes slideUpFade {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 /* Global Branding Boldness & Colors */
 .brand {
     font-weight: 700 !important;
@@ -466,68 +470,73 @@ header .logo span {
 }
 
 /* Mobile Adjustments */
-@media (max-width: 900px) {
-    .hero-image-container {
-        display: none; /* Hide cluttered side images on mobile to let text breathe */
-    }
-    
-    .home .content-text {
-        mix-blend-mode: normal; /* Better legibility on mobile */
-        max-width: 90%;
-    }
-
-    .home .content-text h3 {
-        color: var(--apple-black);
-        font-size: 5rem;
-    }
-
-    .home .content-text p {
-        color: var(--apple-gray);
-    }
-
-    .video-container video {
-        opacity: 0.1; /* Fade video even more for text contrast */
-    }
-}
-
 @media (max-width: 768px) {
     html {
         font-size: 55%;
     }
 
+    body {
+        position: relative;
+        overflow-x: hidden;
+    }
+
     section {
-        padding: 6rem 5%; /* Reduced excessive vertical spacing */
-    }
-
-    .vision {
-        padding: 8rem 5%;
-    }
-
-    .coming-soon {
         padding: 8rem 5%;
     }
 
     .home .content-text h3 {
         font-size: 4.2rem;
+        position: relative;
+        z-index: 50;
+    }
+
+    .home .content-text p {
+        position: relative;
+        z-index: 50;
+    }
+
+    .hero-image-container {
+        width: 18rem;
+        height: 24rem;
+        z-index: 5;
+        opacity: 0.85; /* Highly visible as requested */
+        filter: none; /* Removed blur for perfect visibility */
+    }
+
+    .hero-image-container.left {
+        left: 8%; /* Closer to center, away from edges */
+        top: 35%;
+        transform: translateY(-50%) rotate(-5deg);
+    }
+
+    .hero-image-container.right {
+        right: 8%; /* Closer to center, away from edges */
+        top: 65%;
+        transform: translateY(-50%) rotate(5deg);
+    }
+
+
+    .vision .content h2 {
+        font-size: 4rem !important;
+    }
+
+    .vision .content p {
+        font-size: 1.8rem !important;
     }
 
     .cta-group {
         flex-direction: column;
-        gap: 1.2rem;
+        gap: 1.5rem;
         width: 100%;
-        max-width: 30rem;
+        max-width: 32rem;
         margin: 0 auto;
     }
-    
-    .btn, .btn-secondary {
+
+    .btn,
+    .btn-secondary {
         width: 100%;
         text-align: center;
         padding: 1.4rem;
-    }
-
-    .domain-shortcuts {
-        margin-top: 1.8rem;
-        padding-bottom: 2rem;
     }
 }
 
@@ -536,12 +545,20 @@ header .logo span {
         font-size: 52%;
     }
 
-    header .logo {
-        font-size: 1.8rem;
+    .hero-image-container {
+        width: 14rem;
+        height: 18rem;
+        opacity: 0.4;
     }
 
-    .home .content-text h3 {
-        font-size: 3.8rem;
+    .hero-image-container.left {
+        left: -2%;
+        top: 30%;
+    }
+
+    .hero-image-container.right {
+        right: -2%;
+        top: 70%;
     }
 }
 
@@ -556,13 +573,15 @@ header .logo span {
     -webkit-backdrop-filter: blur(30px);
     color: #ffffff;
     padding: 1.2rem 2.4rem;
-    border-radius: 98rem; /* Pill shape for premium feel */
+    border-radius: 98rem;
+    /* Pill shape for premium feel */
     font-size: 1.5rem;
     font-weight: 500;
     z-index: 10001;
-    box-shadow: 0 2.5rem 5rem rgba(0,0,0,0.2), 0 0 1px rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce/Spring effect */
+    box-shadow: 0 2.5rem 5rem rgba(0, 0, 0, 0.2), 0 0 1px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bounce/Spring effect */
     display: flex;
     align-items: center;
     gap: 1.4rem;
@@ -599,14 +618,24 @@ header .logo span {
     transform: scaleX(0);
 }
 
-.toast.success .progress-bar { background: #34c759; }
-.toast.error .progress-bar { background: #ff3b30; }
+.toast.success .progress-bar {
+    background: #34c759;
+}
+
+.toast.error .progress-bar {
+    background: #ff3b30;
+}
 
 .toast.show .progress-bar {
     animation: toastProgress 4.5s linear forwards;
 }
 
 @keyframes toastProgress {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
 }
