@@ -258,25 +258,33 @@
         const errorTitle = document.getElementById('error-title');
         const errorDesc = document.getElementById('error-desc');
 
-        // Extract emergency ID from the URL
+        // Extract emergency ID from the URL (including hash fragment like #User_0101)
         function getEmergencyId() {
             // 1. Check query parameters (?id=EMRGNCY...)
             const urlParams = new URLSearchParams(window.location.search);
             let id = urlParams.get('id');
             if (id && id.startsWith('EMRGNCY')) {
-                return id.split('#')[0].trim();
+                let fullId = id.trim();
+                if (!fullId.includes('#') && window.location.hash) {
+                    fullId += window.location.hash;
+                }
+                return fullId;
             }
 
             // 2. Check the pathname segments (/e/EMRGNCY...)
             const pathParts = window.location.pathname.split('/');
             for (let part of pathParts) {
                 if (part.startsWith('EMRGNCY')) {
-                    return part.split('#')[0].trim();
+                    let fullId = part.trim();
+                    if (!fullId.includes('#') && window.location.hash) {
+                        fullId += window.location.hash;
+                    }
+                    return fullId;
                 }
             }
 
-            // 3. Fallback: regex search the entire href for any substring starting with EMRGNCY followed by alphanumeric characters
-            const regexMatch = window.location.href.match(/EMRGNCY[A-Za-z0-9]+/);
+            // 3. Fallback: regex search the entire href
+            const regexMatch = window.location.href.match(/EMRGNCY[A-Za-z0-9#_]+/);
             if (regexMatch) {
                 return regexMatch[0];
             }

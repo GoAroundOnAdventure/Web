@@ -10,13 +10,13 @@
         var search = window.location.search;
         var hash = window.location.hash;
 
-        // Look for the EMRGNCY alphanumeric pattern
-        var idMatch = path.match(/EMRGNCY[A-Za-z0-9]+/);
+        // Look for the EMRGNCY alphanumeric pattern (including # and _)
+        var idMatch = path.match(/EMRGNCY[A-Za-z0-9#_]+/);
         if (!idMatch && search) {
-            idMatch = search.match(/EMRGNCY[A-Za-z0-9]+/);
+            idMatch = search.match(/EMRGNCY[A-Za-z0-9#_]+/);
         }
         if (!idMatch && hash) {
-            idMatch = hash.match(/EMRGNCY[A-Za-z0-9]+/);
+            idMatch = hash.match(/EMRGNCY[A-Za-z0-9#_]+/);
         }
 
         if (idMatch) {
