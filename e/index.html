@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoAround Medical ID | Emergency Rescue Profile</title>
+    <link rel="icon" type="image/png" href="../images/orginal logo.png">
+    
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#b91c1c', // Dark red for header
+                            'red-light': '#fef2f2', // Soft red
+                            orange: '#ffa500', // GoAround Brand Orange
+                            dark: '#1d1d1f', // Apple-style dark
+                            gray: '#86868b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen py-8 px-4 flex justify-center items-center font-sans antialiased text-slate-800">
+
+    <div id="app" class="max-w-md w-full flex flex-col justify-center items-center">
+        <!-- Loading State -->
+        <div id="loading" class="w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center text-center space-y-4">
+            <div class="relative w-20 h-20 flex items-center justify-center">
+                <!-- Double pulse spinner -->
+                <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+                <div class="relative rounded-full h-16 w-16 bg-red-700 flex items-center justify-center shadow-lg shadow-red-200">
+                    <i class="fa-solid fa-heart-pulse text-white text-3xl animate-pulse"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800">Verifying Identity</h2>
+            <p class="text-slate-500 text-sm">Accessing GoAround Secure Medical database...</p>
+        </div>
+
+        <!-- Profile Content State (hidden initially) -->
+        <div id="profile-container" class="w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 hidden flex flex-col">
+            <!-- Critical Alert Banner -->
+            <div class="bg-red-50 border-b border-red-100 text-red-800 px-4 py-3.5 text-xs font-semibold flex items-start gap-2.5">
+                <i class="fa-solid fa-circle-exclamation text-red-600 text-base animate-pulse shrink-0 mt-0.5"></i>
+                <span>EMERGENCY RESCUE PROFILE - Please share these vital stats with medical responders</span>
+            </div>
+
+            <!-- Dark Red Block Header -->
+            <div class="bg-gradient-to-r from-red-800 to-red-950 text-white px-6 py-7 flex flex-col items-center text-center relative overflow-hidden">
+                <!-- Decorative overlays -->
+                <div class="absolute -right-10 -top-10 w-28 h-28 bg-white opacity-5 rounded-full"></div>
+                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-white opacity-5 rounded-full"></div>
+                
+                <!-- GoAround logo and branding -->
+                <div class="flex items-center gap-2 mb-3 bg-red-900/40 px-3 py-1 rounded-full border border-red-500/20 backdrop-blur-sm">
+                    <img src="../images/orginal logo.png" alt="GoAround Logo" class="h-4.5 w-auto brightness-0 invert">
+                    <span class="text-white text-[10px] font-black tracking-wider uppercase">Go<span class="text-amber-400">Around</span></span>
+                </div>
+                
+                <h1 class="text-xl font-black tracking-wider uppercase text-red-50">GOAROUND MEDICAL ID</h1>
+                <p class="text-red-200 text-xs font-medium tracking-wide mt-1">Emergency Rescue Profile Information</p>
+            </div>
+
+            <!-- Main Stats -->
+            <div class="p-5 space-y-5 flex-1">
+                <!-- Section A: Personal Stats -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-4">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="space-y-0.5">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</p>
+                            <h2 id="field-name" class="text-lg font-black text-slate-800 uppercase tracking-tight leading-tight">---</h2>
+                        </div>
+                        <div class="shrink-0 bg-red-100 border border-red-200 text-red-800 px-3 py-1.5 rounded-xl text-center flex flex-col items-center shadow-sm">
+                            <i class="fa-solid fa-droplet text-red-600 text-base animate-pulse mb-0.5"></i>
+                            <span id="field-blood" class="text-xs font-black tracking-wide leading-none uppercase">---</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-venus-mars text-slate-400"></i> Gender</p>
+                            <p id="field-gender" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-cake-candles text-slate-400"></i> DOB</p>
+                            <p id="field-dob" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-200/50 pt-3 space-y-3">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> Phone</p>
+                            <p id="field-phone" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-slate-400"></i> Address</p>
+                            <p id="field-address" class="text-sm font-semibold text-slate-700 leading-relaxed mt-0.5">---</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section B: Medical Conditions -->
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3.5">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-notes-medical text-red-600"></i> Medical History</h3>
+                    
+                    <!-- Allergies: highlighted if not none -->
+                    <div id="field-allergies-box" class="rounded-xl p-3 flex gap-3 items-start transition-colors">
+                        <div class="shrink-0 mt-0.5" id="field-allergies-icon-container"></div>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-wider" id="field-allergies-label">Allergies</p>
+                            <p id="field-allergies" class="text-sm font-semibold mt-0.5">---</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-1">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-slate-400"></i> Diseases / Conditions</p>
+                            <p id="field-diseases" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                        <div class="border-t border-slate-100 pt-2.5">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-pills text-slate-400"></i> Active Medications</p>
+                            <p id="field-medicines" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-2.5">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-heart text-slate-400"></i> Organ Donor</p>
+                                <p id="field-donor" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-wheelchair text-slate-400"></i> Disabilities</p>
+                                <p id="field-disability" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-2.5">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-slate-400"></i> Insurance Info</p>
+                            <p id="field-insurance" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C: Emergency Contacts -->
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-phone-volume text-emerald-600"></i> Emergency Contacts</h3>
+                    <div id="contacts-list" class="space-y-2.5">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- Optional Section: Primary Doctor -->
+                <div id="doctor-section" class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 hidden">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-user-doctor text-sky-600"></i> Primary Doctor</h3>
+                    <div class="flex justify-between items-center bg-sky-50/50 hover:bg-sky-50 rounded-xl p-3 border border-sky-100/50 transition-colors">
+                        <div class="space-y-0.5">
+                            <p id="field-doctor-name" class="text-sm font-bold text-slate-800">---</p>
+                            <p class="text-[10px] text-sky-600 font-bold uppercase tracking-wider">Physician</p>
+                        </div>
+                        <a id="btn-call-doctor" href="#" class="bg-sky-600 hover:bg-sky-700 text-white rounded-full p-2.5 flex items-center justify-center shadow-md shadow-sky-100 transition-colors shrink-0">
+                            <i class="fa-solid fa-phone"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Optional Section: Vehicle Tag -->
+                <div id="vehicle-section" class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 hidden">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-car text-amber-600"></i> Registered Vehicle</h3>
+                    <div class="bg-amber-50/30 rounded-xl p-3 border border-amber-100/40 space-y-2">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">License Plate Number</p>
+                            <p id="field-vehicle-plate" class="text-sm font-mono font-bold text-slate-800 mt-0.5">---</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 border-t border-amber-100/30 pt-2">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Type</p>
+                                <p id="field-vehicle-type" class="text-xs font-semibold text-slate-700 mt-0.5">---</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Model</p>
+                                <p id="field-vehicle-model" class="text-xs font-semibold text-slate-700 mt-0.5">---</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional Section: Rescuer Notes -->
+                <div id="notes-section" class="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100/50 space-y-2 hidden">
+                    <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-widest flex items-center gap-2 border-b border-emerald-100/30 pb-1.5"><i class="fa-solid fa-notes-medical text-emerald-600"></i> Rescuer Notes</h3>
+                    <p id="field-notes" class="text-sm text-emerald-950 font-medium leading-relaxed whitespace-pre-line">---</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-slate-50 border-t border-slate-100 px-5 py-4 flex flex-col gap-3">
+                <div class="flex justify-between items-center text-[10px]">
+                    <span id="field-ticket-id" class="font-mono text-slate-400 uppercase">ID: ---</span>
+                    <span class="font-bold text-emerald-600 flex items-center gap-1.5 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/50">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0"></span>
+                        STATUS: ACTIVE
+                    </span>
+                </div>
+                <a href="https://www.goaroundonadventure.com" class="text-xs text-center text-slate-400 hover:text-orange-500 font-semibold transition-colors border-t border-slate-200/30 pt-3">
+                    www.goaroundonadventure.com
+                </a>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center text-center space-y-5 hidden">
+            <div class="rounded-full h-16 w-16 bg-red-100 flex items-center justify-center text-red-600 text-3xl">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <div>
+                <h2 id="error-title" class="text-xl font-extrabold text-slate-800">Connection Failed</h2>
+                <p id="error-desc" class="text-slate-500 text-sm mt-2 leading-relaxed">We were unable to locate this emergency profile in our system.</p>
+            </div>
+            <a href="https://www.goaroundonadventure.com" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition duration-150 text-sm">
+                Return to GoAround Homepage
+            </a>
+        </div>
+    </div>
+
+    <!-- Firebase Web SDK v10 Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration Object
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmQO-DB5vkqplj-0WUKL5Cv420ZR1jJJo",
+            appId: "1:608020950692:web:6193fdb127ae3f2dd10031",
+            projectId: "goaround-11",
+            authDomain: "goaround-11.firebaseapp.com",
+            storageBucket: "goaround-11.firebasestorage.app",
+            messagingSenderId: "608020950692",
+            measurementId: "G-B46NQZCB3P"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM elements
+        const loadingState = document.getElementById('loading');
+        const profileContainer = document.getElementById('profile-container');
+        const errorState = document.getElementById('error');
+        const errorTitle = document.getElementById('error-title');
+        const errorDesc = document.getElementById('error-desc');
+
+        // Extract emergency ID from the URL
+        function getEmergencyId() {
+            // 1. Check query parameters (?id=EMRGNCY...)
+            const urlParams = new URLSearchParams(window.location.search);
+            let id = urlParams.get('id');
+            if (id && id.startsWith('EMRGNCY')) {
+                return id.split('#')[0].trim();
+            }
+
+            // 2. Check the pathname segments (/e/EMRGNCY...)
+            const pathParts = window.location.pathname.split('/');
+            for (let part of pathParts) {
+                if (part.startsWith('EMRGNCY')) {
+                    return part.split('#')[0].trim();
+                }
+            }
+
+            // 3. Fallback: regex search the entire href for any substring starting with EMRGNCY followed by alphanumeric characters
+            const regexMatch = window.location.href.match(/EMRGNCY[A-Za-z0-9]+/);
+            if (regexMatch) {
+                return regexMatch[0];
+            }
+
+            return null;
+        }
+
+        const emergencyId = getEmergencyId();
+
+        async function fetchEmergencyProfile() {
+            if (!emergencyId) {
+                renderError(
+                    "Invalid QR Code", 
+                    "The parsed URL does not contain a valid Emergency ID. Please ensure the QR code scanned is correct."
+                );
+                return;
+            }
+
+            try {
+                // Query Firestore
+                const q = query(
+                    collection(db, "emergency_profile"), 
+                    where("emergencyID", "==", emergencyId), 
+                    limit(1)
+                );
+                
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    renderError(
+                        "Profile Not Found", 
+                        "No emergency profile was found matching the identifier:<br><code class='bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-mono select-all break-all mt-1 inline-block'>" + emergencyId + "</code>"
+                    );
+                    return;
+                }
+
+                const docData = querySnapshot.docs[0].data();
+                renderEmergencyProfile(docData);
+
+            } catch (error) {
+                console.error("Firestore error:", error);
+                renderError(
+                    "Database Connection Failed", 
+                    "Unable to connect to the GoAround secure server. Please check your internet connection and try again."
+                );
+            }
+        }
+
+        function renderEmergencyProfile(data) {
+            // Hide loading spinner
+            loadingState.classList.add('hidden');
+            profileContainer.classList.remove('hidden');
+
+            // --- Section A: Personal Stats ---
+            document.getElementById('field-name').textContent = (data.fullName || data.name || 'Unknown User').toUpperCase();
+            document.getElementById('field-blood').textContent = data.bloodGroup || 'Not Set';
+            document.getElementById('field-gender').textContent = data.gender || 'Not Specified';
+            document.getElementById('field-dob').textContent = data.dob || 'Not Specified';
+            document.getElementById('field-phone').textContent = data.phone || 'Not Provided';
+
+            // Join address details
+            const addrObj = data.address || {};
+            const street = addrObj.homeAddress || addrObj.street || '';
+            const city = addrObj.city || '';
+            const state = addrObj.state || '';
+            const pinCode = addrObj.pinCode || '';
+            const country = addrObj.country || '';
+            let addressParts = [street, city, state].filter(val => val && val.trim() !== '');
+            // Optional addition of pincode/country if not included in the street/city/state
+            if (pinCode) addressParts.push(pinCode);
+            if (country) addressParts.push(country);
+            let fullAddress = addressParts.join(', ');
+            if (!fullAddress.trim()) {
+                fullAddress = 'Not Provided';
+            }
+            document.getElementById('field-address').textContent = fullAddress;
+
+            // --- Section B: Medical Conditions ---
+            const allergiesVal = data.allergies || 'None';
+            const allergiesBox = document.getElementById('field-allergies-box');
+            const allergiesLabel = document.getElementById('field-allergies-label');
+            const allergiesIconContainer = document.getElementById('field-allergies-icon-container');
+            document.getElementById('field-allergies').textContent = allergiesVal;
+
+            if (allergiesVal.trim().toLowerCase() !== 'none' && allergiesVal.trim() !== '') {
+                // Highlighted in Red warning box
+                allergiesBox.className = "bg-red-50 border border-red-200 text-red-950 rounded-xl p-3 flex gap-3 items-start";
+                allergiesLabel.className = "text-[10px] font-black text-red-700 uppercase tracking-wider";
+                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-600 text-lg animate-pulse"></i>';
+            } else {
+                // Standard visual block
+                allergiesBox.className = "bg-slate-50 border border-slate-100 text-slate-800 rounded-xl p-3 flex gap-3 items-start";
+                allergiesLabel.className = "text-[10px] font-bold text-slate-400 uppercase tracking-wider";
+                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-slate-400 text-lg"></i>';
+            }
+
+            document.getElementById('field-diseases').textContent = data.diseases || 'None';
+            document.getElementById('field-medicines').textContent = data.medicines || 'None';
+            document.getElementById('field-disability').textContent = data.disability || 'None';
+
+            // Organ Donor status
+            const isDonor = (data.organDonor === true || (data.insurance && data.insurance.organDonor === 'Yes')) ? 'Yes' : 'No';
+            document.getElementById('field-donor').textContent = isDonor;
+
+            // Insurance details
+            let insuranceText = 'None';
+            const provider = data.insuranceProvider || (data.insurance && data.insurance.provider);
+            const policy = data.insurancePolicy || (data.insurance && data.insurance.policyNumber);
+            if (provider || policy) {
+                insuranceText = [provider, policy].filter(val => val && val.trim() !== '').join(' (Policy #: ') + (policy ? ')' : '');
+            }
+            document.getElementById('field-insurance').textContent = insuranceText;
+
+            // --- Section C: Emergency Contacts ---
+            const contactsList = document.getElementById('contacts-list');
+            contactsList.innerHTML = '';
+            let hasContacts = false;
+
+            function appendContact(name, relation, phone) {
+                if (!name || !phone) return;
+                hasContacts = true;
+                const contactRow = document.createElement('div');
+                contactRow.className = "bg-slate-50 hover:bg-slate-100/80 rounded-xl p-3 border border-slate-100/50 flex justify-between items-center gap-3 transition-colors";
+                contactRow.innerHTML = `
+                    <div class="space-y-0.5 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-slate-800 truncate">${name}</span>
+                            <span class="bg-slate-200 text-slate-700 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">${relation || 'Contact'}</span>
+                        </div>
+                        <a href="tel:${phone}" class="text-xs text-slate-500 font-medium hover:text-brand-orange hover:underline transition-all block truncate">${phone}</a>
+                    </div>
+                    <a href="tel:${phone}" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full p-2.5 flex items-center justify-center shadow-md shadow-emerald-100 transition-colors shrink-0">
+                        <i class="fa-solid fa-phone"></i>
+                    </a>
+                `;
+                contactsList.appendChild(contactRow);
+            }
+
+            appendContact(data.contact1Name, data.contact1Relation, data.contact1Phone);
+            appendContact(data.contact2Name, data.contact2Relation, data.contact2Phone);
+
+            if (!hasContacts) {
+                contactsList.innerHTML = `<p class="text-xs text-slate-400 italic">No emergency contacts listed.</p>`;
+            }
+
+            // --- Optional: Primary Doctor ---
+            if (data.doctorName) {
+                document.getElementById('field-doctor-name').textContent = data.doctorName;
+                if (data.doctorPhone) {
+                    document.getElementById('btn-call-doctor').href = `tel:${data.doctorPhone}`;
+                    document.getElementById('btn-call-doctor').style.display = 'flex';
+                } else {
+                    document.getElementById('btn-call-doctor').style.display = 'none';
+                }
+                document.getElementById('doctor-section').classList.remove('hidden');
+            } else {
+                document.getElementById('doctor-section').classList.add('hidden');
+            }
+
+            // --- Optional: Vehicle details ---
+            const vehicle = data.vehicle || {};
+            if (vehicle.number) {
+                document.getElementById('field-vehicle-plate').textContent = vehicle.number.toUpperCase();
+                document.getElementById('field-vehicle-type').textContent = vehicle.type || 'Not specified';
+                document.getElementById('field-vehicle-model').textContent = [vehicle.brand, vehicle.model].filter(v => v && v.trim() !== '').join(' ') || 'Not specified';
+                document.getElementById('vehicle-section').classList.remove('hidden');
+            } else {
+                document.getElementById('vehicle-section').classList.add('hidden');
+            }
+
+            // --- Optional: Notes for Rescuers ---
+            if (data.notes && data.notes.trim() !== '') {
+                document.getElementById('field-notes').textContent = data.notes;
+                document.getElementById('notes-section').classList.remove('hidden');
+            } else {
+                document.getElementById('notes-section').classList.add('hidden');
+            }
+
+            // --- Ticket ID ---
+            document.getElementById('field-ticket-id').textContent = `ID: ${data.emergencyID}`;
+        }
+
+        // Error display
+        function renderError(title, desc) {
+            loadingState.classList.add('hidden');
+            profileContainer.classList.add('hidden');
+            errorState.classList.remove('hidden');
+            errorTitle.textContent = title;
+            errorDesc.innerHTML = desc;
+        }
+
+        // Fetch data
+        fetchEmergencyProfile();
+    </script>
+</body>
+</html>
