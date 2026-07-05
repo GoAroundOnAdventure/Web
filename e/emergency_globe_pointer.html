@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        if (sessionStorage.getItem('goaround_auth') === 'true') {
+            document.documentElement.classList.add('authenticated');
+        }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoAround Rescue - Emergency Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #010203;
+            --panel-bg: rgba(4, 6, 9, 0.65);
+            --border-color: #1a1e24;
+            --accent-red: #ff3333;
+            --accent-green: #00cc66;
+            --accent-blue: #3399ff;
+            --accent-yellow: #ffcc00;
+            --text-main: #e0e6ed;
+            --text-muted: #6b7a90;
+            --font-ui: 'Rajdhani', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* CRT EFFECTS */
+        .crt-scanlines {
+            position: fixed; inset: 0; z-index: 99998; pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+        }
+        .crt-vignette {
+            position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.85) 100%);
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255,51,51,0.15);
+            background: rgba(1, 2, 3, 0.9);
+            z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .menu-icon { color: var(--text-muted); font-size: 18px; cursor: pointer; }
+        .sys-title { color: var(--accent-red); font-weight: 700; font-size: 18px; letter-spacing: 1.5px; margin-top: 2px; }
+        .live-badge { 
+            background: transparent; 
+            border: 1px solid var(--accent-red); 
+            color: var(--accent-red);
+            padding: 2px 8px; 
+            border-radius: 2px; 
+            font-size: 11px; 
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.2);
+            text-transform: uppercase;
+        }
+        .header-center {
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .header-center span { color: var(--accent-green); text-shadow: 0 0 5px rgba(0, 204, 102, 0.6); }
+        .header-right { display: flex; align-items: center; gap: 15px; font-size: 11px; color: var(--accent-red); font-weight: 600; letter-spacing: 1px; }
+        .header-right i { font-size: 11px; }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: grid;
+            grid-template-columns: 270px 1fr 270px;
+            gap: 12px;
+            padding: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* PANELS */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .side-panel::-webkit-scrollbar { width: 2px; }
+        .side-panel::-webkit-scrollbar-thumb { background: rgba(255,51,51,0.3); border-radius: 2px; }
+
+        .widget {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+        .widget.alert-widget { border: 1px solid rgba(255, 51, 51, 0.4); box-shadow: inset 0 0 15px rgba(255,51,51,0.05); }
+        
+        .widget-header {
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+        .widget-header.red { color: var(--accent-red); border-bottom: 1px solid rgba(255, 51, 51, 0.2); }
+        .widget-header i { font-size: 12px; }
+
+        .widget-content { padding: 10px 12px; }
+
+        /* DATA GROUPS */
+        .data-stack { margin-bottom: 10px; }
+        .data-stack:last-child { margin-bottom: 0; }
+        .data-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; font-weight: 600; }
+        .data-value { font-size: 14px; font-family: var(--font-mono); color: var(--text-main); letter-spacing: 0.5px; }
+        .data-value.red { color: var(--accent-red); font-weight: 700; text-shadow: 0 0 5px rgba(255, 51, 51, 0.5); }
+        .data-value.green { color: var(--accent-green); font-weight: 700; text-shadow: 0 0 5px rgba(0, 204, 102, 0.5); }
+        .data-value.small { font-size: 12px; }
+
+        /* VICTIM INFO */
+        .victim-flex { display: flex; gap: 12px; margin-bottom: 12px; }
+        .victim-photo { width: 75px; height: 90px; border-radius: 2px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); filter: grayscale(20%) contrast(1.1); }
+        .victim-details { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+        /* VITALS GRID */
+        .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .vital-item { display: flex; align-items: center; gap: 8px; }
+        .vital-icon { font-size: 14px; width: 16px; text-align: center; }
+        .vital-icon.green { color: var(--accent-green); text-shadow: 0 0 5px rgba(0, 204, 102, 0.5); }
+        .vital-icon.muted { color: rgba(255,255,255,0.3); }
+        .vital-icon.red { color: var(--accent-red); text-shadow: 0 0 5px rgba(255, 51, 51, 0.5); }
+        .vital-info { display: flex; flex-direction: column; }
+
+        /* SYSTEM FOOTER (Left) */
+        .sys-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 5px 0; letter-spacing: 1px; }
+        .sys-footer span { font-family: var(--font-mono); color: var(--text-main); margin-left: 5px; font-size: 11px; }
+        
+        /* CENTER PANEL (GLOBE) */
+        .center-panel {
+            position: relative;
+            background: transparent;
+            border: 1px solid rgba(255,51,51,0.2);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(255,51,51,0.05);
+        }
+        
+        #globe-container { flex: 1; position: relative; cursor: grab; }
+
+        /* HUD Overlays */
+        .hud-satellite {
+            position: absolute; top: 15px; left: 15px; z-index: 10;
+        }
+        .hud-satellite .label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;}
+        .hud-satellite .status { font-size: 12px; color: var(--accent-green); font-weight: 700; margin-top: 0px; letter-spacing: 1px; }
+        .hud-satellite img { width: 45px; margin-top: 5px; opacity: 0.7; filter: invert(1); }
+
+        .hud-timer {
+            position: absolute; top: 15px; right: 15px; z-index: 10; text-align: right;
+        }
+        .hud-timer .label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+        .hud-timer .time { font-size: 22px; font-family: var(--font-mono); color: var(--accent-red); font-weight: 700; text-shadow: 0 0 10px rgba(255, 51, 51, 0.8); margin-top: 0px; letter-spacing: 2px;}
+
+        .hud-compass {
+            position: absolute; bottom: 85px; left: 20px; z-index: 10;
+            width: 50px; height: 50px;
+        }
+        .compass-circle { width: 100%; height: 100%; border: 1px dashed rgba(255,255,255,0.2); border-radius: 50%; position: relative; }
+        .dir { position: absolute; font-size: 10px; color: var(--text-muted); font-weight: 700; font-family: var(--font-mono);}
+        .dir.n { top: -6px; left: 50%; transform: translateX(-50%); color: var(--text-main); }
+        .dir.s { bottom: -6px; left: 50%; transform: translateX(-50%); }
+        .dir.e { right: -6px; top: 50%; transform: translateY(-50%); }
+        .dir.w { left: -6px; top: 50%; transform: translateY(-50%); }
+        .compass-needle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); color: var(--accent-red); font-size: 14px; text-shadow: 0 0 5px var(--accent-red); }
+
+        /* Bottom Graph */
+        .bottom-hud {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            display: flex; flex-direction: column; z-index: 10;
+        }
+        
+        .feed-graph {
+            border-top: 1px solid rgba(255,51,51,0.2);
+            background: rgba(3, 5, 8, 0.7);
+            padding: 8px 15px;
+            height: 70px;
+        }
+        .feed-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2px; }
+        .feed-title { font-size: 11px; color: var(--accent-red); font-weight: 700; letter-spacing: 1px; }
+        .feed-sub { font-size: 9px; color: var(--accent-red); opacity: 0.7; margin-top: 0px; letter-spacing: 0.5px;}
+        .graph-area { height: 25px; width: 100%; position: relative; }
+        .graph-line { position: absolute; bottom: 5px; left: 0; width: 100%; height: 20px; }
+        .graph-x-axis { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+
+        .console {
+            background: rgba(0, 0, 0, 0.85);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 15px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-green);
+            line-height: 1.4;
+            height: 60px;
+            overflow: hidden;
+            text-shadow: 0 0 3px rgba(0, 204, 102, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        /* RIGHT PANEL CONTROLS */
+        .controls-grid { display: flex; flex-direction: column; gap: 8px; }
+        .btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 15px;
+            background: transparent;
+            border: 1px solid;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-family: var(--font-ui);
+        }
+        .btn i { font-size: 14px; width: 18px; text-align: center; }
+        .btn-green { border-color: rgba(0, 204, 102, 0.4); color: var(--accent-green); }
+        .btn-green:hover { background: rgba(0, 204, 102, 0.1); border-color: var(--accent-green); box-shadow: inset 0 0 10px rgba(0,204,102,0.2); }
+        .btn-blue { border-color: rgba(51, 153, 255, 0.4); color: var(--accent-blue); }
+        .btn-blue:hover { background: rgba(51, 153, 255, 0.1); border-color: var(--accent-blue); box-shadow: inset 0 0 10px rgba(51,153,255,0.2); }
+        .btn-yellow { border-color: rgba(255, 204, 0, 0.4); color: var(--accent-yellow); }
+        .btn-yellow:hover { background: rgba(255, 204, 0, 0.1); border-color: var(--accent-yellow); box-shadow: inset 0 0 10px rgba(255,204,0,0.2); }
+        .btn-red { border-color: rgba(255, 51, 51, 0.4); color: var(--accent-red); }
+        .btn-red:hover { background: rgba(255, 51, 51, 0.1); border-color: var(--accent-red); box-shadow: inset 0 0 10px rgba(255,51,51,0.2); }
+
+        /* RESPONDERS */
+        .responder-list { display: flex; flex-direction: column; gap: 10px; }
+        .responder-item { display: flex; align-items: center; gap: 12px; }
+        .resp-img { width: 34px; height: 34px; border-radius: 2px; object-fit: cover; filter: grayscale(10%); border: 1px solid rgba(255,255,255,0.1); }
+        .resp-info { flex: 1; }
+        .resp-name { font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; letter-spacing: 0.5px;}
+        .resp-status { font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+        .resp-status.accepted { color: var(--accent-green); }
+        .resp-status.pending { color: var(--accent-yellow); }
+        .resp-meta { text-align: right; }
+        .resp-dist { font-size: 12px; font-family: var(--font-mono); color: var(--text-main); margin-bottom: 2px; }
+        .resp-eta { font-size: 9px; font-family: var(--font-mono); color: var(--text-muted); }
+        .resp-eta.active { color: var(--accent-green); }
+
+        /* TIMELINE */
+        .timeline { padding-left: 5px; margin-top: 5px; }
+        .tl-item { display: flex; margin-bottom: 8px; position: relative; align-items: flex-start;}
+        .tl-item:last-child { margin-bottom: 0; }
+        .tl-item::before {
+            content: ''; position: absolute; left: 0; top: 4px;
+            width: 5px; height: 5px; background: transparent; border: 1px solid var(--accent-red);
+            border-radius: 50%; box-shadow: 0 0 3px var(--accent-red);
+        }
+        .tl-item::after {
+            content: ''; position: absolute; left: 2px; top: 12px;
+            width: 1px; height: calc(100% - 2px); background: rgba(255, 51, 51, 0.2);
+        }
+        .tl-item:last-child::after { display: none; }
+        .tl-time { width: 65px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); padding-left: 15px; }
+        .tl-event { flex: 1; font-size: 10px; color: var(--text-main); font-weight: 500; letter-spacing: 0.5px; }
+
+        /* BOTTOM BAR */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(1, 2, 3, 0.9);
+            border-top: 1px solid rgba(255,51,51,0.15);
+        }
+        .btn-operational {
+            background: rgba(255, 51, 51, 0.05);
+            border: 1px solid rgba(255,51,51,0.4);
+            color: var(--accent-red);
+            padding: 4px 40px;
+            border-radius: 2px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset 0 0 10px rgba(255,51,51,0.1);
+        }
+        .server-status { display: flex; gap: 20px; font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 1px;}
+        .server-status .val { color: var(--accent-green); margin-left: 5px; }
+        .server-status i { color: var(--accent-green); margin-left: 5px; font-size: 10px; }
+
+        /* AUTHENTICATED HIDE OVERLAY */
+        .authenticated #login-overlay {
+            display: none !important;
+        }
+
+        /* RETRO LOGIN OVERLAY */
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: #020203;
+            z-index: 99990; /* below scanlines but above everything else */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: var(--font-mono);
+        }
+        .login-box {
+            width: 400px;
+            background: rgba(4, 6, 9, 0.95);
+            border: 1px solid var(--accent-red);
+            border-radius: 4px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.15), inset 0 0 15px rgba(255, 51, 51, 0.05);
+            text-align: left;
+            position: relative;
+        }
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border: 1px solid rgba(255, 51, 51, 0.3);
+            pointer-events: none;
+            border-radius: 6px;
+        }
+        .login-header {
+            color: var(--accent-red);
+            font-family: var(--font-ui);
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 51, 51, 0.2);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .login-header .secure-tag {
+            font-size: 9px;
+            color: var(--accent-green);
+            background: rgba(0, 204, 102, 0.1);
+            border: 1px solid rgba(0, 204, 102, 0.3);
+            padding: 2px 6px;
+            border-radius: 2px;
+            letter-spacing: 1px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 51, 51, 0.25);
+            border-radius: 2px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .input-group input:focus {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.25);
+        }
+        .login-btn {
+            width: 100%;
+            background: rgba(255, 51, 51, 0.05);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+        }
+        .login-btn:hover {
+            background: var(--accent-red);
+            color: #000000;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.4);
+        }
+        .error-msg {
+            color: var(--accent-red);
+            font-size: 12px;
+            margin-top: 15px;
+            display: none;
+            font-family: var(--font-mono);
+            text-align: center;
+            letter-spacing: 0.5px;
+            background: rgba(255, 51, 51, 0.05);
+            border: 1px dashed rgba(255, 51, 51, 0.3);
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-scanlines"></div>
+    <div class="crt-vignette"></div>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <div class="login-header">
+                SECURE ACCESS PORTAL
+                <div class="secure-tag"><i class="fa-solid fa-shield-halved"></i> SECURE</div>
+            </div>
+            <div class="input-group">
+                <label for="login-id">> OPERATOR ID</label>
+                <input type="text" id="login-id" placeholder="ENTER ID..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+            </div>
+            <div class="input-group">
+                <label for="login-pass">> ACCESS PASSKEY</label>
+                <input type="password" id="login-pass" placeholder="ENTER PASSKEY..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+            </div>
+            <button class="login-btn" onclick="verifyLogin()">[ DECRYPT & AUTHORIZE ]</button>
+            <div class="error-msg" id="login-error"></div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fa-solid fa-bars menu-icon"></i>
+            <div class="sys-title">GOAROUND EMERGENCY SYSTEM</div>
+            <div class="live-badge">LIVE TRACKING ACTIVE</div>
+        </div>
+        <div class="header-center">
+            SYSTEM STATUS: <span>ONLINE</span>
+        </div>
+        <div class="header-right">
+            <span>SECURE CONNECTION</span>
+            <i class="fa-solid fa-lock"></i>
+            <span>ENCRYPTION: AES-256</span>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <div class="main-container">
+        
+        <!-- LEFT PANEL -->
+        <div class="side-panel">
+            <!-- INCIDENT ALERT -->
+            <div class="widget alert-widget">
+                <div class="widget-header red">
+                    <i class="fa-solid fa-triangle-exclamation"></i> INCIDENT ALERT
+                </div>
+                <div class="widget-content">
+                    <div class="data-stack">
+                        <div class="data-label">INCIDENT ID</div>
+                        <div class="data-value small">#EMRG-2025-05-20-1127</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">STATUS</div>
+                        <div class="data-value red">ACTIVE</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">SEVERITY</div>
+                        <div class="data-value red">MAXIMUM</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">REPORTED TIME</div>
+                        <div class="data-value small">20 MAY 2025 - 11:27:35 AM</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">LAST UPDATE</div>
+                        <div class="data-value small">11:28:09 AM <span class="green">(LIVE)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VICTIM INFORMATION -->
+            <div class="widget">
+                <div class="widget-header red">
+                    <i class="fa-solid fa-user"></i> VICTIM INFORMATION
+                </div>
+                <div class="widget-content">
+                    <div class="victim-flex">
+                        <img src="https://i.pravatar.cc/150?img=11" alt="Victim" class="victim-photo">
+                        <div class="victim-details">
+                            <div class="data-stack">
+                                <div class="data-label">NAME</div>
+                                <div class="data-value">DEEPAK GOWDA</div>
+                            </div>
+                            <div class="data-stack">
+                                <div class="data-label">PHONE</div>
+                                <div class="data-value small">+91 98765 43210</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">BLOOD GROUP</div>
+                        <div class="data-value">O+<br>24</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">MEDICAL NOTES</div>
+                        <div class="data-value">ASTHMA</div>
+                    </div>
+                    <div class="data-stack">
+                        <div class="data-label">ALLERGIES</div>
+                        <div class="data-value">NONE</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE VITALS -->
+            <div class="widget">
+                <div class="widget-header red">
+                    <i class="fa-solid fa-heart-pulse"></i> LIVE VITALS
+                </div>
+                <div class="widget-content">
+                    <div class="vitals-grid">
+                        <div class="vital-item">
+                            <i class="fa-solid fa-battery-half vital-icon green"></i>
+                            <div class="vital-info">
+                                <div class="data-label">BATTERY</div>
+                                <div class="data-value">42%</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <i class="fa-solid fa-tower-cell vital-icon muted"></i>
+                            <div class="vital-info">
+                                <div class="data-label">NETWORK</div>
+                                <div class="data-value">5G</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <i class="fa-solid fa-gauge-high vital-icon green"></i>
+                            <div class="vital-info">
+                                <div class="data-label">SPEED</div>
+                                <div class="data-value">52 km/h</div>
+                            </div>
+                        </div>
+                        <div class="vital-item">
+                            <i class="fa-solid fa-location-arrow vital-icon muted"></i>
+                            <div class="vital-info">
+                                <div class="data-label">HEADING</div>
+                                <div class="data-value">NW 315&deg;</div>
+                            </div>
+                        </div>
+                        <div class="vital-item" style="grid-column: 1 / -1;">
+                            <i class="fa-solid fa-location-crosshairs vital-icon red"></i>
+                            <div class="vital-info">
+                                <div class="data-label">GPS ACCURACY</div>
+                                <div class="data-value">3.2 m</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sys-footer">
+                <div>SYSTEM UPTIME <span>2D 14H 22M</span></div>
+                <div>ACTIVE INCIDENTS <span>7</span></div>
+            </div>
+        </div>
+
+        <!-- CENTER PANEL -->
+        <div class="center-panel">
+            <div id="globe-container"></div>
+            
+            <div class="hud-satellite">
+                <div class="label">SATELLITE VIEW</div>
+                <div class="status">ACTIVE</div>
+                <img src="https://cdn-icons-png.flaticon.com/512/814/814406.png" alt="Satellite">
+            </div>
+
+            <div class="hud-timer">
+                <div class="label">TRACKING TIME</div>
+                <div class="time" id="timer">00:00:34</div>
+            </div>
+
+            <div class="hud-compass">
+                <div class="compass-circle">
+                    <div class="dir n">N</div>
+                    <div class="dir s">S</div>
+                    <div class="dir e">E</div>
+                    <div class="dir w">W</div>
+                    <i class="fa-solid fa-caret-up compass-needle"></i>
+                </div>
+            </div>
+
+            <div class="bottom-hud">
+                <div class="feed-graph">
+                    <div class="feed-header">
+                        <div>
+                            <div class="feed-title">LIVE LOCATION FEED</div>
+                            <div class="feed-sub">(UPDATING EVERY 2 SECONDS)</div>
+                        </div>
+                    </div>
+                    <div class="graph-area">
+                        <svg class="graph-line" viewBox="0 0 500 20" preserveAspectRatio="none">
+                            <path d="M0,15 L40,14 L80,18 L120,12 L160,14 L200,8 L240,11 L280,5 L320,8 L360,10 L400,16 L440,9 L480,2 L500,1" fill="none" stroke="var(--accent-red)" stroke-width="1.5" filter="drop-shadow(0 0 2px rgba(255,51,51,0.8))"/>
+                            <circle cx="500" cy="1" r="2" fill="var(--accent-red)" filter="drop-shadow(0 0 4px rgba(255,51,51,1))"/>
+                        </svg>
+                    </div>
+                    <div class="graph-x-axis">
+                        <span>11:27:20</span>
+                        <span>11:27:30</span>
+                        <span>11:27:40</span>
+                        <span>11:27:50</span>
+                        <span>11:28:00</span>
+                        <span>11:28:10</span>
+                    </div>
+                </div>
+                <div class="console">
+                    &gt; CONNECTION ESTABLISHED...<br>
+                    &gt; FETCHING LIVE DATA...<br>
+                    &gt; LOCATION LOCKED...<br>
+                    &gt; TRACKING ACTIVE...
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="side-panel">
+            <!-- EMERGENCY CONTROLS -->
+            <div class="widget">
+                <div class="widget-header red">
+                    EMERGENCY CONTROLS
+                </div>
+                <div class="widget-content controls-grid">
+                    <button class="btn btn-green">
+                        <i class="fa-regular fa-map"></i> VIEW ON MAP
+                    </button>
+                    <button class="btn btn-blue">
+                        <i class="fa-solid fa-phone"></i> CALL VICTIM
+                    </button>
+                    <button class="btn btn-yellow">
+                        <i class="fa-solid fa-location-arrow"></i> NAVIGATE
+                    </button>
+                    <button class="btn btn-red">
+                        <i class="fa-solid fa-share-nodes"></i> SHARE LOCATION
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESPONDERS -->
+            <div class="widget">
+                <div class="widget-header red">
+                    RESPONDERS
+                </div>
+                <div class="widget-content responder-list">
+                    <div class="responder-item">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="Ravi" class="resp-img">
+                        <div class="resp-info">
+                            <div class="resp-name">RAVI KUMAR</div>
+                            <div class="resp-status accepted">ACCEPTED</div>
+                        </div>
+                        <div class="resp-meta">
+                            <div class="resp-dist">0.8 km</div>
+                            <div class="resp-eta active">ETA: 02 MIN</div>
+                        </div>
+                    </div>
+                    <div class="responder-item">
+                        <img src="https://i.pravatar.cc/150?img=33" alt="Akash" class="resp-img">
+                        <div class="resp-info">
+                            <div class="resp-name">AKASH</div>
+                            <div class="resp-status pending">PENDING</div>
+                        </div>
+                        <div class="resp-meta">
+                            <div class="resp-dist">1.2 km</div>
+                            <div class="resp-eta">ETA: --</div>
+                        </div>
+                    </div>
+                    <div class="responder-item">
+                        <img src="https://i.pravatar.cc/150?img=5" alt="Anjali" class="resp-img">
+                        <div class="resp-info">
+                            <div class="resp-name">ANJALI</div>
+                            <div class="resp-status pending">PENDING</div>
+                        </div>
+                        <div class="resp-meta">
+                            <div class="resp-dist">1.8 km</div>
+                            <div class="resp-eta">ETA: --</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INCIDENT TIMELINE -->
+            <div class="widget">
+                <div class="widget-header red">
+                    INCIDENT TIMELINE
+                </div>
+                <div class="widget-content timeline">
+                    <div class="tl-item"><div class="tl-time">11:27:35</div><div class="tl-event">EMERGENCY TRIGGERED</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:36</div><div class="tl-event">LOCATION LOCKED</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:37</div><div class="tl-event">NOTIFYING RIDE MEMBERS</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:40</div><div class="tl-event">NO RESPONSE RECEIVED</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:42</div><div class="tl-event">ESCALATED TO MAX</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:43</div><div class="tl-event">EMERGENCY CONTACTS NOTIFIED</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:45</div><div class="tl-event">DASHBOARD CREATED</div></div>
+                    <div class="tl-item"><div class="tl-time">11:27:47</div><div class="tl-event">LIVE TRACKING STARTED</div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+        <div style="width: 150px;"></div> <!-- Spacer -->
+        <div class="btn-operational">ALL SYSTEMS OPERATIONAL</div>
+        <div class="server-status">
+            <div>SERVER STATUS <span class="val">SECURE</span> <i class="fa-solid fa-lock"></i></div>
+            <div>DATA ENCRYPTED <span class="val">AES-256</span> <i class="fa-solid fa-lock"></i></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/three"></script>
+    <script src="https://unpkg.com/globe.gl"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration Object
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmQO-DB5vkqplj-0WUKL5Cv420ZR1jJJo",
+            appId: "1:608020950692:web:6193fdb127ae3f2dd10031",
+            projectId: "goaround-11",
+            authDomain: "goaround-11.firebaseapp.com",
+            storageBucket: "goaround-11.firebasestorage.app",
+            messagingSenderId: "608020950692",
+            measurementId: "G-B46NQZCB3P"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Init Globe
+        const globeContainer = document.getElementById('globe-container');
+        const targetLat = 12.9716;
+        const targetLng = 77.5946;
+
+        const globe = Globe()(globeContainer)
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+            .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+            .showAtmosphere(true)
+            .atmosphereColor('#0088ff')
+            .atmosphereAltitude(0.15)
+            .pointOfView({ lat: targetLat - 2, lng: targetLng, altitude: 1.2 })
+            .ringsData([{ lat: targetLat, lng: targetLng }])
+            .ringColor(() => 'rgba(255, 30, 30, 0.9)')
+            .ringMaxRadius(45)
+            .ringPropagationSpeed(1.5)
+            .ringRepeatPeriod(900)
+            .htmlElementsData([{ lat: targetLat, lng: targetLng }])
+            .htmlElement(() => {
+                const el = document.createElement('div');
+                el.style.cssText = `
+                    position: relative;
+                    /* No transform offset here, so (0,0) is exactly the lat/lng coordinate */
+                `;
+                
+                el.innerHTML = `
+                    <!-- 1. The glowing dot at origin -->
+                    <div style="
+                        position: absolute;
+                        top: 0; left: 0;
+                        transform: translate(-50%, -50%);
+                        width: 5px; height: 5px;
+                        background: #ffffff;
+                        border-radius: 50%;
+                        box-shadow: 0 0 12px 4px rgba(255, 51, 51, 1);
+                        z-index: 2;
+                    "></div>
+
+                    <!-- 2. The vertical line -->
+                    <div style="
+                        position: absolute;
+                        bottom: 0; left: -0.75px;
+                        width: 1.5px; height: 130px;
+                        background: linear-gradient(to top, rgba(255,51,51,1), rgba(255,51,51,0.3));
+                        box-shadow: 0 0 6px #ff3333;
+                        z-index: 1;
+                    "></div>
+
+                    <!-- 3. The HUD Box -->
+                    <div style="
+                        position: absolute;
+                        bottom: 130px; left: -25px; /* Inset line by 25px */
+                        border: 1px solid #ff3333;
+                        border-radius: 3px;
+                        overflow: hidden;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.6), 0 0 15px rgba(255, 51, 51, 0.4);
+                        width: max-content;
+                        z-index: 3;
+                    ">
+                        <!-- CRT scanline overlay specifically for the info box -->
+                        <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px); pointer-events: none; z-index: 10;"></div>
+                        
+                        <!-- Header -->
+                        <div style="
+                            background: linear-gradient(to right, #990000, #4d0000);
+                            padding: 4px 10px;
+                            font-family: 'Rajdhani', sans-serif;
+                            font-size: 13px;
+                            font-weight: 700;
+                            letter-spacing: 1px;
+                            border-bottom: 1px solid rgba(255,51,51,0.5);
+                            position: relative; z-index: 1;
+                        ">
+                            LIVE LOCATION
+                        </div>
+                        <!-- Body -->
+                        <div style="
+                            background: rgba(4, 6, 9, 0.95);
+                            padding: 5px 10px;
+                            font-family: 'Rajdhani', sans-serif;
+                            font-size: 14px;
+                            font-weight: 500;
+                            letter-spacing: 0.5px;
+                            position: relative; z-index: 1;
+                        ">
+                            ${targetLat}&deg; N, ${targetLng}&deg; E
+                        </div>
+                    </div>
+                    
+                    <!-- 4. The little notch triangle where the line meets the box -->
+                    <div style="
+                        position: absolute;
+                        bottom: 125px; left: -5px; /* Centered over the x=0 line */
+                        width: 0; height: 0;
+                        border-left: 5px solid transparent;
+                        border-right: 5px solid transparent;
+                        border-top: 5px solid #ff3333;
+                        z-index: 4;
+                    "></div>
+                `;
+                return el;
+            });
+            
+        // Stop auto-rotation as requested
+        globe.controls().autoRotate = false;
+        globe.controls().enableZoom = true;
+
+        // Add a subtle blue tint to the globe material to match the sci-fi look
+        setTimeout(() => {
+            const globeMaterial = globe.globeMaterial();
+            if (globeMaterial) {
+                // Tint the dark areas slightly cyan/blue
+                globeMaterial.color = new THREE.Color(0x88bbff);
+            }
+        }, 500);
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            globe.width(globeContainer.clientWidth);
+            globe.height(globeContainer.clientHeight);
+        });
+        setTimeout(() => {
+            globe.width(globeContainer.clientWidth);
+            globe.height(globeContainer.clientHeight);
+        }, 100);
+
+        // Timer Logic
+        let seconds = 34;
+        setInterval(() => {
+            seconds++;
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${h}:${m}:${s}`;
+        }, 1000);
+
+        // Seeding database helper
+        async function seedEmergencyCredentials() {
+            try {
+                const q = query(collection(db, 'Owner_Access_Verification'), where('emergency_login.id', '==', 'GoAroundEye'));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    await addDoc(collection(db, 'Owner_Access_Verification'), {
+                        emergency_login: {
+                            id: 'GoAroundEye',
+                            password: 'Karna#RV'
+                        },
+                        createdAt: new Date().toISOString()
+                    });
+                    console.log('✅ Seeded emergency login credentials to Owner_Access_Verification in database.');
+                }
+            } catch (err) {
+                console.warn('⚠️ Seeding emergency credentials skipped:', err.message);
+            }
+        }
+
+        // Run seeding check on startup
+        seedEmergencyCredentials();
+
+        // Login Verification Logic (Using Firestore)
+        async function verifyLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const errorEl = document.getElementById('login-error');
+            const submitBtn = document.querySelector('.login-btn');
+            
+            errorEl.style.display = 'none';
+            submitBtn.textContent = '[ QUERYING SECURITY DATABASE... ]';
+            submitBtn.disabled = true;
+
+            try {
+                const q = query(
+                    collection(db, 'Owner_Access_Verification'),
+                    where('emergency_login.id', '==', id),
+                    where('emergency_login.password', '==', pass)
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    sessionStorage.setItem('goaround_auth', 'true');
+                    document.documentElement.classList.add('authenticated');
+                    document.getElementById('login-overlay').style.display = 'none';
+                } else {
+                    errorEl.style.display = 'block';
+                    errorEl.textContent = '[ACCESS DENIED] INVALID CREDENTIALS';
+                    // Trigger shake effect
+                    const box = document.querySelector('.login-box');
+                    box.style.animation = 'none';
+                    box.offsetHeight; // trigger reflow
+                    box.style.animation = 'shake 0.3s ease-in-out';
+                }
+            } catch (err) {
+                console.error("❌ Firebase login check failed:", err);
+                errorEl.style.display = 'block';
+                errorEl.textContent = '[ERROR] DATABASE VERIFICATION FAILED: ' + err.message;
+            } finally {
+                submitBtn.textContent = '[ DECRYPT & AUTHORIZE ]';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Expose verifyLogin globally so inline HTML onclick works
+        window.verifyLogin = verifyLogin;
+
+        // Add shake keyframes to head dynamically
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-10px); }
+                40%, 80% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Autofocus Operator ID field on load if not authenticated
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('goaround_auth') !== 'true') {
+                const idField = document.getElementById('login-id');
+                if (idField) idField.focus();
+            }
+        });
+    </script>
+</body>
+</html>
