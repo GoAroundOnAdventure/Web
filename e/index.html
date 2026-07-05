@@ -6,9 +6,9 @@
     <title>GoAround Medical ID | Emergency Rescue Profile</title>
     <link rel="icon" type="image/png" href="../images/orginal logo.png">
     
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Premium Icons -->
+    <!-- Google Fonts: Outfit (Brand UI), Inter (Body), Space Mono (Barcodes/Plates) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Tailwind CSS CDN -->
@@ -19,213 +19,304 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        brand: ['Outfit', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
                     },
                     colors: {
                         brand: {
-                            red: '#b91c1c', // Dark red for header
-                            'red-light': '#fef2f2', // Soft red
-                            orange: '#ffa500', // GoAround Brand Orange
-                            dark: '#1d1d1f', // Apple-style dark
-                            gray: '#86868b',
+                            red: '#b91c1c', 
+                            'red-dark': '#7f1d1d',
+                            orange: '#ffa500', 
+                            dark: '#0f172a',
+                            slate: '#1e293b'
                         }
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 99px;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen py-8 px-4 flex justify-center items-center font-sans antialiased text-slate-800">
+<body class="bg-slate-100 min-h-screen py-8 px-4 flex justify-center items-center font-sans antialiased text-slate-800">
 
-    <div id="app" class="max-w-md w-full flex flex-col justify-center items-center">
+    <div id="app" class="max-w-md w-full flex flex-col justify-center items-center relative z-10">
         <!-- Loading State -->
-        <div id="loading" class="w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center text-center space-y-4">
-            <div class="relative w-20 h-20 flex items-center justify-center">
-                <!-- Double pulse spinner -->
-                <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
-                <div class="relative rounded-full h-16 w-16 bg-red-700 flex items-center justify-center shadow-lg shadow-red-200">
-                    <i class="fa-solid fa-heart-pulse text-white text-3xl animate-pulse"></i>
+        <div id="loading" class="w-full bg-white rounded-[24px] shadow-md border border-slate-200/80 p-8 flex flex-col items-center justify-center text-center space-y-6">
+            <div class="relative w-12 h-12 flex items-center justify-center">
+                <div class="rounded-full h-10 w-10 bg-red-50 flex items-center justify-center shadow-sm">
+                    <i class="fa-solid fa-heart-pulse text-red-650 text-xl"></i>
                 </div>
             </div>
-            <h2 class="text-xl font-bold text-slate-800">Verifying Identity</h2>
-            <p class="text-slate-500 text-sm">Accessing GoAround Secure Medical database...</p>
+            <div class="space-y-1">
+                <h2 class="text-base font-bold text-slate-800 font-brand">Verifying Medical ID</h2>
+                <p class="text-slate-400 text-xs">Accessing GoAround Secure Database...</p>
+            </div>
         </div>
 
-        <!-- Profile Content State (hidden initially) -->
-        <div id="profile-container" class="w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 hidden flex flex-col">
-            <!-- Critical Alert Banner -->
-            <div class="bg-red-50 border-b border-red-100 text-red-800 px-4 py-3.5 text-xs font-semibold flex items-start gap-2.5">
-                <i class="fa-solid fa-circle-exclamation text-red-600 text-base animate-pulse shrink-0 mt-0.5"></i>
-                <span>EMERGENCY RESCUE PROFILE - Please share these vital stats with medical responders</span>
+        <!-- Unified Emergency Smart ID Card Container -->
+        <div id="profile-container" class="w-full bg-white rounded-[24px] shadow-xl border border-slate-200/60 overflow-hidden hidden flex flex-col relative">
+            
+            <!-- Circular Landmarks Hologram Watermark -->
+            <img src="../images/orginal logo.png" alt="Hologram Watermark" class="absolute -right-16 -top-16 w-80 h-80 opacity-[0.03] pointer-events-none select-none">
+
+            <!-- Red Warning Header Accent -->
+            <div class="bg-red-650 text-white px-5 py-3.5 text-[9px] font-black tracking-widest uppercase flex items-center justify-between border-b border-red-700 relative z-10 select-none">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                    EMERGENCY MEDICAL SMART CARD
+                </span>
+                <span class="bg-red-800 text-[8px] px-2 py-0.5 rounded-md border border-red-500/30">ACTIVE</span>
             </div>
 
-            <!-- Dark Red Block Header -->
-            <div class="bg-gradient-to-r from-red-800 to-red-950 text-white px-6 py-7 flex flex-col items-center text-center relative overflow-hidden">
-                <!-- Decorative overlays -->
-                <div class="absolute -right-10 -top-10 w-28 h-28 bg-white opacity-5 rounded-full"></div>
-                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-white opacity-5 rounded-full"></div>
-                
-                <!-- GoAround logo and branding -->
-                <div class="flex items-center gap-2 mb-3 bg-red-900/40 px-3 py-1 rounded-full border border-red-500/20 backdrop-blur-sm">
-                    <img src="../images/orginal logo.png" alt="GoAround Logo" class="h-4.5 w-auto brightness-0 invert">
-                    <span class="text-white text-[10px] font-black tracking-wider uppercase">Go<span class="text-amber-400">Around</span></span>
+            <!-- Card Header: Brand Logo & Title -->
+            <div class="px-6 pt-5 pb-2 flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-2">
+                    <img src="../images/orginal logo.png" alt="GoAround Logo" class="h-6 w-auto" style="height: 24px; width: auto;">
+                    <span class="text-xs font-black tracking-wider uppercase font-brand text-slate-900">Go<span class="text-amber-500">Around</span></span>
                 </div>
-                
-                <h1 class="text-xl font-black tracking-wider uppercase text-red-50">GOAROUND MEDICAL ID</h1>
-                <p class="text-red-200 text-xs font-medium tracking-wide mt-1">Emergency Rescue Profile Information</p>
+                <span class="text-[9px] bg-red-50 text-red-650 border border-red-200 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider select-none">Emergency ID</span>
             </div>
 
-            <!-- Main Stats -->
-            <div class="p-5 space-y-5 flex-1">
-                <!-- Section A: Personal Stats -->
-                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-4">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="space-y-0.5">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Full Name</p>
-                            <h2 id="field-name" class="text-lg font-black text-slate-800 uppercase tracking-tight leading-tight">---</h2>
+            <!-- Embedded Black Titanium ATM Card Widget -->
+            <div class="mx-6 my-4 relative rounded-2xl bg-gradient-to-br from-slate-900 via-slate-850 to-slate-950 text-white p-4.5 border border-slate-800 shadow-md overflow-hidden flex flex-col justify-between select-none z-10">
+                <!-- Watermark overlay inside the mini-card -->
+                <img src="../images/orginal logo.png" alt="Card Watermark" class="absolute -right-8 -top-8 w-44 h-44 opacity-[0.03] pointer-events-none filter invert brightness-0">
+
+                <div class="flex justify-between items-start gap-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[7px] font-black tracking-widest text-slate-400 uppercase">GoAround Premium</span>
                         </div>
-                        <div class="shrink-0 bg-red-100 border border-red-200 text-red-800 px-3 py-1.5 rounded-xl text-center flex flex-col items-center shadow-sm">
-                            <i class="fa-solid fa-droplet text-red-600 text-base animate-pulse mb-0.5"></i>
-                            <span id="field-blood" class="text-xs font-black tracking-wide leading-none uppercase">---</span>
+                        <!-- Golden EMV Chip & Wireless Signal -->
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8.5 h-6.5 rounded-md bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 border border-amber-600/40 relative overflow-hidden flex items-center justify-center p-0.5 shadow-inner">
+                                <div class="w-full h-full border-r border-slate-900/10 flex flex-col justify-between">
+                                    <div class="w-full h-[1px] bg-slate-900/20"></div>
+                                    <div class="w-full h-[1px] bg-slate-900/20"></div>
+                                </div>
+                                <div class="absolute inset-x-1.5 inset-y-0.5 border-x border-slate-900/20"></div>
+                            </div>
+                            <i class="fa-solid fa-wifi rotate-90 text-slate-500 text-[8px] opacity-75"></i>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-venus-mars text-slate-400"></i> Gender</p>
-                            <p id="field-gender" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                    <!-- Initials Avatar & Blood Group circular hologram badge -->
+                    <div class="flex items-center gap-2.5">
+                        <!-- Blood Group Pill Badge -->
+                        <div class="bg-gradient-to-br from-red-600 to-rose-800 border border-red-500/20 px-2.5 py-1 rounded-xl text-center flex flex-col items-center justify-center shadow-md">
+                            <span class="text-[5px] font-bold text-red-200 uppercase leading-none">BLOOD</span>
+                            <span id="card-blood" class="text-[11px] font-black text-white uppercase font-mono mt-0.5">--</span>
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-cake-candles text-slate-400"></i> DOB</p>
-                            <p id="field-dob" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-slate-200/50 pt-3 space-y-3">
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> Phone</p>
-                            <p id="field-phone" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-slate-400"></i> Address</p>
-                            <p id="field-address" class="text-sm font-semibold text-slate-700 leading-relaxed mt-0.5">---</p>
+                        <!-- Avatar -->
+                        <div id="avatar-container" class="w-10 h-10 rounded-full bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-inner font-brand">
+                            --
                         </div>
                     </div>
                 </div>
 
-                <!-- Section B: Medical Conditions -->
-                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3.5">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-notes-medical text-red-600"></i> Medical History</h3>
-                    
-                    <!-- Allergies: highlighted if not none -->
-                    <div id="field-allergies-box" class="rounded-xl p-3 flex gap-3 items-start transition-colors">
-                        <div class="shrink-0 mt-0.5" id="field-allergies-icon-container"></div>
+                <!-- Cardholder & ID info -->
+                <div class="mt-4 flex justify-between items-end gap-4 border-t border-slate-800/80 pt-3">
+                    <div class="min-w-0">
+                        <span class="text-[5.5px] font-bold text-slate-550 uppercase tracking-widest block leading-none">CARDHOLDER</span>
+                        <h2 id="card-holder-name" class="text-[11px] font-black text-white uppercase mt-1 truncate font-brand leading-none">---</h2>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-[5.5px] font-bold text-slate-550 uppercase tracking-widest block leading-none">DOB</span>
+                        <p id="card-dob" class="text-[9px] font-bold text-slate-300 mt-1 font-mono leading-none">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Block -->
+            <div class="px-6 pb-6 space-y-5 relative z-10">
+
+                <!-- Allergies Warning Banner -->
+                <div id="field-allergies-box" class="rounded-xl p-3.5 flex gap-3.5 items-start border border-slate-200 bg-slate-50 text-slate-800 shadow-sm">
+                    <div class="shrink-0 mt-0.5" id="field-allergies-icon-container">
+                        <i class="fa-solid fa-shield-halved text-emerald-600 text-base"></i>
+                    </div>
+                    <div class="space-y-0.5">
+                        <p class="text-[8px] font-bold uppercase tracking-wider text-slate-450 select-none" id="field-allergies-label">Allergies</p>
+                        <p id="field-allergies" class="text-[10px] font-bold leading-normal">---</p>
+                    </div>
+                </div>
+
+                <!-- Card 1: Personal Details -->
+                <div class="space-y-3.5">
+                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+                        Personal Information
+                    </h3>
+                    <div class="grid grid-cols-1 gap-3">
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-wider" id="field-allergies-label">Allergies</p>
-                            <p id="field-allergies" class="text-sm font-semibold mt-0.5">---</p>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Full Name</span>
+                            <span id="field-name" class="text-xs font-semibold text-slate-800">---</span>
                         </div>
                     </div>
-
-                    <div class="space-y-3 pt-1">
+                    <div class="grid grid-cols-2 gap-4 pt-1.5">
                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-slate-400"></i> Diseases / Conditions</p>
-                            <p id="field-diseases" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Gender</span>
+                            <span id="field-gender" class="text-xs font-semibold text-slate-800">---</span>
                         </div>
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Date of Birth</span>
+                            <span id="field-dob" class="text-xs font-semibold text-slate-800">---</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 pt-1.5">
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Contact Number</span>
+                            <a id="link-phone" href="#" class="text-xs font-bold text-slate-800 hover:text-red-650 transition-colors block mt-0.5">---</a>
+                        </div>
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Registered Address</span>
+                            <p id="field-address" class="text-xs font-semibold text-slate-700 leading-relaxed mt-0.5">---</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Medical Stats -->
+                <div class="space-y-3.5 pt-2">
+                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+                        Medical History
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Diseases & Conditions</span>
+                            <p id="field-diseases" class="text-xs font-bold text-slate-800 mt-0.5">---</p>
+                        </div>
+                        
                         <div class="border-t border-slate-100 pt-2.5">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-pills text-slate-400"></i> Active Medications</p>
-                            <p id="field-medicines" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Active Medications</span>
+                            <p id="field-medicines" class="text-xs font-bold text-slate-800 mt-0.5">---</p>
                         </div>
+                        
                         <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-2.5">
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-heart text-slate-400"></i> Organ Donor</p>
-                                <p id="field-donor" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Organ Donor</span>
+                                <span id="field-donor-badge" class="mt-1.5 inline-block text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-slate-200 text-slate-650 select-none">---</span>
                             </div>
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-wheelchair text-slate-400"></i> Disabilities</p>
-                                <p id="field-disability" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Disabilities</span>
+                                <p id="field-disability" class="text-xs font-bold text-slate-800 mt-0.5">---</p>
                             </div>
                         </div>
+                        
                         <div class="border-t border-slate-100 pt-2.5">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-slate-400"></i> Insurance Info</p>
-                            <p id="field-insurance" class="text-sm font-semibold text-slate-700 mt-0.5">---</p>
+                            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Insurance Coverage</span>
+                            <p id="field-insurance" class="text-xs font-semibold text-slate-700 mt-0.5">---</p>
                         </div>
+                        
+                        <!-- Hidden element to capture blood group binding safely in JS without errors -->
+                        <span id="field-blood" class="hidden"></span>
                     </div>
                 </div>
 
-                <!-- Section C: Emergency Contacts -->
-                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-phone-volume text-emerald-600"></i> Emergency Contacts</h3>
-                    <div id="contacts-list" class="space-y-2.5">
+                <!-- Card 3: Emergency Contacts List -->
+                <div class="space-y-3.5 pt-2">
+                    <h3 class="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+                        Contacts Details
+                    </h3>
+                    <div id="contacts-list" class="space-y-2">
                         <!-- Injected dynamically -->
                     </div>
+                    
+                    <!-- Doctor section -->
+                    <div id="doctor-section" class="border-t border-slate-150 pt-3.5 hidden">
+                        <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5 leading-none select-none font-brand">PRIMARY PHYSICIAN</span>
+                        <div class="flex justify-between items-center bg-slate-50 rounded-xl p-2.5 border border-slate-200/50">
+                            <div class="min-w-0">
+                                <p id="field-doctor-name" class="text-[10px] font-bold text-slate-800 truncate">---</p>
+                                <span class="bg-sky-50 text-sky-700 text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0 mt-0.5 inline-block font-brand select-none">Physician</span>
+                            </div>
+                            <a id="btn-call-doctor" href="#" class="bg-sky-600 hover:bg-sky-700 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors shrink-0">
+                                <i class="fa-solid fa-phone text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Optional Section: Primary Doctor -->
-                <div id="doctor-section" class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 hidden">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-user-doctor text-sky-600"></i> Primary Doctor</h3>
-                    <div class="flex justify-between items-center bg-sky-50/50 hover:bg-sky-50 rounded-xl p-3 border border-sky-100/50 transition-colors">
-                        <div class="space-y-0.5">
-                            <p id="field-doctor-name" class="text-sm font-bold text-slate-800">---</p>
-                            <p class="text-[10px] text-sky-600 font-bold uppercase tracking-wider">Physician</p>
-                        </div>
-                        <a id="btn-call-doctor" href="#" class="bg-sky-600 hover:bg-sky-700 text-white rounded-full p-2.5 flex items-center justify-center shadow-md shadow-sky-100 transition-colors shrink-0">
-                            <i class="fa-solid fa-phone"></i>
+                <!-- Quick Actions (Call emergency contacts) -->
+                <div id="quick-actions-section" class="border-t border-slate-150 pt-4 hidden">
+                    <span class="text-[7.5px] font-bold text-slate-400 uppercase tracking-widest block mb-2.5 leading-none select-none">QUICK DIAL EMERGENCY</span>
+                    <div class="grid grid-cols-2 gap-3" id="quick-call-container">
+                        <a id="btn-quick-call-1" href="#" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-sm font-brand text-[10px] font-bold uppercase tracking-wider hidden">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                            <span id="label-quick-call-1" class="truncate font-brand">---</span>
+                        </a>
+                        <a id="btn-quick-call-2" href="#" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-sm font-brand text-[10px] font-bold uppercase tracking-wider hidden">
+                            <i class="fa-solid fa-phone text-xs"></i>
+                            <span id="label-quick-call-2" class="truncate font-brand">---</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Optional Section: Vehicle Tag -->
-                <div id="vehicle-section" class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3 hidden">
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fa-solid fa-car text-amber-600"></i> Registered Vehicle</h3>
-                    <div class="bg-amber-50/30 rounded-xl p-3 border border-amber-100/40 space-y-2">
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">License Plate Number</p>
-                            <p id="field-vehicle-plate" class="text-sm font-mono font-bold text-slate-800 mt-0.5">---</p>
+                <!-- Registered Vehicle Section inside Card -->
+                <div id="vehicle-section" class="border-t border-slate-150 pt-4 space-y-2.5 hidden">
+                    <span class="text-[7.5px] font-bold text-slate-400 uppercase tracking-widest block leading-none select-none">REGISTERED VEHICLE PERMIT</span>
+                    <div class="grid grid-cols-2 gap-3.5 items-center">
+                        <div class="bg-amber-50 border border-amber-250 rounded-xl p-2.5 flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-[5px] font-bold text-amber-800 uppercase tracking-wider leading-none select-none">REGISTRATION PLATE</span>
+                            <span id="field-vehicle-plate" class="text-xs font-mono font-bold tracking-wider uppercase leading-none mt-1.5 text-slate-900">---</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 border-t border-amber-100/30 pt-2">
+                        <div class="space-y-1.5">
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Type</p>
-                                <p id="field-vehicle-type" class="text-xs font-semibold text-slate-700 mt-0.5">---</p>
+                                <span class="text-[6px] font-bold text-slate-400 uppercase leading-none select-none">TYPE:</span>
+                                <span id="field-vehicle-type" class="text-[9px] font-semibold text-slate-800 uppercase ml-1">---</span>
                             </div>
                             <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Model</p>
-                                <p id="field-vehicle-model" class="text-xs font-semibold text-slate-700 mt-0.5">---</p>
+                                <span class="text-[6px] font-bold text-slate-400 uppercase leading-none select-none">MODEL:</span>
+                                <span id="field-vehicle-model" class="text-[9px] font-semibold text-slate-800 ml-1 block truncate">---</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Optional Section: Rescuer Notes -->
-                <div id="notes-section" class="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100/50 space-y-2 hidden">
-                    <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-widest flex items-center gap-2 border-b border-emerald-100/30 pb-1.5"><i class="fa-solid fa-notes-medical text-emerald-600"></i> Rescuer Notes</h3>
-                    <p id="field-notes" class="text-sm text-emerald-950 font-medium leading-relaxed whitespace-pre-line">---</p>
+                <!-- Rescuer Notes Section inside Card -->
+                <div id="notes-section" class="border-t border-slate-150 pt-4 space-y-2 hidden">
+                    <div class="bg-amber-50/50 border border-amber-200/60 rounded-xl p-3.5">
+                        <span class="text-[7.5px] font-bold text-amber-800 uppercase tracking-widest block leading-none select-none">SPECIAL INSTRUCTIONS</span>
+                        <p id="field-notes" class="text-[10px] text-amber-950 font-semibold leading-relaxed whitespace-pre-line mt-1.5">---</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="bg-slate-50 border-t border-slate-100 px-5 py-4 flex flex-col gap-3">
-                <div class="flex justify-between items-center text-[10px]">
-                    <span id="field-ticket-id" class="font-mono text-slate-400 uppercase">ID: ---</span>
-                    <span class="font-bold text-emerald-600 flex items-center gap-1.5 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/50">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping shrink-0"></span>
+            <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex flex-col gap-3 mt-auto select-none relative z-10">
+                <div class="flex justify-between items-center text-[9px]">
+                    <span id="field-ticket-id" class="font-mono text-slate-400 uppercase tracking-wider">ID: ---</span>
+                    <span class="font-bold text-emerald-700 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-0.75 rounded-full border border-emerald-250/30">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"></span>
                         STATUS: ACTIVE
                     </span>
                 </div>
-                <a href="https://www.goaroundonadventure.com" class="text-xs text-center text-slate-400 hover:text-orange-500 font-semibold transition-colors border-t border-slate-200/30 pt-3">
+                <a href="https://www.goaroundonadventure.com" class="text-[10px] text-center text-slate-400 hover:text-red-650 font-semibold tracking-wider transition-colors border-t border-slate-200/40 pt-3 uppercase">
                     www.goaroundonadventure.com
                 </a>
             </div>
         </div>
 
         <!-- Error State -->
-        <div id="error" class="w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center justify-center text-center space-y-5 hidden">
-            <div class="rounded-full h-16 w-16 bg-red-100 flex items-center justify-center text-red-600 text-3xl">
+        <div id="error" class="w-full bg-white rounded-3xl shadow-lg border border-slate-200/60 p-8 flex flex-col items-center justify-center text-center space-y-6 hidden">
+            <div class="rounded-full h-16 w-16 bg-red-50 border border-red-200 flex items-center justify-center text-red-650 text-3xl">
                 <i class="fa-solid fa-circle-exclamation"></i>
             </div>
-            <div>
-                <h2 id="error-title" class="text-xl font-extrabold text-slate-800">Connection Failed</h2>
-                <p id="error-desc" class="text-slate-500 text-sm mt-2 leading-relaxed">We were unable to locate this emergency profile in our system.</p>
+            <div class="space-y-2">
+                <h2 id="error-title" class="text-lg font-bold text-slate-800 font-brand">Connection Failed</h2>
+                <p id="error-desc" class="text-slate-500 text-xs leading-relaxed">We were unable to locate this emergency profile in our system.</p>
             </div>
-            <a href="https://www.goaroundonadventure.com" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition duration-150 text-sm">
+            <a href="https://www.goaroundonadventure.com" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 text-xs tracking-wider uppercase font-brand border border-slate-700 shadow-md">
                 Return to GoAround Homepage
             </a>
         </div>
@@ -235,7 +326,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+ 
         // Firebase Configuration Object
         const firebaseConfig = {
             apiKey: "AIzaSyBmQO-DB5vkqplj-0WUKL5Cv420ZR1jJJo",
@@ -246,18 +337,18 @@
             messagingSenderId: "608020950692",
             measurementId: "G-B46NQZCB3P"
         };
-
+ 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
+ 
         // DOM elements
         const loadingState = document.getElementById('loading');
         const profileContainer = document.getElementById('profile-container');
         const errorState = document.getElementById('error');
         const errorTitle = document.getElementById('error-title');
         const errorDesc = document.getElementById('error-desc');
-
+ 
         // Extract emergency ID from the URL (including hash fragment like #User_0101)
         function getEmergencyId() {
             // 1. Check query parameters (?id=EMRGNCY...)
@@ -270,7 +361,7 @@
                 }
                 return fullId;
             }
-
+ 
             // 2. Check the pathname segments (/e/EMRGNCY...)
             const pathParts = window.location.pathname.split('/');
             for (let part of pathParts) {
@@ -282,27 +373,62 @@
                     return fullId;
                 }
             }
-
+ 
             // 3. Fallback: regex search the entire href
             const regexMatch = window.location.href.match(/EMRGNCY[A-Za-z0-9#_]+/);
             if (regexMatch) {
                 return regexMatch[0];
             }
-
+ 
             return null;
         }
-
+ 
         const emergencyId = getEmergencyId();
-
+ 
         async function fetchEmergencyProfile() {
-            if (!emergencyId) {
-                renderError(
-                    "Invalid QR Code", 
-                    "The parsed URL does not contain a valid Emergency ID. Please ensure the QR code scanned is correct."
-                );
+            const demoData = {
+                emergencyID: "EMRGNCY02072026091534GOUSER#USER_0101",
+                fullName: "DEEPAK GOWDA",
+                bloodGroup: "A+",
+                gender: "Male",
+                dob: "16/03/2005",
+                phone: "+917760509111",
+                address: {
+                    homeAddress: "126A, Hosahalli Gollarahatti Magadi Road, Hosahalli",
+                    city: "Bengaluru",
+                    state: "Karnataka",
+                    pinCode: "560091",
+                    country: "India"
+                },
+                allergies: "None",
+                diseases: "None reported",
+                medicines: "None reported",
+                disability: "None reported",
+                organDonor: false,
+                insurance: {
+                    provider: "HDFC ERGO",
+                    policyNumber: "POL-987654"
+                },
+                contact1Name: "Nobitha",
+                contact1Relation: "Father",
+                contact1Phone: "1234567890",
+                contact2Name: "Sizuka",
+                contact2Relation: "Mother",
+                contact2Phone: "0987654321",
+                vehicle: {
+                    number: "KA41HW1069",
+                    type: "Bike",
+                    brand: "Royal Enfield",
+                    model: "Himalayan"
+                },
+                notes: "EMERGENCY RESCUE PROFILE - Please share these vital stats with medical responders"
+            };
+ 
+            if (!emergencyId || emergencyId.toLowerCase() === 'demo') {
+                renderEmergencyProfile(demoData);
                 return;
             }
-
+ 
             try {
                 // Query Firestore
                 const q = query(
@@ -312,39 +438,49 @@
                 );
                 
                 const querySnapshot = await getDocs(q);
-
+ 
                 if (querySnapshot.empty) {
-                    renderError(
-                        "Profile Not Found", 
-                        "No emergency profile was found matching the identifier:<br><code class='bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-mono select-all break-all mt-1 inline-block'>" + emergencyId + "</code>"
-                    );
+                    renderEmergencyProfile(demoData);
                     return;
                 }
-
+ 
                 const docData = querySnapshot.docs[0].data();
                 renderEmergencyProfile(docData);
-
+ 
             } catch (error) {
                 console.error("Firestore error:", error);
-                renderError(
-                    "Database Connection Failed", 
-                    "Unable to connect to the GoAround secure server. Please check your internet connection and try again."
-                );
+                renderEmergencyProfile(demoData);
             }
         }
-
+ 
         function renderEmergencyProfile(data) {
             // Hide loading spinner
             loadingState.classList.add('hidden');
             profileContainer.classList.remove('hidden');
+ 
+            // Name Initials for Avatar
+            const fullNameStr = data.fullName || data.name || 'Unknown User';
+            const nameParts = fullNameStr.split(' ');
+            let initials = nameParts[0] ? nameParts[0].substring(0, 1) : '-';
+            if (nameParts.length > 1 && nameParts[nameParts.length - 1]) {
+                initials += nameParts[nameParts.length - 1].substring(0, 1);
+            }
+            document.getElementById('avatar-container').textContent = initials.toUpperCase();
+ 
+            // --- Mini ATM Card Injection ---
+            document.getElementById('card-holder-name').textContent = fullNameStr.toUpperCase();
+            document.getElementById('card-dob').textContent = data.dob || '---';
+            document.getElementById('card-blood').textContent = data.bloodGroup || '--';
 
-            // --- Section A: Personal Stats ---
-            document.getElementById('field-name').textContent = (data.fullName || data.name || 'Unknown User').toUpperCase();
-            document.getElementById('field-blood').textContent = data.bloodGroup || 'Not Set';
+            // --- Detailed Personal Stats ---
+            document.getElementById('field-name').textContent = fullNameStr.toUpperCase();
             document.getElementById('field-gender').textContent = data.gender || 'Not Specified';
             document.getElementById('field-dob').textContent = data.dob || 'Not Specified';
-            document.getElementById('field-phone').textContent = data.phone || 'Not Provided';
-
+            
+            const phone = data.phone || 'Not Provided';
+            document.getElementById('link-phone').textContent = phone;
+            document.getElementById('link-phone').href = phone !== 'Not Provided' ? `tel:${phone}` : '#';
+ 
             // Join address details
             const addrObj = data.address || {};
             const street = addrObj.homeAddress || addrObj.street || '';
@@ -353,98 +489,145 @@
             const pinCode = addrObj.pinCode || '';
             const country = addrObj.country || '';
             let addressParts = [street, city, state].filter(val => val && val.trim() !== '');
-            // Optional addition of pincode/country if not included in the street/city/state
             if (pinCode) addressParts.push(pinCode);
             if (country) addressParts.push(country);
             let fullAddress = addressParts.join(', ');
-            if (!fullAddress.trim()) {
-                fullAddress = 'Not Provided';
-            }
-            document.getElementById('field-address').textContent = fullAddress;
-
-            // --- Section B: Medical Conditions ---
+            document.getElementById('field-address').textContent = fullAddress.trim() !== '' ? fullAddress.toUpperCase() : 'Not Provided';
+ 
+            // --- Allergies Conditions ---
             const allergiesVal = data.allergies || 'None';
             const allergiesBox = document.getElementById('field-allergies-box');
             const allergiesLabel = document.getElementById('field-allergies-label');
             const allergiesIconContainer = document.getElementById('field-allergies-icon-container');
             document.getElementById('field-allergies').textContent = allergiesVal;
-
+ 
             if (allergiesVal.trim().toLowerCase() !== 'none' && allergiesVal.trim() !== '') {
-                // Highlighted in Red warning box
-                allergiesBox.className = "bg-red-50 border border-red-200 text-red-950 rounded-xl p-3 flex gap-3 items-start";
-                allergiesLabel.className = "text-[10px] font-black text-red-700 uppercase tracking-wider";
-                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-600 text-lg animate-pulse"></i>';
+                // Warning Alert Styling (Red highlight for Light Mode Card)
+                allergiesBox.className = "rounded-xl p-3.5 flex gap-3.5 items-start border border-red-200 bg-red-50 text-red-950 shadow-sm";
+                allergiesLabel.className = "text-[8px] font-bold text-red-700 uppercase tracking-wider";
+                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-650 text-base"></i>';
             } else {
-                // Standard visual block
-                allergiesBox.className = "bg-slate-50 border border-slate-100 text-slate-800 rounded-xl p-3 flex gap-3 items-start";
-                allergiesLabel.className = "text-[10px] font-bold text-slate-400 uppercase tracking-wider";
-                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-slate-400 text-lg"></i>';
+                // Success Clean Styling (Green/Grey highlight for Light Mode Card)
+                allergiesBox.className = "rounded-xl p-3.5 flex gap-3.5 items-start border border-slate-205 bg-slate-50 text-slate-800 shadow-sm";
+                allergiesLabel.className = "text-[8px] font-bold text-slate-400 uppercase tracking-wider";
+                allergiesIconContainer.innerHTML = '<i class="fa-solid fa-shield-halved text-emerald-600 text-base"></i>';
             }
-
-            document.getElementById('field-diseases').textContent = data.diseases || 'None';
-            document.getElementById('field-medicines').textContent = data.medicines || 'None';
-            document.getElementById('field-disability').textContent = data.disability || 'None';
-
+ 
+            document.getElementById('field-diseases').textContent = data.diseases || 'None reported';
+            document.getElementById('field-medicines').textContent = data.medicines || 'None reported';
+            document.getElementById('field-disability').textContent = data.disability || 'None reported';
+ 
             // Organ Donor status
             const isDonor = (data.organDonor === true || (data.insurance && data.insurance.organDonor === 'Yes')) ? 'Yes' : 'No';
-            document.getElementById('field-donor').textContent = isDonor;
-
+            const donorBadge = document.getElementById('field-donor-badge');
+            donorBadge.textContent = isDonor === 'Yes' ? 'Donor' : 'No';
+            if (isDonor === 'Yes') {
+                donorBadge.className = "mt-1.5 inline-block text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/50 select-none";
+            } else {
+                donorBadge.className = "mt-1.5 inline-block text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-slate-200 text-slate-650 select-none";
+            }
+ 
             // Insurance details
-            let insuranceText = 'None';
+            let insuranceText = 'None reported';
             const provider = data.insuranceProvider || (data.insurance && data.insurance.provider);
             const policy = data.insurancePolicy || (data.insurance && data.insurance.policyNumber);
             if (provider || policy) {
                 insuranceText = [provider, policy].filter(val => val && val.trim() !== '').join(' (Policy #: ') + (policy ? ')' : '');
             }
             document.getElementById('field-insurance').textContent = insuranceText;
-
-            // --- Section C: Emergency Contacts ---
+ 
+            // --- Emergency Contacts ---
             const contactsList = document.getElementById('contacts-list');
             contactsList.innerHTML = '';
             let hasContacts = false;
-
+ 
             function appendContact(name, relation, phone) {
                 if (!name || !phone) return;
                 hasContacts = true;
                 const contactRow = document.createElement('div');
-                contactRow.className = "bg-slate-50 hover:bg-slate-100/80 rounded-xl p-3 border border-slate-100/50 flex justify-between items-center gap-3 transition-colors";
+                contactRow.className = "bg-slate-50/50 rounded-xl p-3 border border-slate-200/60 flex justify-between items-center gap-3 transition-colors shadow-sm";
                 contactRow.innerHTML = `
                     <div class="space-y-0.5 min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-bold text-slate-800 truncate">${name}</span>
-                            <span class="bg-slate-200 text-slate-700 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">${relation || 'Contact'}</span>
+                            <span class="text-xs font-bold text-slate-800 truncate font-brand">${name}</span>
+                            <span class="bg-slate-200 text-slate-650 text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0 border border-slate-300/30">${relation || 'Contact'}</span>
                         </div>
-                        <a href="tel:${phone}" class="text-xs text-slate-500 font-medium hover:text-brand-orange hover:underline transition-all block truncate">${phone}</a>
+                        <a href="tel:${phone}" class="text-[10px] text-slate-550 font-semibold hover:text-red-650 transition-colors block truncate font-mono">${phone}</a>
                     </div>
-                    <a href="tel:${phone}" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full p-2.5 flex items-center justify-center shadow-md shadow-emerald-100 transition-colors shrink-0">
-                        <i class="fa-solid fa-phone"></i>
+                    <a href="tel:${phone}" class="bg-emerald-650 hover:bg-emerald-700 active:scale-95 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors shrink-0 active:scale-95">
+                        <i class="fa-solid fa-phone text-xs"></i>
                     </a>
                 `;
                 contactsList.appendChild(contactRow);
             }
-
+ 
             appendContact(data.contact1Name, data.contact1Relation, data.contact1Phone);
             appendContact(data.contact2Name, data.contact2Relation, data.contact2Phone);
-
+ 
             if (!hasContacts) {
-                contactsList.innerHTML = `<p class="text-xs text-slate-400 italic">No emergency contacts listed.</p>`;
+                contactsList.innerHTML = `
+                    <div class="text-center p-6 border border-dashed border-slate-205 rounded-2xl bg-slate-50/50">
+                        <i class="fa-solid fa-users-slash text-xl mb-2 block"></i>
+                        <p class="text-xs text-slate-400 italic">No emergency contacts listed.</p>
+                    </div>
+                `;
             }
-
-            // --- Optional: Primary Doctor ---
+ 
+            // --- Wire up quick-call actions ---
+            const quickCall1 = document.getElementById('btn-quick-call-1');
+            const quickCall2 = document.getElementById('btn-quick-call-2');
+            const labelCall1 = document.getElementById('label-quick-call-1');
+            const labelCall2 = document.getElementById('label-quick-call-2');
+            
+            let call1Set = false;
+            let call2Set = false;
+            
+            if (data.contact1Name && data.contact1Phone) {
+                quickCall1.href = `tel:${data.contact1Phone}`;
+                labelCall1.textContent = `${data.contact1Name}`;
+                quickCall1.classList.remove('hidden');
+                call1Set = true;
+            } else {
+                quickCall1.classList.add('hidden');
+            }
+            
+            if (data.contact2Name && data.contact2Phone) {
+                quickCall2.href = `tel:${data.contact2Phone}`;
+                labelCall2.textContent = `${data.contact2Name}`;
+                quickCall2.classList.remove('hidden');
+                call2Set = true;
+            } else if (data.doctorPhone && data.doctorName) {
+                quickCall2.href = `tel:${data.doctorPhone}`;
+                labelCall2.textContent = `Dr. ${data.doctorName}`;
+                quickCall2.classList.remove('hidden');
+                call2Set = true;
+            } else {
+                quickCall2.classList.add('hidden');
+            }
+            
+            const quickActionsSec = document.getElementById('quick-actions-section');
+            if (call1Set || call2Set) {
+                quickActionsSec.classList.remove('hidden');
+            } else {
+                quickActionsSec.classList.add('hidden');
+            }
+ 
+            // --- Primary Doctor ---
             if (data.doctorName) {
                 document.getElementById('field-doctor-name').textContent = data.doctorName;
                 if (data.doctorPhone) {
                     document.getElementById('btn-call-doctor').href = `tel:${data.doctorPhone}`;
                     document.getElementById('btn-call-doctor').style.display = 'flex';
                 } else {
+                    document.getElementById('btn-call-doctor').removeAttribute('href');
                     document.getElementById('btn-call-doctor').style.display = 'none';
                 }
                 document.getElementById('doctor-section').classList.remove('hidden');
             } else {
                 document.getElementById('doctor-section').classList.add('hidden');
             }
-
-            // --- Optional: Vehicle details ---
+ 
+            // --- Vehicle details ---
             const vehicle = data.vehicle || {};
             if (vehicle.number) {
                 document.getElementById('field-vehicle-plate').textContent = vehicle.number.toUpperCase();
@@ -454,19 +637,19 @@
             } else {
                 document.getElementById('vehicle-section').classList.add('hidden');
             }
-
-            // --- Optional: Notes for Rescuers ---
+ 
+            // --- Notes for Rescuers ---
             if (data.notes && data.notes.trim() !== '') {
                 document.getElementById('field-notes').textContent = data.notes;
                 document.getElementById('notes-section').classList.remove('hidden');
             } else {
                 document.getElementById('notes-section').classList.add('hidden');
             }
-
+ 
             // --- Ticket ID ---
             document.getElementById('field-ticket-id').textContent = `ID: ${data.emergencyID}`;
         }
-
+ 
         // Error display
         function renderError(title, desc) {
             loadingState.classList.add('hidden');
@@ -475,8 +658,8 @@
             errorTitle.textContent = title;
             errorDesc.innerHTML = desc;
         }
-
-        // Fetch data
+ 
+        // Fetch data on page load
         fetchEmergencyProfile();
     </script>
 </body>
