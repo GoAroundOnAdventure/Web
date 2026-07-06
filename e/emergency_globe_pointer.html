@@ -1725,8 +1725,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/globe.gl@2.26.8/dist/globe.gl.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1752,12 +1751,12 @@
         let activeLat = 12.9716;
         let activeLng = 77.5946;
 
-        const globe = Globe()(globeContainer)
-            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-            .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        const globe = Globe({ animateIn: false })(globeContainer)
+            .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+            .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
             .showAtmosphere(true)
-            .atmosphereColor('#0088ff')
-            .atmosphereAltitude(0.15)
+            .atmosphereColor('#1a6fff')
+            .atmosphereAltitude(0.18)
             .pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 })
             .ringsData([{ lat: activeLat, lng: activeLng }])
             .ringColor(() => 'rgba(255, 30, 30, 0.9)')
@@ -1850,18 +1849,32 @@
                 return el;
             });
 
-        // Stop auto-rotation as requested
+        // Controls
         globe.controls().autoRotate = false;
         globe.controls().enableZoom = true;
 
-        // Add a subtle blue tint to the globe material to match the sci-fi look
+        // Set pixel ratio for crisp Retina / HiDPI rendering
+        globe.renderer().setPixelRatio(window.devicePixelRatio);
+
+        // Upgrade globe material to MeshPhongMaterial for specular highlights
         setTimeout(() => {
             const globeMaterial = globe.globeMaterial();
             if (globeMaterial) {
-                // Tint the dark areas slightly cyan/blue
-                globeMaterial.color = new THREE.Color(0x88bbff);
+                // Reset any colour tint so the texture shows its true colours
+                globeMaterial.color.set(0xffffff);
+                // Specular highlight (subtle bluish gloss like real Earth)
+                if (globeMaterial.specular) {
+                    globeMaterial.specular.set(0x223344);
+                    globeMaterial.shininess = 8;
+                }
+                // Very faint emissive so oceans glow slightly on dark side
+                if (globeMaterial.emissive) {
+                    globeMaterial.emissive.set(0x050a14);
+                    globeMaterial.emissiveIntensity = 1;
+                }
+                globeMaterial.needsUpdate = true;
             }
-        }, 500);
+        }, 800);
 
         // Resize handler
         window.addEventListener('resize', () => {
