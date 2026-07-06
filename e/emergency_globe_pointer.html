@@ -1789,12 +1789,12 @@
             .atmosphereAltitude(0.22)
             // Start showing the full globe
             .pointOfView({ lat: 20, lng: activeLng, altitude: 2.5 })
-            // Radar rings — 8 concentric circles visible simultaneously
+            // Radar rings — single slow pulsing ring
             .ringsData([{ lat: activeLat, lng: activeLng }])
             .ringColor(() => t => `rgba(255,${Math.round(60*(1-t))},0,${0.9*(1-t)})`)
-            .ringMaxRadius(15)
-            .ringPropagationSpeed(3)
-            .ringRepeatPeriod(600)
+            .ringMaxRadius(8)
+            .ringPropagationSpeed(1)
+            .ringRepeatPeriod(4000)
             // HUD marker
             .htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }])
             .htmlElement(d => {
@@ -1878,6 +1878,24 @@
         globe.controls().enableZoom = true;
         globe.controls().autoRotate = false;
 
+        // Dynamic Grayscale Zoom Transition
+        const canvas = globe.renderer().domElement;
+        canvas.style.filter = 'grayscale(100%) contrast(1.05) brightness(0.95)';
+        
+        globe.controls().addEventListener('change', () => {
+            const pov = globe.pointOfView();
+            // Interpolate grayscale from 100% (at altitude >= 2.0) to 0% (at altitude <= 1.6)
+            let grayscalePercent = 100;
+            if (pov.altitude <= 1.6) {
+                grayscalePercent = 0;
+            } else if (pov.altitude >= 2.0) {
+                grayscalePercent = 100;
+            } else {
+                grayscalePercent = ((pov.altitude - 1.6) / 0.4) * 100;
+            }
+            canvas.style.filter = `grayscale(${grayscalePercent}%) contrast(1.05) brightness(${0.95 + (100 - grayscalePercent)/100 * 0.05})`;
+        });
+
         // INTRO: spin once then settle on location
         // Step 1 — start spinning
         globe.controls().autoRotate = true;
@@ -1888,30 +1906,6 @@
             globe.controls().autoRotate = false;
             globe.pointOfView({ lat: activeLat - 3, lng: activeLng, altitude: 1.6 }, 2500);
         }, 4500);
-
-        // ── ZOOM-BASED COLOUR TRANSITION ─────────────────────────────────
-        // Globe view (altitude ≥ 1.5) → black & white
-        // Zoom in     (altitude ≤ 0.35) → full satellite colour
-        const globeCanvas = () => globeContainer.querySelector('canvas');
-
-        function applyGlobeFilter(altitude) {
-            const canvas = globeCanvas();
-            if (!canvas) return;
-            // t=1 → fully zoomed out (grayscale), t=0 → zoomed in (color)
-            const HIGH = 1.5, LOW = 0.35;
-            const t = Math.max(0, Math.min(1, (altitude - LOW) / (HIGH - LOW)));
-            const gs        = Math.round(t * 100);           // 0–100 %
-            const brightness = (0.85 + (1 - t) * 0.2).toFixed(2);  // dimmer far, brighter close
-            const contrast   = (1 + (1 - t) * 0.1).toFixed(2);
-            canvas.style.filter = `grayscale(${gs}%) brightness(${brightness}) contrast(${contrast})`;
-            canvas.style.transition = 'filter 0.4s ease';
-        }
-
-        // Listen to every zoom/pan event
-        globe.onZoom(({ altitude }) => applyGlobeFilter(altitude));
-
-        // Set initial grayscale (globe starts at altitude 2.5)
-        setTimeout(() => applyGlobeFilter(2.5), 300);
 
         // Resize handler
         window.addEventListener('resize', () => {
@@ -1930,7 +1924,6 @@
                 setTimeout(() => globe.ringsData([{ lat: activeLat, lng: activeLng }]), 120);
             }
         });
-
 
         // Timer Logic
         let seconds = 34;
