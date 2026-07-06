@@ -159,6 +159,32 @@
         .sys-footer { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 5px 0; letter-spacing: 1px; }
         .sys-footer span { font-family: var(--font-mono); color: var(--text-main); margin-left: 5px; font-size: 11px; }
         
+        .close-profile-btn {
+            width: 100%;
+            background: rgba(255, 59, 48, 0.05);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .close-profile-btn:hover {
+            background: var(--accent-red);
+            color: #000000;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+        }
+        
         /* CENTER PANEL (GLOBE) */
         .center-panel {
             position: relative;
@@ -267,6 +293,7 @@
         .resp-status { font-size: 10px; font-weight: 700; letter-spacing: 1px; }
         .resp-status.accepted { color: var(--accent-green); }
         .resp-status.pending { color: var(--accent-yellow); }
+        .resp-status.offline { color: var(--accent-red); }
         .resp-meta { text-align: right; }
         .resp-dist { font-size: 12px; font-family: var(--font-mono); color: var(--text-main); margin-bottom: 2px; }
         .resp-eta { font-size: 9px; font-family: var(--font-mono); color: var(--text-muted); }
@@ -315,6 +342,236 @@
         .server-status { display: flex; gap: 20px; font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 1px;}
         .server-status .val { color: var(--accent-green); margin-left: 5px; }
         .server-status i { color: var(--accent-green); margin-left: 5px; font-size: 10px; }
+
+        /* NOTIFICATION BELL */
+        .notif-bell-btn {
+            position: relative;
+            background: transparent;
+            border: 1px solid rgba(255,51,51,0.35);
+            color: var(--accent-red);
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .notif-bell-btn:hover {
+            background: rgba(255,51,51,0.1);
+            box-shadow: 0 0 8px rgba(255,51,51,0.3);
+        }
+        .notif-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent-red);
+            color: #000;
+            font-size: 9px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 6px rgba(255,51,51,0.8);
+            animation: pulse-badge 1.5s ease-in-out infinite;
+            display: none;
+        }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 6px rgba(255,51,51,0.8); transform: scale(1); }
+            50% { box-shadow: 0 0 12px rgba(255,51,51,1); transform: scale(1.15); }
+        }
+
+        /* NOTIFICATION PANEL */
+        #notif-panel {
+            position: fixed;
+            top: 0;
+            right: -380px;
+            width: 360px;
+            height: 100vh;
+            background: rgba(2, 3, 5, 0.97);
+            border-left: 1px solid rgba(255,51,51,0.3);
+            z-index: 9990;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            font-family: var(--font-ui);
+            box-shadow: -5px 0 30px rgba(255,51,51,0.12);
+        }
+        #notif-panel.open {
+            right: 0;
+        }
+        .notif-panel-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,51,51,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(4, 6, 9, 0.9);
+            flex-shrink: 0;
+        }
+        .notif-panel-title {
+            color: var(--accent-red);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .notif-close-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 3px 8px;
+            cursor: pointer;
+            border-radius: 2px;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+        .notif-close-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        .notif-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .notif-tab {
+            flex: 1;
+            padding: 7px 0;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .notif-tab.active {
+            color: var(--accent-red);
+            border-bottom-color: var(--accent-red);
+        }
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .notif-list::-webkit-scrollbar { width: 2px; }
+        .notif-list::-webkit-scrollbar-thumb { background: rgba(255,51,51,0.3); }
+        .notif-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .notif-item:hover { background: rgba(255,51,51,0.04); }
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            box-shadow: 0 0 4px var(--accent-red);
+        }
+        .notif-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .notif-icon.red { background: rgba(255,51,51,0.1); color: var(--accent-red); border: 1px solid rgba(255,51,51,0.2); }
+        .notif-icon.green { background: rgba(0,204,102,0.1); color: var(--accent-green); border: 1px solid rgba(0,204,102,0.2); }
+        .notif-icon.yellow { background: rgba(255,204,0,0.1); color: var(--accent-yellow); border: 1px solid rgba(255,204,0,0.2); }
+        .notif-icon.blue { background: rgba(51,153,255,0.1); color: var(--accent-blue); border: 1px solid rgba(51,153,255,0.2); }
+        .notif-body { flex: 1; min-width: 0; }
+        .notif-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notif-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+        }
+        .notif-time {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+            margin-top: 2px;
+        }
+        .notif-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+        .notif-empty i { font-size: 28px; display: block; margin-bottom: 10px; opacity: 0.3; }
+        .notif-panel-footer {
+            padding: 8px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .notif-clear-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-muted);
+            font-family: var(--font-ui);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 7px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .notif-clear-btn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        #notif-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 9989;
+            display: none;
+        }
+        #notif-overlay.open { display: block; }
 
         /* AUTHENTICATED HIDE OVERLAY */
         .authenticated #login-overlay {
@@ -384,18 +641,45 @@
             margin-bottom: 6px;
             font-weight: 600;
         }
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
         .input-group input {
             width: 100%;
             background: rgba(0, 0, 0, 0.9);
             border: 1px solid rgba(255, 51, 51, 0.25);
             border-radius: 2px;
-            color: #ffffff;
+            color: transparent; /* hide real text */
+            caret-color: var(--accent-red); /* show cursor in red */
             font-family: var(--font-mono);
             font-size: 15px;
             padding: 10px 12px;
             outline: none;
             transition: all 0.3s ease;
+            letter-spacing: 5px;
+            position: relative;
+            z-index: 2;
+        }
+        .input-group input::placeholder {
+            color: var(--text-muted);
             letter-spacing: 1px;
+        }
+        .input-mask {
+            position: absolute;
+            inset: 0;
+            padding: 10px 12px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            letter-spacing: 5px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            z-index: 1;
         }
         .input-group input:focus {
             border-color: var(--accent-red);
@@ -433,11 +717,61 @@
             border: 1px dashed rgba(255, 51, 51, 0.3);
             padding: 8px;
         }
+        .logout-btn {
+            background: rgba(255, 51, 51, 0.08);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            font-family: var(--font-ui);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logout-btn:hover {
+            background: var(--accent-red);
+            color: #000000;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+        }
     </style>
 </head>
 <body>
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
+
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div id="confirm-modal-overlay" style="
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 99995;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+    ">
+        <div class="login-box" style="width: 420px; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);">
+            <div class="login-header" style="color: var(--accent-red); border-bottom-color: rgba(255, 51, 51, 0.3);">
+                WARNING: DE-AUTHORIZATION
+                <div class="secure-tag" style="color: var(--accent-red); background: rgba(255, 51, 51, 0.1); border-color: rgba(255, 51, 51, 0.3);"><i class="fa-solid fa-triangle-exclamation"></i> DANGER</div>
+            </div>
+            <div style="font-size: 13px; line-height: 1.6; color: var(--text-main); margin-bottom: 25px; letter-spacing: 0.5px;">
+                &gt; INITIALIZING DATA PURGE PROTOCOL...<br><br>
+                ARE YOU SURE YOU WANT TO DE-AUTHORIZE AND CLEAR THE ACTIVE VICTIM PROFILE FROM THE CURRENT MONITORING SESSION? THIS ACTION CANNOT BE UNDONE.
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button class="login-btn" onclick="executeProfileDeauth()" style="flex: 1; background: rgba(255, 51, 51, 0.1); border-radius: 2px;">[ PURGE DATA ]</button>
+                <button class="login-btn" onclick="closeConfirmModal()" style="flex: 1; border-color: var(--text-muted); color: var(--text-muted); background: transparent; border-radius: 2px;">[ CANCEL ]</button>
+            </div>
+        </div>
+    </div>
 
     <!-- LOGIN OVERLAY -->
     <div id="login-overlay">
@@ -448,13 +782,19 @@
             </div>
             <div class="input-group">
                 <label for="login-id">> OPERATOR ID</label>
-                <input type="text" id="login-id" placeholder="ENTER ID..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+                <div class="input-wrapper">
+                    <input type="text" id="login-id" placeholder="ENTER ID..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+                    <div class="input-mask" id="login-id-mask"></div>
+                </div>
             </div>
             <div class="input-group">
                 <label for="login-pass">> ACCESS PASSKEY</label>
-                <input type="password" id="login-pass" placeholder="ENTER PASSKEY..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+                <div class="input-wrapper">
+                    <input type="text" id="login-pass" placeholder="ENTER PASSKEY..." autocomplete="off" onkeydown="if(event.key === 'Enter') verifyLogin()">
+                    <div class="input-mask" id="login-pass-mask"></div>
+                </div>
             </div>
-            <button class="login-btn" onclick="verifyLogin()">[ DECRYPT & AUTHORIZE ]</button>
+            <button id="login-submit-btn" class="login-btn" onclick="verifyLogin()">[ DECRYPT & AUTHORIZE ]</button>
             <div class="error-msg" id="login-error"></div>
         </div>
     </div>
@@ -473,6 +813,13 @@
             <span>SECURE CONNECTION</span>
             <i class="fa-solid fa-lock"></i>
             <span>ENCRYPTION: AES-256</span>
+            <button class="notif-bell-btn" id="notif-bell-btn" onclick="toggleNotifPanel()">
+                <i class="fa-solid fa-bell"></i> ALERTS
+                <span class="notif-badge" id="notif-badge">0</span>
+            </button>
+            <button class="logout-btn" onclick="logoutOperator()">
+                <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
+            </button>
         </div>
     </header>
 
@@ -517,29 +864,29 @@
                 </div>
                 <div class="widget-content">
                     <div class="victim-flex">
-                        <img src="https://i.pravatar.cc/150?img=11" alt="Victim" class="victim-photo">
+                        <img id="victim-photo" src="https://i.pravatar.cc/150?img=11" alt="Victim" class="victim-photo">
                         <div class="victim-details">
                             <div class="data-stack">
                                 <div class="data-label">NAME</div>
-                                <div class="data-value">DEEPAK GOWDA</div>
+                                <div class="data-value" id="victim-name">DEEPAK GOWDA</div>
                             </div>
                             <div class="data-stack">
                                 <div class="data-label">PHONE</div>
-                                <div class="data-value small">+91 98765 43210</div>
+                                <div class="data-value small" id="victim-phone">+91 98765 43210</div>
                             </div>
                         </div>
                     </div>
                     <div class="data-stack">
                         <div class="data-label">BLOOD GROUP</div>
-                        <div class="data-value">O+<br>24</div>
+                        <div class="data-value" id="victim-blood">O+<br>24</div>
                     </div>
                     <div class="data-stack">
                         <div class="data-label">MEDICAL NOTES</div>
-                        <div class="data-value">ASTHMA</div>
+                        <div class="data-value" id="victim-notes">ASTHMA</div>
                     </div>
                     <div class="data-stack">
                         <div class="data-label">ALLERGIES</div>
-                        <div class="data-value">NONE</div>
+                        <div class="data-value" id="victim-allergies">NONE</div>
                     </div>
                 </div>
             </div>
@@ -589,7 +936,11 @@
                     </div>
                 </div>
             </div>
-
+            
+            <button class="close-profile-btn" onclick="showConfirmModal()">
+                <i class="fa-solid fa-power-off"></i> CLOSE EMERGENCY PROFILE
+            </button>
+ 
             <div class="sys-footer">
                 <div>SYSTEM UPTIME <span>2D 14H 22M</span></div>
                 <div>ACTIVE INCIDENTS <span>7</span></div>
@@ -676,44 +1027,32 @@
                 </div>
             </div>
 
-            <!-- RESPONDERS -->
-            <div class="widget">
+            <!-- TRAVEL GROUP DETAILS -->
+            <div class="widget" id="group-details-widget">
                 <div class="widget-header red">
-                    RESPONDERS
+                    <i class="fa-solid fa-people-group"></i> TRAVEL GROUP DETAILS
                 </div>
-                <div class="widget-content responder-list">
-                    <div class="responder-item">
-                        <img src="https://i.pravatar.cc/150?img=12" alt="Ravi" class="resp-img">
-                        <div class="resp-info">
-                            <div class="resp-name">RAVI KUMAR</div>
-                            <div class="resp-status accepted">ACCEPTED</div>
+                <div class="widget-content">
+                    <div class="data-stack" style="margin-bottom: 12px;">
+                        <div class="data-label">GROUP NAME</div>
+                        <div class="data-value" id="group-name">N/A</div>
+                    </div>
+                    <div class="vitals-grid" style="margin-bottom: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                        <div class="vital-item" style="padding: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                            <div class="data-label" style="font-size: 8px;">TOTAL</div>
+                            <div class="data-value" id="group-total" style="font-size: 13px;">0</div>
                         </div>
-                        <div class="resp-meta">
-                            <div class="resp-dist">0.8 km</div>
-                            <div class="resp-eta active">ETA: 02 MIN</div>
+                        <div class="vital-item" style="padding: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                            <div class="data-label" style="font-size: 8px;">ONLINE</div>
+                            <div class="data-value" id="group-online" style="font-size: 13px; color: var(--accent-green);">0</div>
+                        </div>
+                        <div class="vital-item" style="padding: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                            <div class="data-label" style="font-size: 8px;">OFFLINE</div>
+                            <div class="data-value" id="group-offline" style="font-size: 13px; color: var(--accent-red);">0</div>
                         </div>
                     </div>
-                    <div class="responder-item">
-                        <img src="https://i.pravatar.cc/150?img=33" alt="Akash" class="resp-img">
-                        <div class="resp-info">
-                            <div class="resp-name">AKASH</div>
-                            <div class="resp-status pending">PENDING</div>
-                        </div>
-                        <div class="resp-meta">
-                            <div class="resp-dist">1.2 km</div>
-                            <div class="resp-eta">ETA: --</div>
-                        </div>
-                    </div>
-                    <div class="responder-item">
-                        <img src="https://i.pravatar.cc/150?img=5" alt="Anjali" class="resp-img">
-                        <div class="resp-info">
-                            <div class="resp-name">ANJALI</div>
-                            <div class="resp-status pending">PENDING</div>
-                        </div>
-                        <div class="resp-meta">
-                            <div class="resp-dist">1.8 km</div>
-                            <div class="resp-eta">ETA: --</div>
-                        </div>
+                    <div class="responder-list" id="group-members-list">
+                        <div style="font-size: 12px; color: var(--text-muted);">No group travel details.</div>
                     </div>
                 </div>
             </div>
@@ -723,7 +1062,7 @@
                 <div class="widget-header red">
                     INCIDENT TIMELINE
                 </div>
-                <div class="widget-content timeline">
+                <div class="widget-content timeline" id="timeline-container">
                     <div class="tl-item"><div class="tl-time">11:27:35</div><div class="tl-event">EMERGENCY TRIGGERED</div></div>
                     <div class="tl-item"><div class="tl-time">11:27:36</div><div class="tl-event">LOCATION LOCKED</div></div>
                     <div class="tl-item"><div class="tl-time">11:27:37</div><div class="tl-event">NOTIFYING RIDE MEMBERS</div></div>
@@ -738,6 +1077,33 @@
 
     </div>
 
+    <!-- NOTIFICATION PANEL OVERLAY -->
+    <div id="notif-overlay" onclick="closeNotifPanel()"></div>
+
+    <!-- NOTIFICATION PANEL -->
+    <div id="notif-panel">
+        <div class="notif-panel-header">
+            <div class="notif-panel-title">
+                <i class="fa-solid fa-bell"></i> ALERT NOTIFICATIONS
+            </div>
+            <button class="notif-close-btn" onclick="closeNotifPanel()">[ CLOSE ]</button>
+        </div>
+        <div class="notif-tabs">
+            <div class="notif-tab active" id="tab-all" onclick="switchNotifTab('all')">ALL</div>
+            <div class="notif-tab" id="tab-alerts" onclick="switchNotifTab('alerts')">ALERTS</div>
+            <div class="notif-tab" id="tab-system" onclick="switchNotifTab('system')">SYSTEM</div>
+        </div>
+        <div class="notif-list" id="notif-list">
+            <div class="notif-empty">
+                <i class="fa-solid fa-bell-slash"></i>
+                &gt; NO NOTIFICATIONS RECEIVED
+            </div>
+        </div>
+        <div class="notif-panel-footer">
+            <button class="notif-clear-btn" onclick="clearNotifications()">[ MARK ALL AS READ ]</button>
+        </div>
+    </div>
+
     <!-- BOTTOM BAR -->
     <div class="bottom-bar">
         <div style="width: 150px;"></div> <!-- Spacer -->
@@ -749,11 +1115,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/three"></script>
-    <script src="https://unpkg.com/globe.gl"></script>
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.26.8/dist/globe.gl.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration Object
         const firebaseConfig = {
@@ -772,8 +1138,9 @@
 
         // Init Globe
         const globeContainer = document.getElementById('globe-container');
-        const targetLat = 12.9716;
-        const targetLng = 77.5946;
+        let activeVictimName = "LIVE LOCATION";
+        let activeLat = 12.9716;
+        let activeLng = 77.5946;
 
         const globe = Globe()(globeContainer)
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
@@ -781,14 +1148,14 @@
             .showAtmosphere(true)
             .atmosphereColor('#0088ff')
             .atmosphereAltitude(0.15)
-            .pointOfView({ lat: targetLat - 2, lng: targetLng, altitude: 1.2 })
-            .ringsData([{ lat: targetLat, lng: targetLng }])
+            .pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 })
+            .ringsData([{ lat: activeLat, lng: activeLng }])
             .ringColor(() => 'rgba(255, 30, 30, 0.9)')
             .ringMaxRadius(45)
             .ringPropagationSpeed(1.5)
             .ringRepeatPeriod(900)
-            .htmlElementsData([{ lat: targetLat, lng: targetLng }])
-            .htmlElement(() => {
+            .htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }])
+            .htmlElement((d) => {
                 const el = document.createElement('div');
                 el.style.cssText = `
                     position: relative;
@@ -843,7 +1210,7 @@
                             border-bottom: 1px solid rgba(255,51,51,0.5);
                             position: relative; z-index: 1;
                         ">
-                            LIVE LOCATION
+                            ${(d.label || 'LIVE LOCATION').toUpperCase()}
                         </div>
                         <!-- Body -->
                         <div style="
@@ -855,7 +1222,7 @@
                             letter-spacing: 0.5px;
                             position: relative; z-index: 1;
                         ">
-                            ${targetLat}&deg; N, ${targetLng}&deg; E
+                            ${d.lat.toFixed(4)}&deg; N, ${d.lng.toFixed(4)}&deg; E
                         </div>
                     </div>
                     
@@ -906,35 +1273,315 @@
             document.getElementById('timer').textContent = `${h}:${m}:${s}`;
         }, 1000);
 
-        // Seeding database helper
-        async function seedEmergencyCredentials() {
+        // --- SIREN AUDIO SYNTHESIZER ---
+        let sirenInterval = null;
+        let audioCtx = null;
+        let osc = null;
+        let gain = null;
+
+        function startSiren() {
+            if (sirenInterval) return;
             try {
-                const q = query(collection(db, 'Owner_Access_Verification'), where('emergency_login.id', '==', 'GoAroundEye'));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    await addDoc(collection(db, 'Owner_Access_Verification'), {
-                        emergency_login: {
-                            id: 'GoAroundEye',
-                            password: 'Karna#RV'
-                        },
-                        createdAt: new Date().toISOString()
-                    });
-                    console.log('✅ Seeded emergency login credentials to Owner_Access_Verification in database.');
-                }
-            } catch (err) {
-                console.warn('⚠️ Seeding emergency credentials skipped:', err.message);
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                osc = audioCtx.createOscillator();
+                gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                
+                let high = true;
+                sirenInterval = setInterval(() => {
+                    if (osc && audioCtx) {
+                        osc.frequency.exponentialRampToValueAtTime(high ? 800 : 400, audioCtx.currentTime + 0.4);
+                        high = !high;
+                    }
+                }, 500);
+
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+            } catch (e) {
+                console.error("Siren audio failed:", e);
             }
         }
 
-        // Run seeding check on startup
-        seedEmergencyCredentials();
+        function stopSiren() {
+            if (sirenInterval) {
+                clearInterval(sirenInterval);
+                sirenInterval = null;
+            }
+            if (osc) {
+                try { osc.stop(); } catch(e){}
+                osc.disconnect();
+                osc = null;
+            }
+            if (gain) {
+                gain.disconnect();
+                gain = null;
+            }
+            if (audioCtx) {
+                audioCtx.close();
+                audioCtx = null;
+            }
+        }
+        window.stopSiren = stopSiren;
+
+        // --- REAL-TIME FIRESTORE MONITORING ---
+        let currentAlertId = null;
+        const alertsQuery = query(
+            collection(db, 'emergency_alerts'),
+            orderBy('startedTime', 'desc'),
+            limit(1)
+        );
+
+        onSnapshot(alertsQuery, (snapshot) => {
+            if (snapshot.empty) {
+                console.log("No emergency alerts found.");
+                return;
+            }
+
+            const doc = snapshot.docs[0];
+            const alertData = doc.data();
+            const alertId = doc.id;
+
+            console.log("🔔 [Web UI] New emergency alert received:", alertData);
+
+            // Update local display variables
+            activeVictimName = alertData.victimName || "GoAround User";
+            activeLat = alertData.victimGPS ? alertData.victimGPS.lat : 12.9716;
+            activeLng = alertData.victimGPS ? alertData.victimGPS.lng : 77.5946;
+
+            // Trigger siren if this is a new alert ID and status is active
+            if (alertData.currentStatus === 'active') {
+                if (currentAlertId !== null && currentAlertId !== alertId) {
+                    startSiren();
+                    // Auto-stop siren after 10 seconds to avoid annoying the operator forever
+                    setTimeout(() => {
+                        stopSiren();
+                    }, 10000);
+                }
+                // Push alert notification
+                const isNewAlert = currentAlertId !== alertId;
+                pushNotification({
+                    type: 'alert',
+                    icon: 'triangle-exclamation',
+                    iconColor: 'red',
+                    title: `EMERGENCY: ${(alertData.victimName || 'UNKNOWN').toUpperCase()}`,
+                    desc: `> Status: ACTIVE | ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}${alertData.victimGPS ? ` | GPS: ${alertData.victimGPS.lat?.toFixed(4)}, ${alertData.victimGPS.lng?.toFixed(4)}` : ''}`,
+                    timestamp: alertData.startedTime || new Date()
+                });
+            } else {
+                stopSiren();
+                pushNotification({
+                    type: 'system',
+                    icon: 'circle-check',
+                    iconColor: 'green',
+                    title: `ALERT RESOLVED: ${(alertData.victimName || 'UNKNOWN').toUpperCase()}`,
+                    desc: `> Status: ${(alertData.currentStatus || 'RESOLVED').toUpperCase()} | ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}`,
+                    timestamp: new Date()
+                });
+            }
+            currentAlertId = alertId;
+
+
+            // Update HUD UI values
+            const vNameEl = document.getElementById('victim-name');
+            if (vNameEl) vNameEl.textContent = activeVictimName.toUpperCase();
+            
+            const vPhoneEl = document.getElementById('victim-phone');
+            if (vPhoneEl) vPhoneEl.textContent = alertData.victimPhone || 'N/A';
+            
+            const vPhotoEl = document.getElementById('victim-photo');
+            if (vPhotoEl) vPhotoEl.src = alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11';
+            
+            // Medical & Blood - Only show stack if data is found and not default/empty
+            const vBloodEl = document.getElementById('victim-blood');
+            if (vBloodEl) {
+                const blood = alertData.victimBlood;
+                if (blood && blood !== 'Not set' && blood !== 'Not Set' && blood !== 'N/A' && blood.trim() !== '') {
+                    vBloodEl.parentElement.style.display = 'block';
+                    vBloodEl.innerHTML = blood;
+                } else {
+                    vBloodEl.parentElement.style.display = 'none';
+                }
+            }
+            
+            const vNotesEl = document.getElementById('victim-notes');
+            if (vNotesEl) {
+                const notes = alertData.victimNotes;
+                if (notes && notes !== 'NONE' && notes !== 'None' && notes !== 'Not set' && notes.trim() !== '') {
+                    vNotesEl.parentElement.style.display = 'block';
+                    vNotesEl.textContent = notes;
+                } else {
+                    vNotesEl.parentElement.style.display = 'none';
+                }
+            }
+            
+            const vAllergiesEl = document.getElementById('victim-allergies');
+            if (vAllergiesEl) {
+                const allergies = alertData.victimAllergies;
+                if (allergies && allergies !== 'NONE' && allergies !== 'None' && allergies !== 'Not set' && allergies.trim() !== '') {
+                    vAllergiesEl.parentElement.style.display = 'block';
+                    vAllergiesEl.textContent = allergies;
+                } else {
+                    vAllergiesEl.parentElement.style.display = 'none';
+                }
+            }
+
+            // Vitals
+            const batteryEl = document.querySelector('.vital-item:nth-child(1) .data-value');
+            if (batteryEl) batteryEl.textContent = `${alertData.battery || 100}%`;
+            
+            const networkEl = document.querySelector('.vital-item:nth-child(2) .data-value');
+            if (networkEl) networkEl.textContent = alertData.network || 'Online';
+            
+            const speedEl = document.querySelector('.vital-item:nth-child(3) .data-value');
+            if (speedEl) speedEl.textContent = `${(alertData.speed || 0).toFixed(1)} km/h`;
+            
+            const headingEl = document.querySelector('.vital-item:nth-child(4) .data-value');
+            if (headingEl) headingEl.textContent = `${alertData.heading || 0}°`;
+
+            // Incident Header / Details
+            const incidentIdEl = document.querySelector('.alert-widget .data-value.small');
+            if (incidentIdEl) incidentIdEl.textContent = `#EMRG-${alertId.substring(0, 8).toUpperCase()}`;
+            
+            const statusEl = document.querySelector('.alert-widget .data-value.red');
+            if (statusEl) statusEl.textContent = (alertData.currentStatus || 'ACTIVE').toUpperCase();
+
+            const timeEl = document.querySelector('.alert-widget .data-stack:nth-child(4) .data-value.small');
+            if (timeEl && alertData.startedTime) {
+                const date = alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
+                timeEl.textContent = date.toLocaleString();
+            }
+
+            // Update Globe markers & focus camera
+            globe.htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }]);
+            globe.ringsData([{ lat: activeLat, lng: activeLng }]);
+            globe.pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 }, 2000);
+
+            // Update console text with details (only display fields that exist)
+            const consoleEl = document.querySelector('.console');
+            if (consoleEl) {
+                let consoleText = `> CONNECTION ESTABLISHED...<br>`;
+                consoleText += `> ALERT STATUS: ${(alertData.currentStatus || 'ACTIVE').toUpperCase()}<br>`;
+                consoleText += `> BATTERY LEVEL: ${alertData.battery || 100}% | NETWORK: ${alertData.network || 'N/A'}<br>`;
+                
+                if (alertData.emergencyCard) {
+                    const card = alertData.emergencyCard;
+                    consoleText += `> EMERGENCY CARD LOCKED...<br>`;
+                    
+                    let identityText = [];
+                    if (card.dob && card.dob !== 'Not set' && card.dob.trim() !== '') identityText.push(`DOB: ${card.dob}`);
+                    if (card.gender && card.gender !== 'Not set' && card.gender.trim() !== '') identityText.push(`GENDER: ${card.gender}`);
+                    if (identityText.length > 0) {
+                        consoleText += `> ${identityText.join(' | ')}<br>`;
+                    }
+
+                    if (card.contact1Name && card.contact1Phone) {
+                        consoleText += `> CONTACT 1: ${card.contact1Name} (${card.contact1Phone})${card.contact1Relation ? ' - ' + card.contact1Relation : ''}<br>`;
+                    }
+                    if (card.contact2Name && card.contact2Phone) {
+                        consoleText += `> CONTACT 2: ${card.contact2Name} (${card.contact2Phone})${card.contact2Relation ? ' - ' + card.contact2Relation : ''}<br>`;
+                    }
+                    
+                    if (card.diseases && card.diseases !== 'Not set' && card.diseases.trim() !== '') {
+                        consoleText += `> DISEASES: ${card.diseases.toUpperCase()}<br>`;
+                    }
+                    if (card.medicines && card.medicines !== 'Not set' && card.medicines.trim() !== '') {
+                        consoleText += `> MEDICINES: ${card.medicines.toUpperCase()}<br>`;
+                    }
+                    if (card.allergies && card.allergies !== 'Not set' && card.allergies.trim() !== 'NONE' && card.allergies.trim() !== '') {
+                        consoleText += `> ALLERGIES: ${card.allergies.toUpperCase()}<br>`;
+                    }
+                    if (card.notes && card.notes !== 'Not set' && card.notes.trim() !== 'NONE' && card.notes.trim() !== '') {
+                        consoleText += `> MEDICAL NOTES: ${card.notes.toUpperCase()}<br>`;
+                    }
+                    if (card.vehicle && card.vehicle.number && card.vehicle.number.trim() !== '') {
+                        consoleText += `> VEHICLE: ${card.vehicle.brand || ''} ${card.vehicle.model || ''} [${card.vehicle.number}]<br>`;
+                    }
+                    if (card.insurance && card.insurance.provider && card.insurance.provider.trim() !== '') {
+                        consoleText += `> INS: ${card.insurance.provider} (POLICY: ${card.insurance.policyNumber || 'N/A'})<br>`;
+                    }
+                } else {
+                    consoleText += `> NO OFFLINE EMERGENCY CARD DETECTED...<br>`;
+                }
+                consoleText += `> LIVE TRACKING ACTIVE...`;
+                consoleEl.innerHTML = consoleText;
+            }
+
+            // Group / Traveling Details - Only display if travel group data and members are found
+            const grpWidget = document.getElementById('group-details-widget');
+            if (alertData.group && alertData.group.members && alertData.group.members.length > 0) {
+                if (grpWidget) grpWidget.style.display = 'flex';
+                
+                const grpNameEl = document.getElementById('group-name');
+                if (grpNameEl) grpNameEl.textContent = alertData.group.rideName || 'Ride Group';
+                
+                const grpTotalEl = document.getElementById('group-total');
+                if (grpTotalEl) grpTotalEl.textContent = alertData.group.totalMembers || '0';
+                
+                let onlineCount = 0;
+                let offlineCount = 0;
+                let membersHtml = '';
+
+                alertData.group.members.forEach(member => {
+                    if (member.isOnline) onlineCount++;
+                    else offlineCount++;
+
+                    membersHtml += `
+                        <div class="responder-item" style="margin-bottom: 10px;">
+                            <img src="${member.photo || 'https://i.pravatar.cc/150?img=11'}" alt="${member.name}" class="resp-img">
+                            <div class="resp-info">
+                                <div class="resp-name">${member.name.toUpperCase()}</div>
+                                <div class="resp-status ${member.isOnline ? 'accepted' : 'offline'}">
+                                    ${member.isOnline ? 'ONLINE' : 'OFFLINE'}
+                                </div>
+                            </div>
+                            <div class="resp-meta">
+                                <div class="resp-dist" style="font-size: 11px;">${member.phone || 'N/A'}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                const grpOnlineEl = document.getElementById('group-online');
+                if (grpOnlineEl) grpOnlineEl.textContent = onlineCount;
+                
+                const grpOfflineEl = document.getElementById('group-offline');
+                if (grpOfflineEl) grpOfflineEl.textContent = offlineCount;
+                
+                const listEl = document.getElementById('group-members-list');
+                if (listEl) listEl.innerHTML = membersHtml;
+            } else {
+                if (grpWidget) grpWidget.style.display = 'none';
+            }
+
+            // Timeline populate
+            const timelineEl = document.getElementById('timeline-container');
+            if (timelineEl && alertData.timeline) {
+                timelineEl.innerHTML = '';
+                alertData.timeline.forEach(event => {
+                    const timeDate = event.time && event.time.toDate ? event.time.toDate() : new Date();
+                    const hh = timeDate.getHours().toString().padStart(2, '0');
+                    const mm = timeDate.getMinutes().toString().padStart(2, '0');
+                    const ss = timeDate.getSeconds().toString().padStart(2, '0');
+                    const timeStr = `${hh}:${mm}:${ss}`;
+
+                    const item = document.createElement('div');
+                    item.className = 'tl-item';
+                    item.innerHTML = `<div class="tl-time">${timeStr}</div><div class="tl-event">${event.event}</div>`;
+                    timelineEl.appendChild(item);
+                });
+            }
+        });
 
         // Login Verification Logic (Using Firestore)
         async function verifyLogin() {
             const id = document.getElementById('login-id').value.trim();
             const pass = document.getElementById('login-pass').value;
             const errorEl = document.getElementById('login-error');
-            const submitBtn = document.querySelector('.login-btn');
+            const submitBtn = document.getElementById('login-submit-btn');
             
             errorEl.style.display = 'none';
             submitBtn.textContent = '[ QUERYING SECURITY DATABASE... ]';
@@ -974,6 +1621,206 @@
         // Expose verifyLogin globally so inline HTML onclick works
         window.verifyLogin = verifyLogin;
 
+        // Logout Operator
+        function logoutOperator() {
+            sessionStorage.removeItem('goaround_auth');
+            window.location.reload();
+        }
+        window.logoutOperator = logoutOperator;
+
+        // =============================================
+        // NOTIFICATION PANEL
+        // =============================================
+        let notifications = [];        // all notification objects
+        let unreadCount = 0;
+        let currentTab = 'all';        // 'all' | 'alerts' | 'system'
+
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            const overlay = document.getElementById('notif-overlay');
+            if (panel.classList.contains('open')) {
+                closeNotifPanel();
+            } else {
+                panel.classList.add('open');
+                overlay.classList.add('open');
+                // Mark all visible as read when panel opens
+                markAllAsRead();
+            }
+        }
+        window.toggleNotifPanel = toggleNotifPanel;
+
+        function closeNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            const overlay = document.getElementById('notif-overlay');
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+        window.closeNotifPanel = closeNotifPanel;
+
+        function switchNotifTab(tab) {
+            currentTab = tab;
+            ['all', 'alerts', 'system'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.toggle('active', t === tab);
+            });
+            renderNotifications();
+        }
+        window.switchNotifTab = switchNotifTab;
+
+        function pushNotification({ type, icon, iconColor, title, desc, timestamp }) {
+            const notif = { type, icon, iconColor, title, desc, timestamp: timestamp || new Date(), unread: true, id: Date.now() + Math.random() };
+            notifications.unshift(notif);
+            if (notifications.length > 50) notifications = notifications.slice(0, 50);
+            
+            // Update unread count & badge
+            const panel = document.getElementById('notif-panel');
+            if (!panel.classList.contains('open')) {
+                unreadCount++;
+                updateBadge();
+            }
+            renderNotifications();
+        }
+        window.pushNotification = pushNotification;
+
+        function updateBadge() {
+            const badge = document.getElementById('notif-badge');
+            if (!badge) return;
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function markAllAsRead() {
+            notifications.forEach(n => n.unread = false);
+            unreadCount = 0;
+            updateBadge();
+            renderNotifications();
+        }
+
+        function clearNotifications() {
+            notifications = [];
+            unreadCount = 0;
+            updateBadge();
+            renderNotifications();
+        }
+        window.clearNotifications = clearNotifications;
+
+        function formatNotifTime(date) {
+            if (!date) return '';
+            const d = date instanceof Date ? date : date.toDate ? date.toDate() : new Date(date);
+            const hh = d.getHours().toString().padStart(2, '0');
+            const mm = d.getMinutes().toString().padStart(2, '0');
+            const ss = d.getSeconds().toString().padStart(2, '0');
+            const day = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return `${day} ${hh}:${mm}:${ss}`;
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            if (!list) return;
+
+            const filtered = notifications.filter(n => {
+                if (currentTab === 'all') return true;
+                if (currentTab === 'alerts') return n.type === 'alert';
+                if (currentTab === 'system') return n.type === 'system';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="notif-empty"><i class="fa-solid fa-bell-slash"></i>> NO NOTIFICATIONS RECEIVED</div>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(n => `
+                <div class="notif-item ${n.unread ? 'unread' : ''}" id="notif-${n.id}">
+                    <div class="notif-icon ${n.iconColor || 'red'}">
+                        <i class="fa-solid fa-${n.icon || 'bell'}"></i>
+                    </div>
+                    <div class="notif-body">
+                        <div class="notif-title">${n.title}</div>
+                        <div class="notif-desc">${n.desc}</div>
+                        <div class="notif-time">${formatNotifTime(n.timestamp)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Seed initial system notifications on load
+        setTimeout(() => {
+            pushNotification({
+                type: 'system',
+                icon: 'shield-halved',
+                iconColor: 'green',
+                title: 'SYSTEM ONLINE',
+                desc: '> Secure channel established. Encryption: AES-256.',
+                timestamp: new Date()
+            });
+            pushNotification({
+                type: 'system',
+                icon: 'satellite-dish',
+                iconColor: 'blue',
+                title: 'LIVE TRACKING ACTIVE',
+                desc: '> GPS stream connected. Location update every 2s.',
+                timestamp: new Date()
+            });
+        }, 1500);
+
+        // Custom modal controls & Profile de-authorization
+        function showConfirmModal() {
+            const modal = document.getElementById('confirm-modal-overlay');
+            if (modal) modal.style.display = 'flex';
+        }
+        window.showConfirmModal = showConfirmModal;
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirm-modal-overlay');
+            if (modal) modal.style.display = 'none';
+        }
+        window.closeConfirmModal = closeConfirmModal;
+
+        function executeProfileDeauth() {
+            closeConfirmModal();
+            stopSiren();
+
+            // 1. Scrub/overwrite victim data fields
+            const photoEl = document.getElementById('victim-photo');
+            if (photoEl) {
+                photoEl.src = 'https://dummyimage.com/150x180/020203/ff3333.png&text=XXXXX';
+            }
+
+            const nameEl = document.getElementById('victim-name');
+            const phoneEl = document.getElementById('victim-phone');
+            const bloodEl = document.getElementById('victim-blood');
+            const notesEl = document.getElementById('victim-notes');
+            const allergiesEl = document.getElementById('victim-allergies');
+
+            if (nameEl) nameEl.textContent = 'XXXXX';
+            if (phoneEl) phoneEl.textContent = 'XXXXX';
+            if (bloodEl) bloodEl.innerHTML = 'XXXXX';
+            if (notesEl) notesEl.textContent = 'XXXXX';
+            if (allergiesEl) allergiesEl.textContent = 'XXXXX';
+
+            // 2. Add log entry with timestamp to incident timeline
+            const timeline = document.getElementById('timeline-container');
+            if (timeline) {
+                const now = new Date();
+                const hh = now.getHours().toString().padStart(2, '0');
+                const mm = now.getMinutes().toString().padStart(2, '0');
+                const ss = now.getSeconds().toString().padStart(2, '0');
+                const timeStr = `${hh}:${mm}:${ss}`;
+
+                const newLog = document.createElement('div');
+                newLog.className = 'tl-item';
+                newLog.innerHTML = `<div class="tl-time">${timeStr}</div><div class="tl-event" style="color: var(--accent-red); font-weight: bold;">VICTIM PROFILE REMOVED / ARCHIVED</div>`;
+                
+                timeline.appendChild(newLog);
+            }
+        }
+        window.executeProfileDeauth = executeProfileDeauth;
+
         // Add shake keyframes to head dynamically
         const styleSheet = document.createElement('style');
         styleSheet.textContent = `
@@ -985,11 +1832,34 @@
         `;
         document.head.appendChild(styleSheet);
 
-        // Autofocus Operator ID field on load if not authenticated
+        // Input masking helper functions
+        function updateInputMask(inputId, maskId) {
+            const input = document.getElementById(inputId);
+            const mask = document.getElementById(maskId);
+            if (input && mask) {
+                // Mask with custom retro asterisks *
+                mask.textContent = '*'.repeat(input.value.length);
+            }
+        }
+
+        // Autofocus Operator ID field and input masking setup on load
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('goaround_auth') !== 'true') {
                 const idField = document.getElementById('login-id');
                 if (idField) idField.focus();
+            }
+
+            // Bind input masking listeners
+            const idInput = document.getElementById('login-id');
+            const passInput = document.getElementById('login-pass');
+            if (idInput) {
+                idInput.addEventListener('input', () => updateInputMask('login-id', 'login-id-mask'));
+                // Trigger initially in case of autocomplete
+                updateInputMask('login-id', 'login-id-mask');
+            }
+            if (passInput) {
+                passInput.addEventListener('input', () => updateInputMask('login-pass', 'login-pass-mask'));
+                updateInputMask('login-pass', 'login-pass-mask');
             }
         });
     </script>

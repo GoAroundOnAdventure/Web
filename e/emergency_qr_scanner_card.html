@@ -368,35 +368,41 @@
  
         // Extract emergency ID from the URL (including hash fragment like #User_0101)
         function getEmergencyId() {
+            // Decode components to handle URL-encoded characters like %23 (#)
+            const search = decodeURIComponent(window.location.search);
+            const pathname = decodeURIComponent(window.location.pathname);
+            const hash = decodeURIComponent(window.location.hash);
+            const href = decodeURIComponent(window.location.href);
+
             // 1. Check query parameters (?id=EMRGNCY...)
-            const urlParams = new URLSearchParams(window.location.search);
-            let id = urlParams.get('id');
+            const urlParams = new URLSearchParams(search);
+            let id = urlParams.get('id') || urlParams.get('uid');
             if (id && id.startsWith('EMRGNCY')) {
                 let fullId = id.trim();
-                if (!fullId.includes('#') && window.location.hash) {
-                    fullId += window.location.hash;
+                if (!fullId.includes('#') && hash) {
+                    fullId += hash;
                 }
                 return fullId;
             }
- 
+
             // 2. Check the pathname segments (/e/EMRGNCY...)
-            const pathParts = window.location.pathname.split('/');
+            const pathParts = pathname.split('/');
             for (let part of pathParts) {
                 if (part.startsWith('EMRGNCY')) {
                     let fullId = part.trim();
-                    if (!fullId.includes('#') && window.location.hash) {
-                        fullId += window.location.hash;
+                    if (!fullId.includes('#') && hash) {
+                        fullId += hash;
                     }
                     return fullId;
                 }
             }
- 
-            // 3. Fallback: regex search the entire href
-            const regexMatch = window.location.href.match(/EMRGNCY[A-Za-z0-9#_]+/);
+
+            // 3. Fallback: regex search the entire decoded href
+            const regexMatch = href.match(/EMRGNCY[A-Za-z0-9#_]+/);
             if (regexMatch) {
                 return regexMatch[0];
             }
- 
+
             return null;
         }
  
