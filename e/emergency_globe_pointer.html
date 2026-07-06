@@ -1826,6 +1826,29 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // One-time seeding of 'Go' / 'Around' in Firestore (Owner_Access_Verification)
+        (async function seedCredentials() {
+            try {
+                const colRef = collection(db, 'Owner_Access_Verification');
+                const q = query(colRef, where('email', '==', 'go'));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    await addDoc(colRef, {
+                        email: 'go',
+                        password: 'Around',
+                        emergency_login: {
+                            id: 'Go',
+                            password: 'Around'
+                        },
+                        createdAt: new Date().toISOString()
+                    });
+                    console.log("✅ Credentials 'Go' / 'Around' successfully seeded in Firestore database!");
+                }
+            } catch (err) {
+                console.error("⚠️ Failed to seed credentials in Firestore:", err);
+            }
+        })();
+
         // ── MAPBOX GL JS GLOBE ──────────────────────────────────────────
         let activeVictimName = "LIVE LOCATION";
         let activeLat = 12.9716;
