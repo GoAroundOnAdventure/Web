@@ -1889,6 +1889,30 @@
             globe.pointOfView({ lat: activeLat - 3, lng: activeLng, altitude: 1.6 }, 2500);
         }, 4500);
 
+        // ── ZOOM-BASED COLOUR TRANSITION ─────────────────────────────────
+        // Globe view (altitude ≥ 1.5) → black & white
+        // Zoom in     (altitude ≤ 0.35) → full satellite colour
+        const globeCanvas = () => globeContainer.querySelector('canvas');
+
+        function applyGlobeFilter(altitude) {
+            const canvas = globeCanvas();
+            if (!canvas) return;
+            // t=1 → fully zoomed out (grayscale), t=0 → zoomed in (color)
+            const HIGH = 1.5, LOW = 0.35;
+            const t = Math.max(0, Math.min(1, (altitude - LOW) / (HIGH - LOW)));
+            const gs        = Math.round(t * 100);           // 0–100 %
+            const brightness = (0.85 + (1 - t) * 0.2).toFixed(2);  // dimmer far, brighter close
+            const contrast   = (1 + (1 - t) * 0.1).toFixed(2);
+            canvas.style.filter = `grayscale(${gs}%) brightness(${brightness}) contrast(${contrast})`;
+            canvas.style.transition = 'filter 0.4s ease';
+        }
+
+        // Listen to every zoom/pan event
+        globe.onZoom(({ altitude }) => applyGlobeFilter(altitude));
+
+        // Set initial grayscale (globe starts at altitude 2.5)
+        setTimeout(() => applyGlobeFilter(2.5), 300);
+
         // Resize handler
         window.addEventListener('resize', () => {
             globe.width(globeContainer.clientWidth);
@@ -1906,6 +1930,7 @@
                 setTimeout(() => globe.ringsData([{ lat: activeLat, lng: activeLng }]), 120);
             }
         });
+
 
         // Timer Logic
         let seconds = 34;
