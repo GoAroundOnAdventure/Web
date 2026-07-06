@@ -1300,13 +1300,21 @@
             white-space: nowrap;
             overflow: hidden;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-            z-index: 1;
+            z-index: 3; /* Render on top of the input's dark background */
         }
 
         #login-id-mask {
-            color: #c0c0c0; /* silver */
-            text-shadow: 0 0 5px rgba(192, 192, 192, 0.4);
+            color: #e0e0e0 !important; /* bright silver */
+            -webkit-text-fill-color: #e0e0e0 !important;
+            text-shadow: 0 0 6px rgba(224, 224, 224, 0.6) !important;
             letter-spacing: 2px;
+        }
+
+        #login-pass-mask {
+            color: var(--accent-red) !important; /* glowing red */
+            -webkit-text-fill-color: var(--accent-red) !important;
+            text-shadow: 0 0 6px rgba(255, 51, 51, 0.6) !important;
+            letter-spacing: 5px;
         }
 
         #login-id {
