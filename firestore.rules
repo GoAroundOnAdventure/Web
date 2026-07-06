@@ -1,3 +1,4 @@
+git commit -m "Update Flutter project files"
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
