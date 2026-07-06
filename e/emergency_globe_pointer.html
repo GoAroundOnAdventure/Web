@@ -370,33 +370,49 @@
         }
 
         /* Hide Mapbox logo/attribution to keep the HUD look clean */
-        .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none !important; }
-        .mapboxgl-ctrl-group { background: rgba(4,6,9,0.8) !important; border: 1px solid rgba(255,51,51,0.3) !important; }
-        .mapboxgl-ctrl-group button { background: transparent !important; }
-        .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon { filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg) brightness(1.2); }
+        .mapboxgl-ctrl-logo,
+        .mapboxgl-ctrl-attrib {
+            display: none !important;
+        }
+
+        .mapboxgl-ctrl-group {
+            background: rgba(4, 6, 9, 0.8) !important;
+            border: 1px solid rgba(255, 51, 51, 0.3) !important;
+        }
+
+        .mapboxgl-ctrl-group button {
+            background: transparent !important;
+        }
+
+        .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg) brightness(1.2);
+        }
 
 
         /* Pulsing ring CSS animation on the marker */
         @keyframes hud-pulse {
-            0%   {
+            0% {
                 box-shadow:
-                    0 0 0   0px rgba(255, 51, 51, 0.9),
-                    0 0 0   0px rgba(255, 51, 51, 0.4),
+                    0 0 0 0px rgba(255, 51, 51, 0.9),
+                    0 0 0 0px rgba(255, 51, 51, 0.4),
                     0 0 14px 5px rgba(255, 51, 51, 0.8);
             }
-            60%  {
+
+            60% {
                 box-shadow:
-                    0 0 0  18px rgba(255, 51, 51, 0.0),
-                    0 0 0  36px rgba(255, 51, 51, 0.0),
+                    0 0 0 18px rgba(255, 51, 51, 0.0),
+                    0 0 0 36px rgba(255, 51, 51, 0.0),
                     0 0 20px 8px rgba(255, 51, 51, 1);
             }
+
             100% {
                 box-shadow:
-                    0 0 0   0px rgba(255, 51, 51, 0),
-                    0 0 0   0px rgba(255, 51, 51, 0),
+                    0 0 0 0px rgba(255, 51, 51, 0),
+                    0 0 0 0px rgba(255, 51, 51, 0),
                     0 0 14px 5px rgba(255, 51, 51, 0.8);
             }
         }
+
         .hud-pulse-dot {
             animation: hud-pulse 1.8s ease-out infinite;
         }
@@ -1255,8 +1271,19 @@
         }
 
         .input-group input::placeholder {
-            color: var(--text-muted);
+            color: rgba(255, 51, 51, 0.4) !important;
+            -webkit-text-fill-color: rgba(255, 51, 51, 0.4) !important;
+            text-shadow: 0 0 3px rgba(255, 51, 51, 0.3);
             letter-spacing: 1px;
+            opacity: 1 !important;
+        }
+
+        #login-id::placeholder {
+            color: rgba(192, 192, 192, 0.4) !important;
+            -webkit-text-fill-color: rgba(192, 192, 192, 0.4) !important;
+            text-shadow: 0 0 3px rgba(192, 192, 192, 0.3);
+            letter-spacing: 1px;
+            opacity: 1 !important;
         }
 
         .input-mask {
@@ -1274,6 +1301,16 @@
             overflow: hidden;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
             z-index: 1;
+        }
+
+        #login-id-mask {
+            color: #c0c0c0; /* silver */
+            text-shadow: 0 0 5px rgba(192, 192, 192, 0.4);
+            letter-spacing: 2px;
+        }
+
+        #login-id {
+            letter-spacing: 2px !important;
         }
 
         .input-group input:focus {
@@ -1364,7 +1401,8 @@
                 WARNING: DE-AUTHORIZATION
                 <div class="secure-tag"
                     style="color: var(--accent-red); background: rgba(255, 51, 51, 0.1); border-color: rgba(255, 51, 51, 0.3);">
-                    <i class="fa-solid fa-triangle-exclamation"></i> DANGER</div>
+                    <i class="fa-solid fa-triangle-exclamation"></i> DANGER
+                </div>
             </div>
             <div
                 style="font-size: 13px; line-height: 1.6; color: var(--text-main); margin-bottom: 25px; letter-spacing: 0.5px;">
@@ -1898,12 +1936,12 @@
                 paint: {
                     'fill-extrusion-color': [
                         'interpolate', ['linear'], ['get', 'height'],
-                        0,   '#0a0f1a',
-                        50,  '#111827',
+                        0, '#0a0f1a',
+                        50, '#111827',
                         200, '#1e293b'
                     ],
                     'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base':   ['get', 'min_height'],
+                    'fill-extrusion-base': ['get', 'min_height'],
                     'fill-extrusion-opacity': 0.85
                 }
             });
@@ -1917,10 +1955,10 @@
             // Settle on location at a moderate zoom (streets NOT visible yet)
             setTimeout(() => {
                 map.flyTo({
-                    center:   [activeLng, activeLat],
-                    zoom:     5.5,      // moderate zoom
-                    pitch:    15,
-                    bearing:  0,
+                    center: [activeLng, activeLat],
+                    zoom: 5.5,      // moderate zoom
+                    pitch: 15,
+                    bearing: 0,
                     duration: 3000,
                     essential: true
                 });
@@ -1942,7 +1980,7 @@
             } else {
                 grayscalePercent = ((5.5 - z) / 3.5) * 100;
             }
-            canvas.style.filter = `grayscale(${grayscalePercent}%) contrast(1.05) brightness(${0.95 + (100 - grayscalePercent)/100 * 0.05})`;
+            canvas.style.filter = `grayscale(${grayscalePercent}%) contrast(1.05) brightness(${0.95 + (100 - grayscalePercent) / 100 * 0.05})`;
         });
 
         // Initialize grayscale on load
@@ -2548,8 +2586,13 @@
             const input = document.getElementById(inputId);
             const mask = document.getElementById(maskId);
             if (input && mask) {
-                // Mask with custom retro asterisks *
-                mask.textContent = '*'.repeat(input.value.length);
+                if (inputId === 'login-id') {
+                    // Display the actual ID in silver
+                    mask.textContent = input.value;
+                } else {
+                    // Mask passkey with custom retro asterisks *
+                    mask.textContent = '*'.repeat(input.value.length);
+                }
             }
         }
 
