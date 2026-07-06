@@ -368,6 +368,11 @@
             min-height: 0;
         }
 
+        /* Black & white satellite imagery — marker stays red */
+        #globe-container .mapboxgl-canvas {
+            filter: grayscale(100%) contrast(1.05) brightness(0.95);
+        }
+
         /* Hide Mapbox logo/attribution to keep the HUD look clean */
         .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none !important; }
         .mapboxgl-ctrl-group { background: rgba(4,6,9,0.8) !important; border: 1px solid rgba(255,51,51,0.3) !important; }
