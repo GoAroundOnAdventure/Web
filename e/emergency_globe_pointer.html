@@ -1792,7 +1792,7 @@
             style: 'mapbox://styles/mapbox/satellite-streets-v12',
             projection: 'globe',
             center: [activeLng, activeLat],
-            zoom: 5,
+            zoom: 1.5,          // full Earth globe view on open
             pitch: 0,
             bearing: 0,
             antialias: true
@@ -1909,20 +1909,28 @@
             // Add marker to map
             activeMarker.addTo(map);
 
-            // Push the globe's viewport center upward so it sits above the bottom HUD strip
+            // Offset viewport so globe sits above the bottom HUD strip
             map.setPadding({ top: 0, bottom: 130, left: 0, right: 0 });
 
-            // Gentle zoom from globe to country level — user scrolls in from here
+            // ── INTRO ANIMATION ───────────────────────────────────────────
+            // Step 1: Spin the globe one full rotation (360°) over 5 seconds
+            map.rotateTo(360, {
+                duration: 5000,
+                easing: (t) => t < 0.5 ? 2*t*t : -1+(4-2*t)*t   // ease-in-out
+            });
+
+            // Step 2: After spin finishes, fly to the emergency location at
+            //         a moderate zoom — NOT street level. User zooms in from here.
             setTimeout(() => {
                 map.flyTo({
                     center:   [activeLng, activeLat],
-                    zoom:     4.5,
-                    pitch:    20,
+                    zoom:     5.5,      // country/region view — streets NOT visible yet
+                    pitch:    15,
                     bearing:  0,
-                    duration: 3500,
+                    duration: 3000,
                     essential: true
                 });
-            }, 1000);
+            }, 5500);   // 5s spin + 0.5s buffer
         });
 
         // Helper: move marker + update HUD coords label
