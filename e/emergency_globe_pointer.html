@@ -1761,9 +1761,9 @@
             .pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 })
             .ringsData([{ lat: activeLat, lng: activeLng }])
             .ringColor(() => 'rgba(255, 30, 30, 0.9)')
-            .ringMaxRadius(45)
-            .ringPropagationSpeed(1.5)
-            .ringRepeatPeriod(900)
+            .ringMaxRadius(8)
+            .ringPropagationSpeed(1)
+            .ringRepeatPeriod(4000)
             .htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }])
             .htmlElement((d) => {
                 const el = document.createElement('div');
@@ -1872,6 +1872,16 @@
             globe.width(globeContainer.clientWidth);
             globe.height(globeContainer.clientHeight);
         }, 100);
+
+        // Reset ring when user returns to tab (prevents ring pile-up after inactivity)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                globe.ringsData([]);
+                setTimeout(() => {
+                    globe.ringsData([{ lat: activeLat, lng: activeLng }]);
+                }, 100);
+            }
+        });
 
         // Timer Logic
         let seconds = 34;
