@@ -16,6 +16,7 @@
         href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
     <style>
         :root {
             --bg-color: #010203;
@@ -364,6 +365,23 @@
             flex: 1;
             position: relative;
             cursor: grab;
+            min-height: 0;
+        }
+
+        /* Hide Mapbox logo/attribution to keep the HUD look clean */
+        .mapboxgl-ctrl-logo, .mapboxgl-ctrl-attrib { display: none !important; }
+        .mapboxgl-ctrl-group { background: rgba(4,6,9,0.8) !important; border: 1px solid rgba(255,51,51,0.3) !important; }
+        .mapboxgl-ctrl-group button { background: transparent !important; }
+        .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon { filter: invert(1) sepia(1) saturate(5) hue-rotate(300deg) brightness(1.2); }
+
+        /* Pulsing ring CSS animation on the marker */
+        @keyframes hud-pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255,51,51,0.7), 0 0 10px 4px rgba(255,51,51,0.5); }
+            70%  { box-shadow: 0 0 0 20px rgba(255,51,51,0), 0 0 10px 4px rgba(255,51,51,0.5); }
+            100% { box-shadow: 0 0 0 0 rgba(255,51,51,0), 0 0 10px 4px rgba(255,51,51,0.5); }
+        }
+        .hud-pulse-dot {
+            animation: hud-pulse 2s ease-out infinite;
         }
 
         /* HUD Overlays */
@@ -1725,7 +1743,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/globe.gl@2.31.0/dist/globe.gl.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1745,155 +1763,161 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Init Globe
-        const globeContainer = document.getElementById('globe-container');
+        // ── MAPBOX GL JS GLOBE ──────────────────────────────────────────
         let activeVictimName = "LIVE LOCATION";
         let activeLat = 12.9716;
         let activeLng = 77.5946;
 
-        const globe = Globe({ animateIn: false })(globeContainer)
-            .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
-            .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-            .showAtmosphere(true)
-            .atmosphereColor('#1a6fff')
-            .atmosphereAltitude(0.18)
-            .pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 })
-            .ringsData([{ lat: activeLat, lng: activeLng }])
-            .ringColor(() => 'rgba(255, 30, 30, 0.9)')
-            .ringMaxRadius(8)
-            .ringPropagationSpeed(1)
-            .ringRepeatPeriod(4000)
-            .htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }])
-            .htmlElement((d) => {
-                const el = document.createElement('div');
-                el.style.cssText = `
-                    position: relative;
-                    /* No transform offset here, so (0,0) is exactly the lat/lng coordinate */
-                `;
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZ29hcm91bmRvbmFkdmVudH' +
+            'VyZSIsImEiOiJjbWltdTJva2kxdXVkM2ZyMWVyMDhtZ2h4In0' +
+            '.hvu8oKN8LRg-acsd6XsPcA';
 
-                el.innerHTML = `
-                    <!-- 1. The glowing dot at origin -->
-                    <div style="
-                        position: absolute;
-                        top: 0; left: 0;
-                        transform: translate(-50%, -50%);
-                        width: 5px; height: 5px;
-                        background: #ffffff;
-                        border-radius: 50%;
-                        box-shadow: 0 0 12px 4px rgba(255, 51, 51, 1);
-                        z-index: 2;
-                    "></div>
+        const map = new mapboxgl.Map({
+            container: 'globe-container',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            projection: 'globe',
+            center: [activeLng, activeLat],
+            zoom: 1.5,
+            pitch: 0,
+            bearing: 0,
+            antialias: true
+        });
 
-                    <!-- 2. The vertical line -->
-                    <div style="
-                        position: absolute;
-                        bottom: 0; left: -0.75px;
-                        width: 1.5px; height: 130px;
-                        background: linear-gradient(to top, rgba(255,51,51,1), rgba(255,51,51,0.3));
-                        box-shadow: 0 0 6px #ff3333;
-                        z-index: 1;
-                    "></div>
+        // ── Custom HUD Marker element ───────────────────────────────────
+        function buildMarkerEl(lat, lng, label) {
+            const el = document.createElement('div');
+            el.style.cssText = 'position:relative; pointer-events:none;';
+            el.innerHTML = `
+                <!-- Glowing dot -->
+                <div class="hud-pulse-dot" style="
+                    position:absolute; top:0; left:0;
+                    transform:translate(-50%,-50%);
+                    width:10px; height:10px;
+                    background:#ff3333;
+                    border-radius:50%;
+                    border:2px solid #fff;
+                    z-index:2;
+                "></div>
 
-                    <!-- 3. The HUD Box -->
-                    <div style="
-                        position: absolute;
-                        bottom: 130px; left: -25px; /* Inset line by 25px */
-                        border: 1px solid #ff3333;
-                        border-radius: 3px;
-                        overflow: hidden;
-                        box-shadow: 0 5px 15px rgba(0,0,0,0.6), 0 0 15px rgba(255, 51, 51, 0.4);
-                        width: max-content;
-                        z-index: 3;
-                    ">
-                        <!-- CRT scanline overlay specifically for the info box -->
-                        <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.5) 1px, rgba(0,0,0,0.5) 2px); pointer-events: none; z-index: 10;"></div>
-                        
-                        <!-- Header -->
-                        <div style="
-                            background: linear-gradient(to right, #990000, #4d0000);
-                            padding: 4px 10px;
-                            font-family: 'Rajdhani', sans-serif;
-                            font-size: 13px;
-                            font-weight: 700;
-                            letter-spacing: 1px;
-                            border-bottom: 1px solid rgba(255,51,51,0.5);
-                            position: relative; z-index: 1;
-                        ">
-                            ${(d.label || 'LIVE LOCATION').toUpperCase()}
-                        </div>
-                        <!-- Body -->
-                        <div style="
-                            background: rgba(4, 6, 9, 0.95);
-                            padding: 5px 10px;
-                            font-family: 'Rajdhani', sans-serif;
-                            font-size: 14px;
-                            font-weight: 500;
-                            letter-spacing: 0.5px;
-                            position: relative; z-index: 1;
-                        ">
-                            ${d.lat.toFixed(4)}&deg; N, ${d.lng.toFixed(4)}&deg; E
-                        </div>
+                <!-- Vertical line -->
+                <div style="
+                    position:absolute;
+                    bottom:0; left:-0.75px;
+                    width:1.5px; height:90px;
+                    background:linear-gradient(to top,rgba(255,51,51,1),rgba(255,51,51,0.2));
+                    box-shadow:0 0 6px #ff3333;
+                    z-index:1;
+                "></div>
+
+                <!-- HUD box -->
+                <div style="
+                    position:absolute;
+                    bottom:90px; left:-40px;
+                    border:1px solid #ff3333;
+                    border-radius:3px;
+                    overflow:hidden;
+                    box-shadow:0 5px 15px rgba(0,0,0,0.7),0 0 15px rgba(255,51,51,0.4);
+                    width:max-content;
+                    z-index:3;
+                    font-family:'Rajdhani',sans-serif;
+                ">
+                    <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,0,0,0.5) 1px,rgba(0,0,0,0.5) 2px);pointer-events:none;z-index:10;"></div>
+                    <div style="background:linear-gradient(to right,#990000,#4d0000);padding:4px 10px;font-size:12px;font-weight:700;letter-spacing:1px;border-bottom:1px solid rgba(255,51,51,0.5);position:relative;z-index:1;">
+                        ${(label || 'LIVE LOCATION').toUpperCase()}
                     </div>
-                    
-                    <!-- 4. The little notch triangle where the line meets the box -->
-                    <div style="
-                        position: absolute;
-                        bottom: 125px; left: -5px; /* Centered over the x=0 line */
-                        width: 0; height: 0;
-                        border-left: 5px solid transparent;
-                        border-right: 5px solid transparent;
-                        border-top: 5px solid #ff3333;
-                        z-index: 4;
-                    "></div>
-                `;
-                return el;
+                    <div id="hud-coords" style="background:rgba(4,6,9,0.95);padding:5px 10px;font-size:13px;font-weight:500;letter-spacing:0.5px;position:relative;z-index:1;">
+                        ${lat.toFixed(4)}&deg; N, ${lng.toFixed(4)}&deg; E
+                    </div>
+                </div>
+
+                <!-- Triangle notch -->
+                <div style="
+                    position:absolute;
+                    bottom:85px; left:-5px;
+                    width:0; height:0;
+                    border-left:5px solid transparent;
+                    border-right:5px solid transparent;
+                    border-top:5px solid #ff3333;
+                    z-index:4;
+                "></div>
+            `;
+            return el;
+        }
+
+        // Create the marker but don't add to map yet — wait for load
+        let markerEl = buildMarkerEl(activeLat, activeLng, activeVictimName);
+        let activeMarker = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
+            .setLngLat([activeLng, activeLat]);
+
+        map.on('load', () => {
+            // Atmosphere / space fog for globe view
+            map.setFog({
+                color: 'rgb(2, 6, 18)',
+                'high-color': 'rgb(10, 30, 80)',
+                'horizon-blend': 0.08,
+                'space-color': 'rgb(1, 3, 10)',
+                'star-intensity': 0.8
             });
 
-        // Controls
-        globe.controls().autoRotate = false;
-        globe.controls().enableZoom = true;
+            // 3D terrain
+            map.addSource('mapbox-dem', {
+                type: 'raster-dem',
+                url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                tileSize: 512,
+                maxzoom: 14
+            });
+            map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.3 });
 
-        // Set pixel ratio for crisp Retina / HiDPI rendering
-        globe.renderer().setPixelRatio(window.devicePixelRatio);
-
-        // Upgrade globe material to MeshPhongMaterial for specular highlights
-        setTimeout(() => {
-            const globeMaterial = globe.globeMaterial();
-            if (globeMaterial) {
-                // Reset any colour tint so the texture shows its true colours
-                globeMaterial.color.set(0xffffff);
-                // Specular highlight (subtle bluish gloss like real Earth)
-                if (globeMaterial.specular) {
-                    globeMaterial.specular.set(0x223344);
-                    globeMaterial.shininess = 8;
+            // 3D buildings (visible when zoomed in)
+            map.addLayer({
+                id: '3d-buildings',
+                source: 'composite',
+                'source-layer': 'building',
+                filter: ['==', 'extrude', 'true'],
+                type: 'fill-extrusion',
+                minzoom: 14,
+                paint: {
+                    'fill-extrusion-color': [
+                        'interpolate', ['linear'], ['get', 'height'],
+                        0,   '#0a0f1a',
+                        50,  '#111827',
+                        200, '#1e293b'
+                    ],
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-base':   ['get', 'min_height'],
+                    'fill-extrusion-opacity': 0.85
                 }
-                // Very faint emissive so oceans glow slightly on dark side
-                if (globeMaterial.emissive) {
-                    globeMaterial.emissive.set(0x050a14);
-                    globeMaterial.emissiveIntensity = 1;
-                }
-                globeMaterial.needsUpdate = true;
-            }
-        }, 800);
+            });
 
-        // Resize handler
-        window.addEventListener('resize', () => {
-            globe.width(globeContainer.clientWidth);
-            globe.height(globeContainer.clientHeight);
+            // Add marker to map
+            activeMarker.addTo(map);
+
+            // Fly from globe view down to the emergency location
+            setTimeout(() => {
+                map.flyTo({
+                    center: [activeLng, activeLat],
+                    zoom: 14,
+                    pitch: 55,
+                    bearing: -20,
+                    duration: 5000,
+                    essential: true
+                });
+            }, 1200);
         });
-        setTimeout(() => {
-            globe.width(globeContainer.clientWidth);
-            globe.height(globeContainer.clientHeight);
-        }, 100);
 
-        // Reset ring when user returns to tab (prevents ring pile-up after inactivity)
+        // Helper: move marker + update HUD coords label
+        function updateMapMarker(lat, lng, label) {
+            activeMarker.setLngLat([lng, lat]);
+            const coordEl = document.getElementById('hud-coords');
+            if (coordEl) coordEl.innerHTML = `${lat.toFixed(4)}&deg; N, ${lng.toFixed(4)}&deg; E`;
+        }
+
+        // Resize (Mapbox auto-handles it, just trigger it)
+        window.addEventListener('resize', () => map.resize());
+
+        // No ring pile-up on tab return — just a no-op for Mapbox (CSS animation handles it)
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                globe.ringsData([]);
-                setTimeout(() => {
-                    globe.ringsData([{ lat: activeLat, lng: activeLng }]);
-                }, 100);
-            }
+            if (!document.hidden) map.resize();
         });
 
         // Timer Logic
@@ -2088,10 +2112,9 @@
                 timeEl.textContent = date.toLocaleString();
             }
 
-            // Update Globe markers & focus camera
-            globe.htmlElementsData([{ lat: activeLat, lng: activeLng, label: activeVictimName }]);
-            globe.ringsData([{ lat: activeLat, lng: activeLng }]);
-            globe.pointOfView({ lat: activeLat - 2, lng: activeLng, altitude: 1.2 }, 2000);
+            // Update Mapbox marker & ease camera to new GPS position
+            updateMapMarker(activeLat, activeLng, activeVictimName);
+            map.easeTo({ center: [activeLng, activeLat], duration: 2000 });
 
             // Update console text with details (only display fields that exist)
             const consoleEl = document.querySelector('.console');
