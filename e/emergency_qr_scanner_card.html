@@ -342,7 +342,7 @@
     <!-- Firebase Web SDK v10 Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, collectionGroup, query, where, limit, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
  
         // Firebase Configuration Object
         const firebaseConfig = {
@@ -455,7 +455,7 @@
             try {
                 // Query Firestore
                 const q = query(
-                    collection(db, "emergency_profile"), 
+                    collectionGroup(db, "QR"), 
                     where("emergencyID", "==", emergencyId), 
                     limit(1)
                 );
