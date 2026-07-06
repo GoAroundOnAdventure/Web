@@ -485,13 +485,14 @@
             // Hide loading spinner
             loadingState.classList.add('hidden');
             profileContainer.classList.remove('hidden');
+
+            const fullNameStr = data.fullName || data.name || 'Unknown User';
  
             // Name Initials or Profile Photo for Avatar
             const avatarContainer = document.getElementById('avatar-container');
             if (data.photoUrl && data.photoUrl.trim() !== '') {
                 avatarContainer.innerHTML = `<img src="${data.photoUrl}" class="w-full h-full rounded-full object-cover">`;
             } else {
-                const fullNameStr = data.fullName || data.name || 'Unknown User';
                 const nameParts = fullNameStr.split(' ');
                 let initials = nameParts[0] ? nameParts[0].substring(0, 1) : '-';
                 if (nameParts.length > 1 && nameParts[nameParts.length - 1]) {
