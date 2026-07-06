@@ -22,7 +22,7 @@
             --bg-color: #010203;
             --panel-bg: rgba(4, 6, 9, 0.65);
             --border-color: #1a1e24;
-            --accent-red: #ff3333;
+            --accent-red: #d32f2f;
             --accent-green: #00cc66;
             --accent-blue: #3399ff;
             --accent-yellow: #ffcc00;
@@ -71,7 +71,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 8px 15px;
-            border-bottom: 1px solid rgba(255, 51, 51, 0.15);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.15);
             background: rgba(1, 2, 3, 0.9);
             z-index: 100;
         }
@@ -94,10 +94,11 @@
             font-size: 18px;
             letter-spacing: 1.5px;
             margin-top: 2px;
+            text-shadow: 0 0 8px rgba(211, 47, 47, 0.65);
         }
 
         .live-badge {
-            background: transparent;
+            background: rgba(211, 47, 47, 0.05);
             border: 1px solid var(--accent-red);
             color: var(--accent-red);
             padding: 2px 8px;
@@ -105,7 +106,8 @@
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 1px;
-            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.2);
+            box-shadow: inset 0 0 5px rgba(211, 47, 47, 0.2), 0 0 8px rgba(211, 47, 47, 0.3);
+            text-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
             text-transform: uppercase;
         }
 
@@ -129,6 +131,7 @@
             color: var(--accent-red);
             font-weight: 600;
             letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
         }
 
         .header-right i {
@@ -159,7 +162,7 @@
         }
 
         .side-panel::-webkit-scrollbar-thumb {
-            background: rgba(255, 51, 51, 0.3);
+            background: rgba(211, 47, 47, 0.3);
             border-radius: 2px;
         }
 
@@ -172,8 +175,8 @@
         }
 
         .widget.alert-widget {
-            border: 1px solid rgba(255, 51, 51, 0.4);
-            box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.05);
+            border: 1px solid rgba(211, 47, 47, 0.4);
+            box-shadow: inset 0 0 15px rgba(211, 47, 47, 0.05);
         }
 
         .widget-header {
@@ -191,7 +194,7 @@
 
         .widget-header.red {
             color: var(--accent-red);
-            border-bottom: 1px solid rgba(255, 51, 51, 0.2);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.2);
         }
 
         .widget-header i {
@@ -230,7 +233,7 @@
         .data-value.red {
             color: var(--accent-red);
             font-weight: 700;
-            text-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+            text-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
         }
 
         .data-value.green {
@@ -296,7 +299,7 @@
 
         .vital-icon.red {
             color: var(--accent-red);
-            text-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+            text-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
         }
 
         .vital-info {
@@ -324,7 +327,7 @@
 
         .close-profile-btn {
             width: 100%;
-            background: rgba(255, 59, 48, 0.05);
+            background: rgba(211, 47, 47, 0.05);
             border: 1px solid var(--accent-red);
             color: var(--accent-red);
             font-family: var(--font-ui);
@@ -335,7 +338,7 @@
             cursor: pointer;
             border-radius: 2px;
             transition: all 0.2s ease;
-            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+            box-shadow: inset 0 0 5px rgba(211, 47, 47, 0.1);
             margin-top: 15px;
             display: flex;
             align-items: center;
@@ -346,19 +349,19 @@
         .close-profile-btn:hover {
             background: var(--accent-red);
             color: #000000;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+            box-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
         }
 
         /* CENTER PANEL (GLOBE) */
         .center-panel {
             position: relative;
             background: transparent;
-            border: 1px solid rgba(255, 51, 51, 0.2);
+            border: 1px solid rgba(211, 47, 47, 0.2);
             border-radius: 4px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(255, 51, 51, 0.05);
+            box-shadow: inset 0 0 30px rgba(211, 47, 47, 0.05);
         }
 
         #globe-container {
@@ -377,7 +380,7 @@
 
         .mapboxgl-ctrl-group {
             background: rgba(4, 6, 9, 0.8) !important;
-            border: 1px solid rgba(255, 51, 51, 0.3) !important;
+            border: 1px solid rgba(211, 47, 47, 0.3) !important;
         }
 
         .mapboxgl-ctrl-group button {
@@ -393,23 +396,23 @@
         @keyframes hud-pulse {
             0% {
                 box-shadow:
-                    0 0 0 0px rgba(255, 51, 51, 0.9),
-                    0 0 0 0px rgba(255, 51, 51, 0.4),
-                    0 0 14px 5px rgba(255, 51, 51, 0.8);
+                    0 0 0 0px rgba(211, 47, 47, 0.9),
+                    0 0 0 0px rgba(211, 47, 47, 0.4),
+                    0 0 14px 5px rgba(211, 47, 47, 0.8);
             }
 
             60% {
                 box-shadow:
-                    0 0 0 18px rgba(255, 51, 51, 0.0),
-                    0 0 0 36px rgba(255, 51, 51, 0.0),
-                    0 0 20px 8px rgba(255, 51, 51, 1);
+                    0 0 0 18px rgba(211, 47, 47, 0.0),
+                    0 0 0 36px rgba(211, 47, 47, 0.0),
+                    0 0 20px 8px rgba(211, 47, 47, 1);
             }
 
             100% {
                 box-shadow:
-                    0 0 0 0px rgba(255, 51, 51, 0),
-                    0 0 0 0px rgba(255, 51, 51, 0),
-                    0 0 14px 5px rgba(255, 51, 51, 0.8);
+                    0 0 0 0px rgba(211, 47, 47, 0),
+                    0 0 0 0px rgba(211, 47, 47, 0),
+                    0 0 14px 5px rgba(211, 47, 47, 0.8);
             }
         }
 
@@ -441,12 +444,6 @@
             letter-spacing: 1px;
         }
 
-        .hud-satellite img {
-            width: 45px;
-            margin-top: 5px;
-            opacity: 0.7;
-            filter: invert(1);
-        }
 
         .hud-timer {
             position: absolute;
@@ -469,7 +466,7 @@
             font-family: var(--font-mono);
             color: var(--accent-red);
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 51, 51, 0.8);
+            text-shadow: 0 0 10px rgba(211, 47, 47, 0.8);
             margin-top: 0px;
             letter-spacing: 2px;
         }
@@ -546,7 +543,7 @@
         }
 
         .feed-graph {
-            border-top: 1px solid rgba(255, 51, 51, 0.2);
+            border-top: 1px solid rgba(211, 47, 47, 0.2);
             background: rgba(3, 5, 8, 0.7);
             padding: 8px 15px;
             height: 70px;
@@ -675,14 +672,14 @@
         }
 
         .btn-red {
-            border-color: rgba(255, 51, 51, 0.4);
+            border-color: rgba(211, 47, 47, 0.4);
             color: var(--accent-red);
         }
 
         .btn-red:hover {
-            background: rgba(255, 51, 51, 0.1);
+            background: rgba(211, 47, 47, 0.1);
             border-color: var(--accent-red);
-            box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.2);
+            box-shadow: inset 0 0 10px rgba(211, 47, 47, 0.2);
         }
 
         /* RESPONDERS */
@@ -795,7 +792,7 @@
             top: 12px;
             width: 1px;
             height: calc(100% - 2px);
-            background: rgba(255, 51, 51, 0.2);
+            background: rgba(211, 47, 47, 0.2);
         }
 
         .tl-item:last-child::after {
@@ -825,12 +822,12 @@
             align-items: center;
             padding: 8px 15px;
             background: rgba(1, 2, 3, 0.9);
-            border-top: 1px solid rgba(255, 51, 51, 0.15);
+            border-top: 1px solid rgba(211, 47, 47, 0.15);
         }
 
         .btn-operational {
-            background: rgba(255, 51, 51, 0.05);
-            border: 1px solid rgba(255, 51, 51, 0.4);
+            background: rgba(211, 47, 47, 0.05);
+            border: 1px solid rgba(211, 47, 47, 0.4);
             color: var(--accent-red);
             padding: 4px 40px;
             border-radius: 2px;
@@ -840,7 +837,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.1);
+            box-shadow: inset 0 0 10px rgba(211, 47, 47, 0.1);
         }
 
         .server-status {
@@ -867,7 +864,7 @@
         .notif-bell-btn {
             position: relative;
             background: transparent;
-            border: 1px solid rgba(255, 51, 51, 0.35);
+            border: 1px solid rgba(211, 47, 47, 0.35);
             color: var(--accent-red);
             font-size: 14px;
             padding: 4px 10px;
@@ -884,8 +881,8 @@
         }
 
         .notif-bell-btn:hover {
-            background: rgba(255, 51, 51, 0.1);
-            box-shadow: 0 0 8px rgba(255, 51, 51, 0.3);
+            background: rgba(211, 47, 47, 0.1);
+            box-shadow: 0 0 8px rgba(211, 47, 47, 0.3);
         }
 
         .notif-badge {
@@ -903,7 +900,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 6px rgba(255, 51, 51, 0.8);
+            box-shadow: 0 0 6px rgba(211, 47, 47, 0.8);
             animation: pulse-badge 1.5s ease-in-out infinite;
             display: none;
         }
@@ -912,12 +909,12 @@
 
             0%,
             100% {
-                box-shadow: 0 0 6px rgba(255, 51, 51, 0.8);
+                box-shadow: 0 0 6px rgba(211, 47, 47, 0.8);
                 transform: scale(1);
             }
 
             50% {
-                box-shadow: 0 0 12px rgba(255, 51, 51, 1);
+                box-shadow: 0 0 12px rgba(211, 47, 47, 1);
                 transform: scale(1.15);
             }
         }
@@ -930,13 +927,13 @@
             width: 360px;
             height: 100vh;
             background: rgba(2, 3, 5, 0.97);
-            border-left: 1px solid rgba(255, 51, 51, 0.3);
+            border-left: 1px solid rgba(211, 47, 47, 0.3);
             z-index: 9990;
             display: flex;
             flex-direction: column;
             transition: right 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             font-family: var(--font-ui);
-            box-shadow: -5px 0 30px rgba(255, 51, 51, 0.12);
+            box-shadow: -5px 0 30px rgba(211, 47, 47, 0.12);
         }
 
         #notif-panel.open {
@@ -945,7 +942,7 @@
 
         .notif-panel-header {
             padding: 12px 16px;
-            border-bottom: 1px solid rgba(255, 51, 51, 0.2);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.2);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1015,7 +1012,7 @@
         }
 
         .notif-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 51, 51, 0.3);
+            background: rgba(211, 47, 47, 0.3);
         }
 
         .notif-item {
@@ -1029,7 +1026,7 @@
         }
 
         .notif-item:hover {
-            background: rgba(255, 51, 51, 0.04);
+            background: rgba(211, 47, 47, 0.04);
         }
 
         .notif-item.unread::before {
@@ -1058,9 +1055,9 @@
         }
 
         .notif-icon.red {
-            background: rgba(255, 51, 51, 0.1);
+            background: rgba(211, 47, 47, 0.1);
             color: var(--accent-red);
-            border: 1px solid rgba(255, 51, 51, 0.2);
+            border: 1px solid rgba(211, 47, 47, 0.2);
         }
 
         .notif-icon.green {
@@ -1192,7 +1189,7 @@
             border: 1px solid var(--accent-red);
             border-radius: 4px;
             padding: 30px;
-            box-shadow: 0 0 30px rgba(255, 51, 51, 0.15), inset 0 0 15px rgba(255, 51, 51, 0.05);
+            box-shadow: 0 0 30px rgba(211, 47, 47, 0.15), inset 0 0 15px rgba(211, 47, 47, 0.05);
             text-align: left;
             position: relative;
         }
@@ -1204,7 +1201,7 @@
             left: -3px;
             right: -3px;
             bottom: -3px;
-            border: 1px solid rgba(255, 51, 51, 0.3);
+            border: 1px solid rgba(211, 47, 47, 0.3);
             pointer-events: none;
             border-radius: 6px;
         }
@@ -1216,7 +1213,7 @@
             font-weight: 700;
             letter-spacing: 2px;
             margin-bottom: 25px;
-            border-bottom: 1px solid rgba(255, 51, 51, 0.2);
+            border-bottom: 1px solid rgba(211, 47, 47, 0.2);
             padding-bottom: 10px;
             display: flex;
             justify-content: space-between;
@@ -1254,7 +1251,7 @@
         .input-group input {
             width: 100%;
             background: rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(255, 51, 51, 0.25);
+            border: 1px solid rgba(211, 47, 47, 0.25);
             border-radius: 2px;
             color: transparent;
             /* hide real text */
@@ -1271,9 +1268,9 @@
         }
 
         .input-group input::placeholder {
-            color: rgba(255, 51, 51, 0.4) !important;
-            -webkit-text-fill-color: rgba(255, 51, 51, 0.4) !important;
-            text-shadow: 0 0 3px rgba(255, 51, 51, 0.3);
+            color: rgba(211, 47, 47, 0.4) !important;
+            -webkit-text-fill-color: rgba(211, 47, 47, 0.4) !important;
+            text-shadow: 0 0 3px rgba(211, 47, 47, 0.3);
             letter-spacing: 1px;
             opacity: 1 !important;
         }
@@ -1313,7 +1310,7 @@
         #login-pass-mask {
             color: var(--accent-red) !important; /* glowing red */
             -webkit-text-fill-color: var(--accent-red) !important;
-            text-shadow: 0 0 6px rgba(255, 51, 51, 0.6) !important;
+            text-shadow: 0 0 6px rgba(211, 47, 47, 0.6) !important;
             letter-spacing: 5px;
         }
 
@@ -1323,12 +1320,12 @@
 
         .input-group input:focus {
             border-color: var(--accent-red);
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.25);
+            box-shadow: 0 0 10px rgba(211, 47, 47, 0.25);
         }
 
         .login-btn {
             width: 100%;
-            background: rgba(255, 51, 51, 0.05);
+            background: rgba(211, 47, 47, 0.05);
             border: 1px solid var(--accent-red);
             color: var(--accent-red);
             font-family: var(--font-ui);
@@ -1339,13 +1336,13 @@
             cursor: pointer;
             border-radius: 2px;
             transition: all 0.3s ease;
-            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+            box-shadow: inset 0 0 5px rgba(211, 47, 47, 0.1);
         }
 
         .login-btn:hover {
             background: var(--accent-red);
             color: #000000;
-            box-shadow: 0 0 15px rgba(255, 51, 51, 0.4);
+            box-shadow: 0 0 15px rgba(211, 47, 47, 0.4);
         }
 
         .error-msg {
@@ -1356,13 +1353,13 @@
             font-family: var(--font-mono);
             text-align: center;
             letter-spacing: 0.5px;
-            background: rgba(255, 51, 51, 0.05);
-            border: 1px dashed rgba(255, 51, 51, 0.3);
+            background: rgba(211, 47, 47, 0.05);
+            border: 1px dashed rgba(211, 47, 47, 0.3);
             padding: 8px;
         }
 
         .logout-btn {
-            background: rgba(255, 51, 51, 0.08);
+            background: rgba(211, 47, 47, 0.08);
             border: 1px solid var(--accent-red);
             color: var(--accent-red);
             font-family: var(--font-ui);
@@ -1373,7 +1370,7 @@
             cursor: pointer;
             letter-spacing: 1.5px;
             transition: all 0.2s ease;
-            box-shadow: inset 0 0 5px rgba(255, 51, 51, 0.1);
+            box-shadow: inset 0 0 5px rgba(211, 47, 47, 0.1);
             margin-left: 5px;
             display: flex;
             align-items: center;
@@ -1383,7 +1380,7 @@
         .logout-btn:hover {
             background: var(--accent-red);
             color: #000000;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+            box-shadow: 0 0 10px rgba(211, 47, 47, 0.4);
         }
     </style>
 </head>
@@ -1404,11 +1401,11 @@
         font-family: var(--font-mono);
     ">
         <div class="login-box"
-            style="width: 420px; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);">
-            <div class="login-header" style="color: var(--accent-red); border-bottom-color: rgba(255, 51, 51, 0.3);">
+            style="width: 420px; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(211, 47, 47, 0.3);">
+            <div class="login-header" style="color: var(--accent-red); border-bottom-color: rgba(211, 47, 47, 0.3);">
                 WARNING: DE-AUTHORIZATION
                 <div class="secure-tag"
-                    style="color: var(--accent-red); background: rgba(255, 51, 51, 0.1); border-color: rgba(255, 51, 51, 0.3);">
+                    style="color: var(--accent-red); background: rgba(211, 47, 47, 0.1); border-color: rgba(211, 47, 47, 0.3);">
                     <i class="fa-solid fa-triangle-exclamation"></i> DANGER
                 </div>
             </div>
@@ -1420,7 +1417,7 @@
             </div>
             <div style="display: flex; gap: 15px;">
                 <button class="login-btn" onclick="executeProfileDeauth()"
-                    style="flex: 1; background: rgba(255, 51, 51, 0.1); border-radius: 2px;">[ PURGE DATA ]</button>
+                    style="flex: 1; background: rgba(211, 47, 47, 0.1); border-radius: 2px;">[ PURGE DATA ]</button>
                 <button class="login-btn" onclick="closeConfirmModal()"
                     style="flex: 1; border-color: var(--text-muted); color: var(--text-muted); background: transparent; border-radius: 2px;">[
                     CANCEL ]</button>
@@ -1611,7 +1608,6 @@
             <div class="hud-satellite">
                 <div class="label">SATELLITE VIEW</div>
                 <div class="status">ACTIVE</div>
-                <img src="https://cdn-icons-png.flaticon.com/512/814/814406.png" alt="Satellite">
             </div>
 
             <div class="hud-timer">
@@ -1883,7 +1879,7 @@
             el.innerHTML = `
                 <!-- HUD info box -->
                 <div style="
-                    border:1px solid #ff3333;
+                    border:1px solid #d32f2f;
                     border-radius:4px;
                     overflow:hidden;
                     box-shadow:
@@ -1907,7 +1903,7 @@
                 </div>
 
                 <!-- Triangle notch connecting box to line -->
-                <div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #ff3333;flex-shrink:0;"></div>
+                <div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #d32f2f;flex-shrink:0;"></div>
 
                 <!-- Glowing vertical line -->
                 <div style="
@@ -1922,7 +1918,7 @@
                 <div class="hud-pulse-dot" style="
                     width:14px;
                     height:14px;
-                    background:radial-gradient(circle,#ffffff 20%,#ff3333 65%);
+                    background:radial-gradient(circle,#ffffff 20%,#d32f2f 65%);
                     border-radius:50%;
                     border:2px solid rgba(255,255,255,0.9);
                     flex-shrink:0;
