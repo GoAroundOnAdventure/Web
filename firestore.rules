@@ -33,6 +33,10 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    match /Owner_Access_Verification/{document=**} {
+      allow read, write: if true;
+    }
+
     // 5. DELETED FILES ARCHIVE
     match /admin_deleted_files/{document=**} {
       allow read, write: if true;
