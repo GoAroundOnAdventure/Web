@@ -2928,29 +2928,33 @@
             snapshot.docs.forEach(doc => {
                 const id = doc.id;
                 const data = doc.data();
-                if (!seenActiveAlertIds.has(id)) {
+                
+                const isNew = !seenActiveAlertIds.has(id);
+                if (isNew) {
                     seenActiveAlertIds.add(id);
+                }
 
-                    // If page is already active and this is a new incoming alert
-                    if (seenActiveAlertIds.size > 1 && sessionStorage.getItem('goaround_auth') === 'true' && !playedSirenAlertIds.has(id)) {
-                        // Play siren
-                        startSiren();
-                        playedSirenAlertIds.add(id);
-                        setTimeout(() => stopSiren(), 12000);
+                // If active emergency, authenticated, and we haven't played the siren for this alert yet
+                if (data.currentStatus === 'active' && sessionStorage.getItem('goaround_auth') === 'true' && !playedSirenAlertIds.has(id)) {
+                    // Play siren
+                    startSiren();
+                    playedSirenAlertIds.add(id);
+                    setTimeout(() => stopSiren(), 12000);
 
-                        // Show on-screen toast notification
+                    // Show on-screen toast notification only if this is a newly-discovered alert (to avoid toast spam on initial load)
+                    if (isNew) {
                         showScreenToast(data.victimName || "GoAround User", id);
-
-                        // Push notification to panel
-                        pushNotification({
-                            type: 'alert',
-                            icon: 'triangle-exclamation',
-                            iconColor: 'red',
-                            title: `🚨 ADDITIONAL SOS: ${(data.victimName || 'UNKNOWN').toUpperCase()}`,
-                            desc: `> Status: ACTIVE | ID: #EMRG-${id.substring(0, 8).toUpperCase()}`,
-                            timestamp: data.startedTime || new Date()
-                        });
                     }
+
+                    // Push notification to panel
+                    pushNotification({
+                        type: 'alert',
+                        icon: 'triangle-exclamation',
+                        iconColor: 'red',
+                        title: `🚨 EMERGENCY: ${(data.victimName || 'UNKNOWN').toUpperCase()}`,
+                        desc: `> Status: ACTIVE | ID: #EMRG-${id.substring(0, 8).toUpperCase()}`,
+                        timestamp: data.startedTime || new Date()
+                    });
                 }
             });
 
