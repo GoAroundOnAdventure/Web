@@ -1471,6 +1471,9 @@
             <i class="fa-solid fa-bars menu-icon"></i>
             <div class="sys-title">GOAROUND EMERGENCY SYSTEM</div>
             <div class="live-badge">LIVE TRACKING ACTIVE</div>
+            <div class="live-badge" id="audio-armed-badge" style="display:none; background:rgba(255,44,44,0.12); border-color:#FF2C2C; color:#FF2C2C; animation: hud-pulse 1.8s ease-out infinite;">
+                <i class="fa-solid fa-volume-high" style="margin-right:4px;"></i>SIREN ARMED
+            </div>
         </div>
         <div class="header-center">
             SYSTEM STATUS: <span>ONLINE</span>
@@ -2109,10 +2112,49 @@
         let osc = null;
         let gain = null;
 
+        // ── PRE-UNLOCK AudioContext ───────────────────────────────────────────
+        // Call this on any user gesture (login click) so the AudioContext is in
+        // 'running' state BEFORE the siren needs to fire from the Firestore listener.
+        // Without this, browsers block audio on devices that haven't interacted.
+        function unlockAudio() {
+            if (audioCtx && audioCtx.state !== 'closed') return; // already unlocked
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                // Play a 0-volume beep instantly to unlock the context
+                const unlockOsc = audioCtx.createOscillator();
+                const unlockGain = audioCtx.createGain();
+                unlockGain.gain.setValueAtTime(0.0001, audioCtx.currentTime); // silent
+                unlockOsc.connect(unlockGain);
+                unlockGain.connect(audioCtx.destination);
+                unlockOsc.start();
+                unlockOsc.stop(audioCtx.currentTime + 0.001);
+                // Resume if suspended
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                console.log('🔊 [Audio] AudioContext unlocked. State:', audioCtx.state);
+
+                // Show AUDIO ARMED badge in header
+                const badge = document.getElementById('audio-armed-badge');
+                if (badge) badge.style.display = 'inline-flex';
+            } catch (e) {
+                console.warn('Audio unlock failed:', e);
+            }
+        }
+        window.unlockAudio = unlockAudio;
+
         function startSiren() {
             if (sirenInterval) return;
             try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                // Reuse existing unlocked context, or create fresh if needed
+                if (!audioCtx || audioCtx.state === 'closed') {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                // Resume if suspended (e.g. browser paused it)
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
                 osc = audioCtx.createOscillator();
                 gain = audioCtx.createGain();
 
@@ -2122,15 +2164,16 @@
                 let high = true;
                 sirenInterval = setInterval(() => {
                     if (osc && audioCtx) {
-                        osc.frequency.exponentialRampToValueAtTime(high ? 800 : 400, audioCtx.currentTime + 0.4);
+                        osc.frequency.exponentialRampToValueAtTime(high ? 900 : 380, audioCtx.currentTime + 0.4);
                         high = !high;
                     }
                 }, 500);
 
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.28, audioCtx.currentTime);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
+                console.log('🚨 [Siren] STARTED. AudioContext state:', audioCtx.state);
             } catch (e) {
                 console.error("Siren audio failed:", e);
             }
@@ -2594,6 +2637,12 @@
                 }
 
                 if (!querySnapshot.empty) {
+                    // ── UNLOCK AUDIO on login click (user gesture) ──────────────────
+                    // This is the ONLY reliable moment to unlock AudioContext across
+                    // all devices. Without this, the Firestore siren callback cannot
+                    // play audio due to browser autoplay policy.
+                    unlockAudio();
+
                     sessionStorage.setItem('goaround_auth', 'true');
                     document.documentElement.classList.add('authenticated');
                     document.getElementById('login-overlay').style.display = 'none';
