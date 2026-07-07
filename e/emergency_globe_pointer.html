@@ -1531,59 +1531,63 @@
                 <div class="widget-header red">
                     <i class="fa-solid fa-user"></i> VICTIM INFORMATION
                 </div>
-                <div class="widget-content">
-                    <div class="victim-flex">
-                        <img id="victim-photo" src="https://i.pravatar.cc/150?img=11" alt="Victim" class="victim-photo">
-                        <div class="victim-details">
-                            <div class="data-stack">
-                                <div class="data-label">NAME</div>
-                                <div class="data-value" id="victim-name">DEEPAK GOWDA</div>
+                <div class="widget-content" style="padding:10px 12px 8px;">
+                    <!-- TOP ROW: photo | details | QR -->
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <!-- Photo -->
+                        <img id="victim-photo" src="https://i.pravatar.cc/150?img=11" alt="Victim"
+                            class="victim-photo"
+                            style="width:62px;height:62px;object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid rgba(255,44,44,0.4);">
+
+                        <!-- Name / Phone / Blood — centre column -->
+                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+                            <div>
+                                <div class="data-label" style="margin-bottom:1px;">NAME</div>
+                                <div class="data-value" id="victim-name" style="font-size:13px; line-height:1.2;">DEEPAK GOWDA</div>
                             </div>
-                            <div class="data-stack">
-                                <div class="data-label">PHONE</div>
-                                <div class="data-value small" id="victim-phone">+91 98765 43210</div>
+                            <div>
+                                <div class="data-label" style="margin-bottom:1px;">PHONE</div>
+                                <div class="data-value small" id="victim-phone" style="font-size:11px;">+91 98765 43210</div>
+                            </div>
+                            <div>
+                                <div class="data-label" style="margin-bottom:1px;">BLOOD</div>
+                                <div class="data-value" id="victim-blood" style="font-size:13px; color:#FF2C2C; text-shadow:0 0 8px rgba(255,44,44,0.6);">O+</div>
                             </div>
                         </div>
-                    </div>
-                    <!-- BLOOD GROUP + QR side by side -->
-                    <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:2px;">
-                        <div class="data-stack" style="flex:1;">
-                            <div class="data-label">BLOOD GROUP</div>
-                            <div class="data-value" id="victim-blood">O+</div>
-                        </div>
-                        <!-- QR Code — links to victim's live emergency profile -->
+
+                        <!-- QR Code — compact, right-aligned -->
                         <div style="flex-shrink:0; text-align:center;">
-                            <div class="data-label" style="margin-bottom:5px;">EMERGENCY QR</div>
+                            <div class="data-label" style="margin-bottom:3px; font-size:7px;">EMERGENCY QR</div>
                             <div style="
                                 background:#fff;
-                                border:2px solid rgba(255,44,44,0.5);
-                                border-radius:4px;
-                                padding:3px;
-                                box-shadow:0 0 10px rgba(255,44,44,0.3);
-                                width:72px;
-                                height:72px;
+                                border:1.5px solid rgba(255,44,44,0.5);
+                                border-radius:3px;
+                                padding:2px;
+                                box-shadow:0 0 8px rgba(255,44,44,0.25);
+                                width:58px;
+                                height:58px;
                                 display:flex;
                                 align-items:center;
                                 justify-content:center;
                             ">
-                                <img id="victim-qr"
-                                    src=""
-                                    alt="QR"
-                                    width="66"
-                                    height="66"
-                                    style="display:block; image-rendering:pixelated;"
-                                >
+                                <img id="victim-qr" src="" alt="QR"
+                                    width="54" height="54"
+                                    style="display:block; image-rendering:pixelated;">
                             </div>
-                            <div style="font-size:8px;letter-spacing:1px;color:rgba(255,44,44,0.6);margin-top:4px;">SCAN TO VIEW</div>
+                            <div style="font-size:7px;letter-spacing:0.8px;color:rgba(255,44,44,0.5);margin-top:2px;">SCAN</div>
                         </div>
                     </div>
-                    <div class="data-stack">
-                        <div class="data-label">MEDICAL NOTES</div>
-                        <div class="data-value" id="victim-notes">ASTHMA</div>
-                    </div>
-                    <div class="data-stack">
-                        <div class="data-label">ALLERGIES</div>
-                        <div class="data-value" id="victim-allergies">NONE</div>
+
+                    <!-- BOTTOM ROW: notes & allergies inline -->
+                    <div style="display:flex; gap:12px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,44,44,0.1);">
+                        <div class="data-stack" style="flex:1;" id="notes-stack">
+                            <div class="data-label">MEDICAL NOTES</div>
+                            <div class="data-value" id="victim-notes" style="font-size:11px;"></div>
+                        </div>
+                        <div class="data-stack" style="flex:1;" id="allergies-stack">
+                            <div class="data-label">ALLERGIES</div>
+                            <div class="data-value" id="victim-allergies" style="font-size:11px;">NONE</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2297,16 +2301,11 @@
             const vPhotoEl = document.getElementById('victim-photo');
             if (vPhotoEl) vPhotoEl.src = alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11';
 
-            // Blood + QR
+            // Blood (now inside the top row centre column — just update text)
             const vBloodEl = document.getElementById('victim-blood');
             if (vBloodEl) {
                 const blood = alertData.victimBlood;
-                if (blood && blood !== 'Not set' && blood !== 'Not Set' && blood !== 'N/A' && blood.trim() !== '') {
-                    vBloodEl.parentElement.parentElement.style.display = 'flex';
-                    vBloodEl.innerHTML = blood;
-                } else {
-                    vBloodEl.parentElement.parentElement.style.display = 'none';
-                }
+                vBloodEl.textContent = (blood && blood !== 'Not set' && blood !== 'N/A' && blood.trim() !== '') ? blood : '—';
             }
 
             // QR Code — generate live link for this victim's emergency profile
@@ -2315,31 +2314,32 @@
                 const profileUrl = encodeURIComponent(
                     `https://goaround-safety.web.app/emergency?uid=${alertData.victimId}`
                 );
-                vQrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=132x132&color=000000&bgcolor=ffffff&data=${profileUrl}`;
+                vQrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=108x108&color=000000&bgcolor=ffffff&data=${profileUrl}`;
                 vQrEl.style.display = 'block';
             }
-
             // Medical notes
             const vNotesEl = document.getElementById('victim-notes');
+            const notesStack = document.getElementById('notes-stack');
             if (vNotesEl) {
                 const notes = alertData.victimNotes;
                 if (notes && notes !== 'NONE' && notes !== 'None' && notes !== 'Not set' && notes.trim() !== '') {
-                    vNotesEl.parentElement.style.display = 'block';
+                    if (notesStack) notesStack.style.display = 'block';
                     vNotesEl.textContent = notes;
                 } else {
-                    vNotesEl.parentElement.style.display = 'none';
+                    if (notesStack) notesStack.style.display = 'none';
                 }
             }
 
             // Allergies
             const vAllergiesEl = document.getElementById('victim-allergies');
+            const allergiesStack = document.getElementById('allergies-stack');
             if (vAllergiesEl) {
                 const allergies = alertData.victimAllergies;
                 if (allergies && allergies !== 'NONE' && allergies !== 'None' && allergies !== 'Not set' && allergies.trim() !== '') {
-                    vAllergiesEl.parentElement.style.display = 'block';
+                    if (allergiesStack) allergiesStack.style.display = 'block';
                     vAllergiesEl.textContent = allergies;
                 } else {
-                    vAllergiesEl.parentElement.style.display = 'none';
+                    if (allergiesStack) allergiesStack.style.display = 'none';
                 }
             }
 
