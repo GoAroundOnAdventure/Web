@@ -1496,149 +1496,17 @@
     <div class="main-container">
 
         <!-- LEFT PANEL -->
-        <div class="side-panel">
-            <!-- INCIDENT ALERT -->
-            <div class="widget alert-widget">
-                <div class="widget-header red">
-                    <i class="fa-solid fa-triangle-exclamation"></i> INCIDENT ALERT
-                </div>
-                <div class="widget-content">
-                    <div class="data-stack">
-                        <div class="data-label">INCIDENT ID</div>
-                        <div class="data-value small">#EMRG-2025-05-20-1127</div>
-                    </div>
-                    <div class="data-stack">
-                        <div class="data-label">STATUS</div>
-                        <div class="data-value red">ACTIVE</div>
-                    </div>
-                    <div class="data-stack">
-                        <div class="data-label">SEVERITY</div>
-                        <div class="data-value red">MAXIMUM</div>
-                    </div>
-                    <div class="data-stack">
-                        <div class="data-label">REPORTED TIME</div>
-                        <div class="data-value small">20 MAY 2025 - 11:27:35 AM</div>
-                    </div>
-                    <div class="data-stack">
-                        <div class="data-label">LAST UPDATE</div>
-                        <div class="data-value small">11:28:09 AM <span class="green">(LIVE)</span></div>
-                    </div>
+        <div class="side-panel" id="left-side-panel">
+            <div id="active-profiles-container" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+                <!-- Dynamic active profile cards will be populated here -->
+                <div class="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
+                    <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
+                    <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
+                    <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
                 </div>
             </div>
 
-            <!-- VICTIM INFORMATION -->
-            <div class="widget">
-                <div class="widget-header red">
-                    <i class="fa-solid fa-user"></i> VICTIM INFORMATION
-                </div>
-                <div class="widget-content" style="padding:10px 12px 8px;">
-                    <!-- TOP ROW: photo | details | QR -->
-                    <div style="display:flex; align-items:flex-start; gap:10px;">
-                        <!-- Photo -->
-                        <img id="victim-photo" src="https://i.pravatar.cc/150?img=11" alt="Victim"
-                            class="victim-photo"
-                            style="width:62px;height:62px;object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid rgba(255,44,44,0.4);">
-
-                        <!-- Name / Phone / Blood — centre column -->
-                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
-                            <div>
-                                <div class="data-label" style="margin-bottom:1px;">NAME</div>
-                                <div class="data-value" id="victim-name" style="font-size:13px; line-height:1.2;">DEEPAK GOWDA</div>
-                            </div>
-                            <div>
-                                <div class="data-label" style="margin-bottom:1px;">PHONE</div>
-                                <div class="data-value small" id="victim-phone" style="font-size:11px;">+91 98765 43210</div>
-                            </div>
-                            <div>
-                                <div class="data-label" style="margin-bottom:1px;">BLOOD</div>
-                                <div class="data-value" id="victim-blood" style="font-size:13px; color:#FF2C2C; text-shadow:0 0 8px rgba(255,44,44,0.6);">O+</div>
-                            </div>
-                        </div>
-
-                        <!-- QR Code — compact, right-aligned -->
-                        <div style="flex-shrink:0; text-align:center;">
-                            <div class="data-label" style="margin-bottom:3px; font-size:7px;">EMERGENCY QR</div>
-                            <div style="
-                                background:#fff;
-                                border:1.5px solid rgba(255,44,44,0.5);
-                                border-radius:3px;
-                                padding:2px;
-                                box-shadow:0 0 8px rgba(255,44,44,0.25);
-                                width:58px;
-                                height:58px;
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-                            ">
-                                <img id="victim-qr" src="" alt="QR"
-                                    width="54" height="54"
-                                    style="display:block; image-rendering:pixelated;">
-                            </div>
-                            <div style="font-size:7px;letter-spacing:0.8px;color:rgba(255,44,44,0.5);margin-top:2px;">SCAN</div>
-                        </div>
-                    </div>
-
-                    <!-- BOTTOM ROW: notes & allergies inline -->
-                    <div style="display:flex; gap:12px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,44,44,0.1);">
-                        <div class="data-stack" style="flex:1;" id="notes-stack">
-                            <div class="data-label">MEDICAL NOTES</div>
-                            <div class="data-value" id="victim-notes" style="font-size:11px;"></div>
-                        </div>
-                        <div class="data-stack" style="flex:1;" id="allergies-stack">
-                            <div class="data-label">ALLERGIES</div>
-                            <div class="data-value" id="victim-allergies" style="font-size:11px;">NONE</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LIVE VITALS -->
-            <div class="widget">
-                <div class="widget-header red">
-                    <i class="fa-solid fa-heart-pulse"></i> LIVE VITALS
-                </div>
-                <div class="widget-content">
-                    <div class="vitals-grid">
-                        <div class="vital-item">
-                            <i class="fa-solid fa-battery-half vital-icon green"></i>
-                            <div class="vital-info">
-                                <div class="data-label">BATTERY</div>
-                                <div class="data-value">42%</div>
-                            </div>
-                        </div>
-                        <div class="vital-item">
-                            <i class="fa-solid fa-tower-cell vital-icon muted"></i>
-                            <div class="vital-info">
-                                <div class="data-label">NETWORK</div>
-                                <div class="data-value">5G</div>
-                            </div>
-                        </div>
-                        <div class="vital-item">
-                            <i class="fa-solid fa-gauge-high vital-icon green"></i>
-                            <div class="vital-info">
-                                <div class="data-label">SPEED</div>
-                                <div class="data-value">52 km/h</div>
-                            </div>
-                        </div>
-                        <div class="vital-item">
-                            <i class="fa-solid fa-location-arrow vital-icon muted"></i>
-                            <div class="vital-info">
-                                <div class="data-label">HEADING</div>
-                                <div class="data-value">NW 315&deg;</div>
-                            </div>
-                        </div>
-                        <div class="vital-item" style="grid-column: 1 / -1;">
-                            <i class="fa-solid fa-location-crosshairs vital-icon red"></i>
-                            <div class="vital-info">
-                                <div class="data-label">GPS ACCURACY</div>
-                                <div class="data-value">3.2 m</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="close-profile-btn" onclick="showConfirmModal()">
+            <button class="close-profile-btn" onclick="showConfirmModal()" id="close-profile-btn-el" style="display:none; margin-top:auto; margin-bottom:10px;">
                 <i class="fa-solid fa-power-off"></i> CLOSE EMERGENCY PROFILE
             </button>
 
@@ -2437,6 +2305,188 @@
             where('currentStatus', '==', 'active')
         );
 
+        // --- DYNAMIC PROFILE CARD BUILDER ---
+        function buildProfileCardHtml(alertId, alertData, isFocused) {
+            const date = alertData.startedTime && alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
+            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const borderStyle = isFocused 
+                ? 'border: 2px solid #FF2C2C; box-shadow: 0 0 15px rgba(255, 44, 44, 0.4); background: rgba(255, 44, 44, 0.05);' 
+                : 'border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85);';
+            const opacityStyle = isFocused ? '' : 'opacity: 0.65; cursor: pointer;';
+
+            // Compile the emergency card snap if present
+            let emCardHtml = '';
+            if (alertData.emergencyCard) {
+                const c = alertData.emergencyCard;
+                emCardHtml = `
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1); font-size:9px; color:rgba(255,255,255,0.4); line-height:1.4; font-family:inherit;">
+                        ${c.dob ? `<div>DOB: ${c.dob} | GENDER: ${c.gender}</div>` : ''}
+                        ${c.contact1Name ? `<div>CONTACT 1: ${c.contact1Name} (${c.contact1Phone})</div>` : ''}
+                        ${c.contact2Name ? `<div>CONTACT 2: ${c.contact2Name} (${c.contact2Phone})</div>` : ''}
+                        ${c.organDonor ? `<div style="color:#FF2C2C; font-weight:bold; font-size:8px; margin-top:2px;"><i class="fa-solid fa-heart"></i> DECLARED ORGAN DONOR</div>` : ''}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="widget" id="profile-card-${alertId}" 
+                     onclick="loadAlertDirectly('${alertId}')"
+                     style="${opacityStyle} ${borderStyle} transition: all 0.3s; display: flex; flex-direction: column;">
+                    
+                    <!-- Unified Widget Header -->
+                    <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
+                        <span><i class="fa-solid fa-user-shield" style="margin-right:6px;"></i>EMERGENCY PROFILE</span>
+                        <span style="
+                            background: rgba(255,44,44,0.15); 
+                            color: #FF2C2C; 
+                            padding: 2px 6px; 
+                            border-radius: 2px; 
+                            font-weight: bold;
+                            font-size: 9px;
+                            letter-spacing: 1px;
+                        ">${(alertData.emergencyLevel || 'MAX').toUpperCase()}</span>
+                    </div>
+
+                    <div class="widget-content" style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+                        <!-- Row 1: Victim Details + Photo + QR -->
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <img src="${alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11'}" alt="Victim"
+                                style="width:58px; height:58px; object-fit:cover; border-radius:4px; flex-shrink:0; border:1px solid rgba(255,44,44,0.4);">
+                            
+                            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">NAME</div>
+                                    <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        ${(alertData.victimName || 'GoAround User').toUpperCase()}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">PHONE</div>
+                                    <div class="data-value small" style="font-size:10px;">${alertData.victimPhone || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">BLOOD GROUP</div>
+                                    <div class="data-value" style="font-size:11px; color:#FF2C2C; font-weight:bold;">${alertData.victimBlood || '—'}</div>
+                                </div>
+                            </div>
+
+                            <!-- QR Code -->
+                            <div style="flex-shrink:0; text-align:center;">
+                                <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
+                                <div style="background:#fff; padding:2px; border-radius:2px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,44,44,0.3);">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&color=000000&bgcolor=ffffff&data=${encodeURIComponent('https://goaround-safety.web.app/emergency?uid=' + alertData.victimId)}" 
+                                         width="44" height="44" style="display:block; image-rendering:pixelated;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Medical Info -->
+                        <div style="display:flex; gap:10px; font-size:10px; background:rgba(255,255,255,0.01); padding:6px; border-radius:3px; border:1px solid rgba(255,255,255,0.03);">
+                            <div style="flex:1; min-width:0;">
+                                <div class="data-label" style="font-size:7px;">MEDICAL NOTES</div>
+                                <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                    ${alertData.victimNotes || 'NONE'}
+                                </div>
+                            </div>
+                            <div style="flex:1; min-width:0;">
+                                <div class="data-label" style="font-size:7px;">ALLERGIES</div>
+                                <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                    ${alertData.victimAllergies || 'NONE'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Live Vitals Grid -->
+                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; background:rgba(255,44,44,0.02); padding:8px; border-radius:4px; border:1px solid rgba(255,44,44,0.05);">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-battery-half" style="color:#00e676; font-size:9px;"></i>
+                                <div>
+                                    <div class="data-label" style="font-size:7px; line-height:1;">BATTERY</div>
+                                    <div style="font-size:10px; font-weight:bold;" data-vital="battery">${alertData.battery || 100}%</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-tower-cell" style="color:#888; font-size:9px;"></i>
+                                <div>
+                                    <div class="data-label" style="font-size:7px; line-height:1;">NETWORK</div>
+                                    <div style="font-size:10px; font-weight:bold;" data-vital="network">${alertData.network || 'Online'}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-gauge-high" style="color:#00e676; font-size:9px;"></i>
+                                <div>
+                                    <div class="data-label" style="font-size:7px; line-height:1;">SPEED</div>
+                                    <div style="font-size:10px; font-weight:bold;" data-vital="speed">${((alertData.speed || 0) * 3.6).toFixed(1)} km/h</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-location-crosshairs" style="color:#FF2C2C; font-size:9px;"></i>
+                                <div>
+                                    <div class="data-label" style="font-size:7px; line-height:1;">ACCURACY</div>
+                                    <div style="font-size:10px; font-weight:bold;" data-vital="accuracy">${(alertData.gpsAccuracy || 0).toFixed(1)}m</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Telemetry / Incident Data -->
+                        <div style="font-size:8px; color:rgba(255,255,255,0.3); display:flex; flex-direction:column; gap:2px; font-family:'Share Tech Mono', monospace;">
+                            <div>ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}</div>
+                            <div>REPORTED: ${timeStr}</div>
+                            ${alertData.address ? `<div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">LOC: ${alertData.address}</div>` : ''}
+                        </div>
+
+                        ${emCardHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render all profile cards one below another in left panel
+        function renderAllProfileCards() {
+            const container = document.getElementById('active-profiles-container');
+            if (!container) return;
+
+            if (Object.keys(activeAlertsMap).length === 0) {
+                container.innerHTML = `
+                    <div class="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
+                        <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
+                        <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
+                        <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
+                    </div>
+                `;
+                const btn = document.getElementById('close-profile-btn-el');
+                if (btn) btn.style.display = 'none';
+                return;
+            }
+
+            const btn = document.getElementById('close-profile-btn-el');
+            if (btn) btn.style.display = 'block';
+
+            // Clear placeholder/cards
+            container.innerHTML = '';
+            
+            // Sort active alerts descending by startedTime (newest first)
+            const sortedIds = Object.keys(activeAlertsMap).sort((a, b) => {
+                const tA = activeAlertsMap[a].startedTime;
+                const tB = activeAlertsMap[b].startedTime;
+                const msA = tA && tA.toMillis ? tA.toMillis() : 0;
+                const msB = tB && tB.toMillis ? tB.toMillis() : 0;
+                return msB - msA;
+            });
+
+            sortedIds.forEach(id => {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = buildProfileCardHtml(id, activeAlertsMap[id], id === activeAlertId);
+                container.appendChild(wrapper.firstElementChild);
+            });
+        }
+
+        // Listen to ALL active emergency alerts.
+        const alertsQuery = query(
+            collection(db, 'emergency_alerts'),
+            where('currentStatus', '==', 'active')
+        );
+
         function renderActiveAlert(alertId, alertData, isNewAlert) {
             console.log('🔔 [Web] Rendering active alert details:', alertId, alertData);
 
@@ -2452,7 +2502,7 @@
                     // Auto-stop siren after 12 seconds so it doesn't loop forever
                     setTimeout(() => stopSiren(), 12000);
                 }
-                // Push alert notification
+                // Push alert notification to console panel
                 pushNotification({
                     type: 'alert',
                     icon: 'triangle-exclamation',
@@ -2474,84 +2524,6 @@
             }
             currentAlertId = alertId;
             prevAlertStatus = alertData.currentStatus;
-
-            // ── UPDATE HUD UI VALUES ───────────────────────────────────────
-            const vNameEl = document.getElementById('victim-name');
-            if (vNameEl) vNameEl.textContent = activeVictimName.toUpperCase();
-
-            const vPhoneEl = document.getElementById('victim-phone');
-            if (vPhoneEl) vPhoneEl.textContent = alertData.victimPhone || 'N/A';
-
-            const vPhotoEl = document.getElementById('victim-photo');
-            if (vPhotoEl) vPhotoEl.src = alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11';
-
-            // Blood (now inside the top row centre column — just update text)
-            const vBloodEl = document.getElementById('victim-blood');
-            if (vBloodEl) {
-                const blood = alertData.victimBlood;
-                vBloodEl.textContent = (blood && blood !== 'Not set' && blood !== 'N/A' && blood.trim() !== '') ? blood : '—';
-            }
-
-            // QR Code — generate live link for this victim's emergency profile
-            const vQrEl = document.getElementById('victim-qr');
-            if (vQrEl && alertData.victimId) {
-                const profileUrl = encodeURIComponent(
-                    `https://goaround-safety.web.app/emergency?uid=${alertData.victimId}`
-                );
-                vQrEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=108x108&color=000000&bgcolor=ffffff&data=${profileUrl}`;
-                vQrEl.style.display = 'block';
-            }
-            // Medical notes
-            const vNotesEl = document.getElementById('victim-notes');
-            const notesStack = document.getElementById('notes-stack');
-            if (vNotesEl) {
-                const notes = alertData.victimNotes;
-                if (notes && notes !== 'NONE' && notes !== 'None' && notes !== 'Not set' && notes.trim() !== '') {
-                    if (notesStack) notesStack.style.display = 'block';
-                    vNotesEl.textContent = notes;
-                } else {
-                    if (notesStack) notesStack.style.display = 'none';
-                }
-            }
-
-            // Allergies
-            const vAllergiesEl = document.getElementById('victim-allergies');
-            const allergiesStack = document.getElementById('allergies-stack');
-            if (vAllergiesEl) {
-                const allergies = alertData.victimAllergies;
-                if (allergies && allergies !== 'NONE' && allergies !== 'None' && allergies !== 'Not set' && allergies.trim() !== '') {
-                    if (allergiesStack) allergiesStack.style.display = 'block';
-                    vAllergiesEl.textContent = allergies;
-                } else {
-                    if (allergiesStack) allergiesStack.style.display = 'none';
-                }
-            }
-
-            // ── VITALS GRID ───────────────────────────────────────────────
-            const batteryEl = document.querySelector('.vital-item:nth-child(1) .data-value');
-            if (batteryEl) batteryEl.textContent = `${alertData.battery || 100}%`;
-
-            const networkEl = document.querySelector('.vital-item:nth-child(2) .data-value');
-            if (networkEl) networkEl.textContent = alertData.network || 'Online';
-
-            const speedEl = document.querySelector('.vital-item:nth-child(3) .data-value');
-            if (speedEl) speedEl.textContent = `${((alertData.speed || 0) * 3.6).toFixed(1)} km/h`;
-
-            const headingEl = document.querySelector('.vital-item:nth-child(4) .data-value');
-            if (headingEl) headingEl.textContent = `${Math.round(alertData.heading || 0)}°`;
-
-            // ── INCIDENT HEADER DETAILS ───────────────────────────────────
-            const incidentIdEl = document.querySelector('.alert-widget .data-value.small');
-            if (incidentIdEl) incidentIdEl.textContent = `#EMRG-${alertId.substring(0, 8).toUpperCase()}`;
-
-            const statusEl = document.querySelector('.alert-widget .data-value.red');
-            if (statusEl) statusEl.textContent = (alertData.currentStatus || 'ACTIVE').toUpperCase();
-
-            const timeEl = document.querySelector('.alert-widget .data-stack:nth-child(4) .data-value.small');
-            if (timeEl && alertData.startedTime) {
-                const date = alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
-                timeEl.textContent = date.toLocaleString();
-            }
 
             // ── CONSOLE TEXT — all new fields included ─────────────────────
             const consoleEl = document.querySelector('.console');
@@ -2691,21 +2663,21 @@
                         // Draw visual sweep line from marker
                         drawDynamicSweepLine(newLat, newLng);
 
-                        // Update Live Vitals panel
-                        const batteryVal = document.querySelector('.vital-item:nth-child(1) .data-value');
-                        if (batteryVal) batteryVal.textContent = `${liveData.battery || 100}%`;
+                        // Update Live Vitals inside the selected profile card dynamically
+                        const card = document.getElementById(`profile-card-${alertId}`);
+                        if (card) {
+                            const batteryVal = card.querySelector('[data-vital="battery"]');
+                            if (batteryVal) batteryVal.textContent = `${liveData.battery || 100}%`;
 
-                        const netVal = document.querySelector('.vital-item:nth-child(2) .data-value');
-                        if (netVal) netVal.textContent = liveData.network || 'Online';
+                            const netVal = card.querySelector('[data-vital="network"]');
+                            if (netVal) netVal.textContent = liveData.network || 'Online';
 
-                        const speedVal = document.querySelector('.vital-item:nth-child(3) .data-value');
-                        if (speedVal) speedVal.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
+                            const speedVal = card.querySelector('[data-vital="speed"]');
+                            if (speedVal) speedVal.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
 
-                        const headingVal = document.querySelector('.vital-item:nth-child(4) .data-value');
-                        if (headingVal) headingVal.textContent = `${Math.round(liveData.heading || 0)}°`;
-
-                        const accVal = document.querySelector('.vital-item:nth-child(5) .data-value');
-                        if (accVal) accVal.textContent = `${(liveData.gpsAccuracy || 0.0).toFixed(1)} m`;
+                            const accVal = card.querySelector('[data-vital="accuracy"]');
+                            if (accVal) accVal.textContent = `${(liveData.gpsAccuracy || 0.0).toFixed(1)}m`;
+                        }
                     });
                 }
             }
@@ -2792,23 +2764,29 @@
         }
 
         onSnapshot(alertsQuery, (snapshot) => {
+            // Build map of current active alerts
+            const currentActiveMap = {};
+            snapshot.docs.forEach(doc => {
+                currentActiveMap[doc.id] = doc.data();
+            });
+
+            // Save activeAlertsMap globally so loadAlertDirectly can access it
+            activeAlertsMap = currentActiveMap;
+
             if (snapshot.empty) {
                 console.log('📭 [Web] No active emergency alerts in Firestore.');
                 if (activeMarker) activeMarker.remove();
+                
                 const footerActive = document.querySelector('.sys-footer div:nth-child(2) span');
                 if (footerActive) footerActive.textContent = '0';
+                
+                renderAllProfileCards();
                 return;
             }
 
             // Update footer active count dynamically
             const footerActive = document.querySelector('.sys-footer div:nth-child(2) span');
             if (footerActive) footerActive.textContent = snapshot.docs.length;
-
-            // Build map of current active alerts
-            const currentActiveMap = {};
-            snapshot.docs.forEach(doc => {
-                currentActiveMap[doc.id] = doc.data();
-            });
 
             // Detect new alerts
             snapshot.docs.forEach(doc => {
@@ -2849,9 +2827,6 @@
                 }
             }
 
-            // Save activeAlertsMap globally so loadAlertDirectly can access it
-            activeAlertsMap = currentActiveMap;
-
             // If we don't have an activeAlertId or the current one was resolved, pick the newest
             if (!activeAlertId || !activeAlertsMap[activeAlertId]) {
                 let newestId = null;
@@ -2865,7 +2840,10 @@
                 activeAlertId = newestId;
             }
 
-            // Render the active alert
+            // Redraw left side panel containing all active profile cards
+            renderAllProfileCards();
+
+            // Render details for the currently focused alert
             if (activeAlertId && activeAlertsMap[activeAlertId]) {
                 const isNewAlert = (currentAlertId !== activeAlertId);
                 renderActiveAlert(activeAlertId, activeAlertsMap[activeAlertId], isNewAlert);
