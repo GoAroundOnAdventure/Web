@@ -1731,7 +1731,7 @@
                 </div>
             </div>
 
-            <!-- TRAVEL GROUP DETAILS -->
+            <!-- TRAVEL GROUP DETAILS — always visible above timeline -->
             <div class="widget" id="group-details-widget">
                 <div class="widget-header red">
                     <i class="fa-solid fa-people-group"></i> TRAVEL GROUP DETAILS
@@ -1842,9 +1842,32 @@
     <div class="bottom-bar">
         <div style="width: 150px;"></div> <!-- Spacer -->
         <div class="btn-operational">ALL SYSTEMS OPERATIONAL</div>
-        <div class="server-status">
-            <div>SERVER STATUS <span class="val">SECURE</span> <i class="fa-solid fa-lock"></i></div>
-            <div>DATA ENCRYPTED <span class="val">AES-256</span> <i class="fa-solid fa-lock"></i></div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <!-- HISTORY BUTTON -->
+            <button onclick="window.open('history.html','_blank')" style="
+                background: transparent;
+                border: 1px solid rgba(255,44,44,0.4);
+                color: rgba(255,44,44,0.85);
+                font-family: inherit;
+                font-size: 10px;
+                letter-spacing: 1.5px;
+                padding: 5px 14px;
+                border-radius: 2px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                transition: all 0.2s;
+                white-space: nowrap;
+            " onmouseover="this.style.background='rgba(255,44,44,0.12)';this.style.borderColor='rgba(255,44,44,0.8)';"
+               onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,44,44,0.4)';">
+                <i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>
+                HISTORY
+            </button>
+            <div class="server-status">
+                <div>SERVER STATUS <span class="val">SECURE</span> <i class="fa-solid fa-lock"></i></div>
+                <div>DATA ENCRYPTED <span class="val">AES-256</span> <i class="fa-solid fa-lock"></i></div>
+            </div>
         </div>
     </div>
 
@@ -2579,7 +2602,7 @@
 
 
 
-            // Group / Traveling Details - Only display if travel group data and members are found
+            // Group / Traveling Details — always visible, show empty state when no group
             const grpWidget = document.getElementById('group-details-widget');
             if (alertData.group && alertData.group.members && alertData.group.members.length > 0) {
                 if (grpWidget) grpWidget.style.display = 'flex';
@@ -2623,7 +2646,22 @@
                 const listEl = document.getElementById('group-members-list');
                 if (listEl) listEl.innerHTML = membersHtml;
             } else {
-                if (grpWidget) grpWidget.style.display = 'none';
+                // Keep widget visible — show empty state instead of hiding
+                if (grpWidget) grpWidget.style.display = 'flex';
+                const grpNameEl = document.getElementById('group-name');
+                if (grpNameEl) grpNameEl.textContent = 'SOLO RIDE';
+                const grpTotalEl = document.getElementById('group-total');
+                if (grpTotalEl) grpTotalEl.textContent = '1';
+                const grpOnlineEl = document.getElementById('group-online');
+                if (grpOnlineEl) grpOnlineEl.textContent = '1';
+                const grpOfflineEl = document.getElementById('group-offline');
+                if (grpOfflineEl) grpOfflineEl.textContent = '0';
+                const listEl = document.getElementById('group-members-list');
+                if (listEl) listEl.innerHTML = `
+                    <div style="font-size:11px; color:rgba(255,255,255,0.3); letter-spacing:1px; padding:8px 0; text-align:center; border:1px dashed rgba(255,255,255,0.07); border-radius:3px;">
+                        <i class="fa-solid fa-person" style="margin-right:6px; color:rgba(255,44,44,0.4);"></i>
+                        NO GROUP — VICTIM RIDING SOLO
+                    </div>`;
             }
 
             // Timeline populate
