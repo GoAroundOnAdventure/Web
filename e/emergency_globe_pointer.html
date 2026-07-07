@@ -2259,23 +2259,38 @@
         let currentAlertId = null;
         let prevAlertStatus = null;
         window._liveLocationUnsub = null;
+
+        // Listen to ALL active emergency alerts.
+        // NOTE: We do NOT use orderBy+limit here because that requires a
+        // Firestore composite index which may not exist. Instead we fetch
+        // all active docs and pick the newest client-side.
         const alertsQuery = query(
             collection(db, 'emergency_alerts'),
-            orderBy('startedTime', 'desc'),
-            limit(1)
+            where('currentStatus', '==', 'active')
         );
 
         onSnapshot(alertsQuery, (snapshot) => {
             if (snapshot.empty) {
-                console.log("No emergency alerts found.");
+                console.log('📭 [Web] No active emergency alerts in Firestore.');
                 return;
             }
 
-            const alertDoc = snapshot.docs[0];
+            // Pick the most recent doc by startedTime (sort client-side — no index needed)
+            let newestDoc = null;
+            let newestTime = 0;
+            snapshot.docs.forEach(d => {
+                const t = d.data().startedTime;
+                const ms = t && t.toMillis ? t.toMillis() : 0;
+                if (ms > newestTime) { newestTime = ms; newestDoc = d; }
+            });
+            // Fallback: just use first doc if no timestamps yet
+            if (!newestDoc) newestDoc = snapshot.docs[0];
+
+            const alertDoc = newestDoc;
             const alertData = alertDoc.data();
             const alertId = alertDoc.id;
 
-            console.log("🔔 [Web UI] New emergency alert received:", alertData);
+            console.log('🔔 [Web] Emergency alert received:', alertId, alertData);
 
             // Update local display variables
             activeVictimName = alertData.victimName || "GoAround User";

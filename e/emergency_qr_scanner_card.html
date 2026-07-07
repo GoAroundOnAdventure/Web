@@ -692,8 +692,8 @@
             const trackBtn = document.getElementById('btn-view-tracking');
             
             const incQuery = query(
-                collection(db, "emergency_incidents"),
-                where("userId", "==", userId),
+                collection(db, "emergency_alerts"),
+                where("victimId", "==", userId),
                 where("currentStatus", "==", "active"),
                 limit(1)
             );
