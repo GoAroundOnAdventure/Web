@@ -2148,40 +2148,9 @@
         `;
         document.body.appendChild(toastContainer);
 
-        // Interaction Required warning for audio context
-        const audioWarning = document.createElement('div');
-        audioWarning.id = 'audio-warning-banner';
-        audioWarning.style.cssText = `
-            position: fixed;
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 44, 44, 0.95);
-            border: 2px solid #FF2C2C;
-            color: white;
-            padding: 8px 16px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 1.5px;
-            z-index: 9999;
-            box-shadow: 0 0 15px rgba(255, 44, 44, 0.5);
-            border-radius: 4px;
-            display: none;
-            cursor: pointer;
-            text-align: center;
-            animation: pulseWarning 1.5s infinite;
-        `;
-        audioWarning.innerHTML = `⚠️ ACTION REQUIRED: CLICK ANYWHERE ON THIS CONSOLE TO ACTIVATE AUDIO SIREN ALERTS`;
-        document.body.appendChild(audioWarning);
-
-        // Add CSS animations
+        // Add CSS animations for toast notifications
         const toastStyleSheet = document.createElement("style");
         toastStyleSheet.innerText = `
-            @keyframes pulseWarning {
-                0% { opacity: 0.8; box-shadow: 0 0 5px rgba(255, 44, 44, 0.4); }
-                50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 44, 44, 0.8); }
-                100% { opacity: 0.8; box-shadow: 0 0 5px rgba(255, 44, 44, 0.4); }
-            }
             @keyframes slideIn {
                 from { transform: translateX(120%); opacity: 0; }
                 to { transform: translateX(0); opacity: 1; }
@@ -2202,26 +2171,14 @@
         `;
         document.head.appendChild(toastStyleSheet);
 
-        // Audio auto-unlock on first interaction
+        // Audio auto-unlock on first user interaction (silently arms siren on first click/tap anywhere)
         function triggerFirstInteraction() {
             unlockAudio();
-            audioWarning.style.display = 'none';
             window.removeEventListener('click', triggerFirstInteraction);
             window.removeEventListener('touchstart', triggerFirstInteraction);
         }
         window.addEventListener('click', triggerFirstInteraction);
         window.addEventListener('touchstart', triggerFirstInteraction);
-
-        // Show warning if audio is suspended (only if logged in)
-        setInterval(() => {
-            if (sessionStorage.getItem('goaround_auth') === 'true') {
-                if (!audioCtx || audioCtx.state === 'suspended') {
-                    audioWarning.style.display = 'block';
-                } else {
-                    audioWarning.style.display = 'none';
-                }
-            }
-        }, 3000);
 
         // Toast Dismiss
         function dismissToast(btn) {
@@ -2494,9 +2451,8 @@
             activeLat = alertData.victimGPS ? alertData.victimGPS.lat : 12.9716;
             activeLng = alertData.victimGPS ? alertData.victimGPS.lng : 77.5946;
 
-            // ── SIREN TRIGGER ──────────────────────────────────────────────
             if (alertData.currentStatus === 'active') {
-                if (isNewAlert) {
+                if (isNewAlert && sessionStorage.getItem('goaround_auth') === 'true') {
                     startSiren();
                     // Auto-stop siren after 12 seconds so it doesn't loop forever
                     setTimeout(() => stopSiren(), 12000);
@@ -2794,7 +2750,7 @@
                     seenActiveAlertIds.add(id);
 
                     // If page is already active and this is a new incoming alert
-                    if (seenActiveAlertIds.size > 1) {
+                    if (seenActiveAlertIds.size > 1 && sessionStorage.getItem('goaround_auth') === 'true') {
                         // Play siren
                         startSiren();
                         setTimeout(() => stopSiren(), 12000);
@@ -2887,6 +2843,15 @@
                     sessionStorage.setItem('goaround_auth', 'true');
                     document.documentElement.classList.add('authenticated');
                     document.getElementById('login-overlay').style.display = 'none';
+
+                    // Trigger siren immediately on login if an active emergency is already present
+                    if (activeAlertId && activeAlertsMap[activeAlertId]) {
+                        const alertData = activeAlertsMap[activeAlertId];
+                        if (alertData.currentStatus === 'active') {
+                            startSiren();
+                            setTimeout(() => stopSiren(), 12000);
+                        }
+                    }
                 } else {
                     errorEl.style.display = 'block';
                     errorEl.textContent = '[ACCESS DENIED] INVALID CREDENTIALS';
