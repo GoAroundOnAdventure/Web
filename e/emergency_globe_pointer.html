@@ -2040,9 +2040,14 @@
         // 'running' state BEFORE the siren needs to fire from the Firestore listener.
         // Without this, browsers block audio on devices that haven't interacted.
         function unlockAudio() {
-            if (audioCtx && audioCtx.state !== 'closed') return; // already unlocked
             try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx || audioCtx.state === 'closed') {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                // Always resume it if it is currently suspended
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 // Play a 0-volume beep instantly to unlock the context
                 const unlockOsc = audioCtx.createOscillator();
                 const unlockGain = audioCtx.createGain();
@@ -2051,10 +2056,6 @@
                 unlockGain.connect(audioCtx.destination);
                 unlockOsc.start();
                 unlockOsc.stop(audioCtx.currentTime + 0.001);
-                // Resume if suspended
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
                 console.log('🔊 [Audio] AudioContext unlocked. State:', audioCtx.state);
 
                 // Show AUDIO ARMED badge in header
@@ -2205,9 +2206,11 @@
         function triggerFirstInteraction() {
             unlockAudio();
             audioWarning.style.display = 'none';
+            window.removeEventListener('click', triggerFirstInteraction);
+            window.removeEventListener('touchstart', triggerFirstInteraction);
         }
-        window.addEventListener('click', triggerFirstInteraction, { once: true });
-        window.addEventListener('touchstart', triggerFirstInteraction, { once: true });
+        window.addEventListener('click', triggerFirstInteraction);
+        window.addEventListener('touchstart', triggerFirstInteraction);
 
         // Show warning if audio is suspended (only if logged in)
         setInterval(() => {
@@ -2481,11 +2484,7 @@
             });
         }
 
-        // Listen to ALL active emergency alerts.
-        const alertsQuery = query(
-            collection(db, 'emergency_alerts'),
-            where('currentStatus', '==', 'active')
-        );
+
 
         function renderActiveAlert(alertId, alertData, isNewAlert) {
             console.log('🔔 [Web] Rendering active alert details:', alertId, alertData);
