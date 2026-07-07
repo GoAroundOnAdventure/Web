@@ -2175,8 +2175,8 @@
         document.body.appendChild(audioWarning);
 
         // Add CSS animations
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
+        const toastStyleSheet = document.createElement("style");
+        toastStyleSheet.innerText = `
             @keyframes pulseWarning {
                 0% { opacity: 0.8; box-shadow: 0 0 5px rgba(255, 44, 44, 0.4); }
                 50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 44, 44, 0.8); }
@@ -2200,7 +2200,7 @@
                 100% { border-color: #FF2C2C; box-shadow: 0 0 10px rgba(255, 44, 44, 0.3); }
             }
         `;
-        document.head.appendChild(styleSheet);
+        document.head.appendChild(toastStyleSheet);
 
         // Audio auto-unlock on first interaction
         function triggerFirstInteraction() {
@@ -2659,8 +2659,7 @@
                         const coordEl = document.getElementById('hud-coords');
                         if (coordEl) coordEl.innerHTML = `${newLat.toFixed(4)}&deg; N, ${newLng.toFixed(4)}&deg; E`;
 
-                        // Draw visual sweep line from marker
-                        drawDynamicSweepLine(newLat, newLng);
+
 
                         // Update Live Vitals inside the selected profile card dynamically
                         const card = document.getElementById(`profile-card-${alertId}`);
