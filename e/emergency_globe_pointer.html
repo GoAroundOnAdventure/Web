@@ -2924,6 +2924,9 @@
             const footerActive = document.querySelector('.sys-footer div:nth-child(2) span');
             if (footerActive) footerActive.textContent = snapshot.docs.length;
 
+            const wasAlreadyLoaded = (seenActiveAlertIds.size > 0);
+            let newlyArrivedAlertId = null;
+
             // Detect new alerts
             snapshot.docs.forEach(doc => {
                 const id = doc.id;
@@ -2932,6 +2935,9 @@
                 const isNew = !seenActiveAlertIds.has(id);
                 if (isNew) {
                     seenActiveAlertIds.add(id);
+                    if (wasAlreadyLoaded) {
+                        newlyArrivedAlertId = id;
+                    }
                 }
 
                 // If active emergency, authenticated, and we haven't played the siren for this alert yet
@@ -2957,6 +2963,12 @@
                     });
                 }
             });
+
+            // Auto-focus a newly arrived alert on-screen
+            if (newlyArrivedAlertId && activeAlertsMap[newlyArrivedAlertId]) {
+                activeAlertId = newlyArrivedAlertId;
+                viewingProfileUid = activeAlertsMap[newlyArrivedAlertId].victimId;
+            }
 
             // Clean up resolved alerts
             for (let id of seenActiveAlertIds) {
