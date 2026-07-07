@@ -1497,6 +1497,35 @@
 
         <!-- LEFT PANEL -->
         <div class="side-panel" id="left-side-panel">
+            <!-- INCIDENT ALERT WIDGET -->
+            <div id="incident-alert-widget" class="widget alert-widget" style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); flex-direction: column; width: 100%; margin-bottom: 12px;">
+                <div class="widget-header red">
+                    <i class="fa-solid fa-triangle-exclamation"></i> INCIDENT ALERT
+                </div>
+                <div class="widget-content" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                    <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
+                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">INCIDENT ID</div>
+                        <div class="data-value small" id="inc-id" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">—</div>
+                    </div>
+                    <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
+                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">STATUS</div>
+                        <div class="data-value red" id="inc-status" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">—</div>
+                    </div>
+                    <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
+                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">SEVERITY</div>
+                        <div class="data-value red" id="inc-severity" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">MAXIMUM</div>
+                    </div>
+                    <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
+                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">REPORTED TIME</div>
+                        <div class="data-value small" id="inc-reported" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">—</div>
+                    </div>
+                    <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
+                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">LAST UPDATE</div>
+                        <div class="data-value small" id="inc-update" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">— <span class="green">(LIVE)</span></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="active-profile-widget" class="widget" style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); display: flex; flex-direction: column; width: 100%;">
                 <!-- Widget Header -->
                 <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
@@ -2446,6 +2475,8 @@
 
             if (Object.keys(activeAlertsMap).length === 0) {
                 if (widget) widget.style.display = 'none';
+                const incWidget = document.getElementById('incident-alert-widget');
+                if (incWidget) incWidget.style.display = 'none';
                 if (placeholder) placeholder.style.display = 'block';
                 if (btn) btn.style.display = 'none';
                 return;
@@ -2586,6 +2617,30 @@
             }
             currentAlertId = alertId;
             prevAlertStatus = alertData.currentStatus;
+
+            // Update INCIDENT ALERT widget fields
+            const incWidget = document.getElementById('incident-alert-widget');
+            if (incWidget) {
+                incWidget.style.display = 'flex';
+                
+                const incIdEl = document.getElementById('inc-id');
+                if (incIdEl) incIdEl.textContent = `#EMRG-${alertId.substring(0, 8).toUpperCase()}`;
+
+                const incStatusEl = document.getElementById('inc-status');
+                if (incStatusEl) incStatusEl.textContent = (alertData.currentStatus || 'ACTIVE').toUpperCase();
+
+                const incReportedEl = document.getElementById('inc-reported');
+                if (incReportedEl && alertData.startedTime) {
+                    const date = alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
+                    incReportedEl.textContent = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ' - ' + date.toLocaleTimeString();
+                }
+
+                const incUpdateEl = document.getElementById('inc-update');
+                if (incUpdateEl) {
+                    const now = new Date();
+                    incUpdateEl.innerHTML = `${now.toLocaleTimeString()} <span class="green">(LIVE)</span>`;
+                }
+            }
 
             // Render profile details for the selected active victim if viewing them
             if (viewingProfileUid === alertData.victimId) {
