@@ -1497,13 +1497,37 @@
 
         <!-- LEFT PANEL -->
         <div class="side-panel" id="left-side-panel">
-            <div id="active-profiles-container" style="display:flex; flex-direction:column; gap:12px; width:100%;">
-                <!-- Dynamic active profile cards will be populated here -->
-                <div class="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
-                    <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
-                    <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
-                    <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
+            <div id="active-profile-widget" class="widget" style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); display: flex; flex-direction: column; width: 100%;">
+                <!-- Widget Header -->
+                <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
+                    <span><i class="fa-solid fa-user-shield" style="margin-right:6px;"></i>EMERGENCY PROFILE</span>
+                    <span id="active-profile-badge" style="
+                        background: rgba(255,44,44,0.15); 
+                        color: #FF2C2C; 
+                        padding: 2px 6px; 
+                        border-radius: 2px; 
+                        font-weight: bold;
+                        font-size: 9px;
+                        letter-spacing: 1px;
+                    ">ACTIVE</span>
                 </div>
+                
+                <!-- Active Members Row (Photos) -->
+                <div id="profile-photos-row" style="display:flex; gap:12px; padding:10px 12px; background:rgba(255,44,44,0.02); border-bottom:1px solid rgba(255,44,44,0.1); overflow-x:auto; align-items:center; scrollbar-width: none;">
+                    <!-- Circle photos of active alerts and group members -->
+                </div>
+
+                <!-- Selected Profile Details Content -->
+                <div id="profile-details-content" style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Details of selected person will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Placeholder when no alerts -->
+            <div id="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
+                <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
+                <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
+                <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
             </div>
 
             <button class="close-profile-btn" onclick="showConfirmModal()" id="close-profile-btn-el" style="display:none; margin-top:auto; margin-bottom:10px;">
@@ -2131,6 +2155,7 @@
         let currentAlertId = null;
         let prevAlertStatus = null;
         window._liveLocationUnsub = null;
+        let viewingProfileUid = null;
 
         // Toast container
         const toastContainer = document.createElement('div');
@@ -2188,11 +2213,12 @@
         }
         window.dismissToast = dismissToast;
 
-        // Direct loader
         function loadAlertDirectly(alertId) {
             if (activeAlertsMap[alertId]) {
                 activeAlertId = alertId;
+                viewingProfileUid = activeAlertsMap[alertId].victimId;
                 renderActiveAlert(alertId, activeAlertsMap[alertId], true);
+                renderAllProfileCards();
             }
         }
         window.loadAlertDirectly = loadAlertDirectly;
@@ -2265,21 +2291,19 @@
             where('currentStatus', '==', 'active')
         );
 
-        // --- DYNAMIC PROFILE CARD BUILDER ---
-        function buildProfileCardHtml(alertId, alertData, isFocused) {
-            const date = alertData.startedTime && alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
-            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const borderStyle = isFocused 
-                ? 'border: 2px solid #FF2C2C; box-shadow: 0 0 15px rgba(255, 44, 44, 0.4); background: rgba(255, 44, 44, 0.05);' 
-                : 'border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85);';
-            const opacityStyle = isFocused ? '' : 'opacity: 0.65; cursor: pointer;';
+        // --- DYNAMIC PROFILE DETAILS PANELS ---
+        function renderProfileDetails(d) {
+            const content = document.getElementById('profile-details-content');
+            if (!content) return;
 
-            // Compile the emergency card snap if present
+            const notes = d.notes && d.notes !== 'Not set' && d.notes !== 'None' && d.notes !== 'NONE' ? d.notes : 'NONE';
+            const allergies = d.allergies && d.allergies !== 'Not set' && d.allergies !== 'None' && d.allergies !== 'NONE' ? d.allergies : 'NONE';
+
             let emCardHtml = '';
-            if (alertData.emergencyCard) {
-                const c = alertData.emergencyCard;
+            if (d.emergencyCard) {
+                const c = d.emergencyCard;
                 emCardHtml = `
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1); font-size:9px; color:rgba(255,255,255,0.4); line-height:1.4; font-family:inherit;">
+                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1); font-size:9px; color:rgba(255,255,255,0.4); line-height:1.4;">
                         ${c.dob ? `<div>DOB: ${c.dob} | GENDER: ${c.gender}</div>` : ''}
                         ${c.contact1Name ? `<div>CONTACT 1: ${c.contact1Name} (${c.contact1Phone})</div>` : ''}
                         ${c.contact2Name ? `<div>CONTACT 2: ${c.contact2Name} (${c.contact2Phone})</div>` : ''}
@@ -2288,156 +2312,235 @@
                 `;
             }
 
-            return `
-                <div class="widget" id="profile-card-${alertId}" 
-                     onclick="loadAlertDirectly('${alertId}')"
-                     style="${opacityStyle} ${borderStyle} transition: all 0.3s; display: flex; flex-direction: column;">
+            content.innerHTML = `
+                <!-- Row 1: Victim Details + Photo + QR -->
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <img src="${d.photo || 'https://i.pravatar.cc/150?img=11'}" alt="Victim"
+                        style="width:58px; height:58px; object-fit:cover; border-radius:4px; flex-shrink:0; border:1px solid rgba(255,44,44,0.4);">
                     
-                    <!-- Unified Widget Header -->
-                    <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
-                        <span><i class="fa-solid fa-user-shield" style="margin-right:6px;"></i>EMERGENCY PROFILE</span>
-                        <span style="
-                            background: rgba(255,44,44,0.15); 
-                            color: #FF2C2C; 
-                            padding: 2px 6px; 
-                            border-radius: 2px; 
-                            font-weight: bold;
-                            font-size: 9px;
-                            letter-spacing: 1px;
-                        ">${(alertData.emergencyLevel || 'MAX').toUpperCase()}</span>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+                        <div>
+                            <div class="data-label" style="font-size:8px;">NAME</div>
+                            <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                ${(d.name || 'GoAround User').toUpperCase()}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="data-label" style="font-size:8px;">PHONE</div>
+                            <div class="data-value small" style="font-size:10px;">${d.phone || 'N/A'}</div>
+                        </div>
+                        <div>
+                            <div class="data-label" style="font-size:8px;">BLOOD GROUP</div>
+                            <div class="data-value" style="font-size:11px; color:#FF2C2C; font-weight:bold;">${d.bloodGroup || '—'}</div>
+                        </div>
                     </div>
 
-                    <div class="widget-content" style="padding:12px; display:flex; flex-direction:column; gap:10px;">
-                        <!-- Row 1: Victim Details + Photo + QR -->
-                        <div style="display:flex; align-items:flex-start; gap:10px;">
-                            <img src="${alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11'}" alt="Victim"
-                                style="width:58px; height:58px; object-fit:cover; border-radius:4px; flex-shrink:0; border:1px solid rgba(255,44,44,0.4);">
-                            
-                            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
-                                <div>
-                                    <div class="data-label" style="font-size:8px;">NAME</div>
-                                    <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                        ${(alertData.victimName || 'GoAround User').toUpperCase()}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="data-label" style="font-size:8px;">PHONE</div>
-                                    <div class="data-value small" style="font-size:10px;">${alertData.victimPhone || 'N/A'}</div>
-                                </div>
-                                <div>
-                                    <div class="data-label" style="font-size:8px;">BLOOD GROUP</div>
-                                    <div class="data-value" style="font-size:11px; color:#FF2C2C; font-weight:bold;">${alertData.victimBlood || '—'}</div>
-                                </div>
-                            </div>
-
-                            <!-- QR Code -->
-                            <div style="flex-shrink:0; text-align:center;">
-                                <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
-                                <div style="background:#fff; padding:2px; border-radius:2px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,44,44,0.3);">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&color=000000&bgcolor=ffffff&data=${encodeURIComponent('https://goaround-safety.web.app/emergency?uid=' + alertData.victimId)}" 
-                                         width="44" height="44" style="display:block; image-rendering:pixelated;">
-                                </div>
-                            </div>
+                    <!-- QR Code -->
+                    <div style="flex-shrink:0; text-align:center;">
+                        <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
+                        <div style="background:#fff; padding:2px; border-radius:2px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,44,44,0.3);">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&color=000000&bgcolor=ffffff&data=${encodeURIComponent('https://goaround-safety.web.app/emergency?uid=' + d.uid)}" 
+                                 width="44" height="44" style="display:block; image-rendering:pixelated;">
                         </div>
-
-                        <!-- Row 2: Medical Info -->
-                        <div style="display:flex; gap:10px; font-size:10px; background:rgba(255,255,255,0.01); padding:6px; border-radius:3px; border:1px solid rgba(255,255,255,0.03);">
-                            <div style="flex:1; min-width:0;">
-                                <div class="data-label" style="font-size:7px;">MEDICAL NOTES</div>
-                                <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    ${alertData.victimNotes || 'NONE'}
-                                </div>
-                            </div>
-                            <div style="flex:1; min-width:0;">
-                                <div class="data-label" style="font-size:7px;">ALLERGIES</div>
-                                <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                    ${alertData.victimAllergies || 'NONE'}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Row 3: Live Vitals Grid -->
-                        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; background:rgba(255,44,44,0.02); padding:8px; border-radius:4px; border:1px solid rgba(255,44,44,0.05);">
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <i class="fa-solid fa-battery-half" style="color:#00e676; font-size:9px;"></i>
-                                <div>
-                                    <div class="data-label" style="font-size:7px; line-height:1;">BATTERY</div>
-                                    <div style="font-size:10px; font-weight:bold;" data-vital="battery">${alertData.battery || 100}%</div>
-                                </div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <i class="fa-solid fa-tower-cell" style="color:#888; font-size:9px;"></i>
-                                <div>
-                                    <div class="data-label" style="font-size:7px; line-height:1;">NETWORK</div>
-                                    <div style="font-size:10px; font-weight:bold;" data-vital="network">${alertData.network || 'Online'}</div>
-                                </div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <i class="fa-solid fa-gauge-high" style="color:#00e676; font-size:9px;"></i>
-                                <div>
-                                    <div class="data-label" style="font-size:7px; line-height:1;">SPEED</div>
-                                    <div style="font-size:10px; font-weight:bold;" data-vital="speed">${((alertData.speed || 0) * 3.6).toFixed(1)} km/h</div>
-                                </div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <i class="fa-solid fa-location-crosshairs" style="color:#FF2C2C; font-size:9px;"></i>
-                                <div>
-                                    <div class="data-label" style="font-size:7px; line-height:1;">ACCURACY</div>
-                                    <div style="font-size:10px; font-weight:bold;" data-vital="accuracy">${(alertData.gpsAccuracy || 0).toFixed(1)}m</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Row 4: Telemetry / Incident Data -->
-                        <div style="font-size:8px; color:rgba(255,255,255,0.3); display:flex; flex-direction:column; gap:2px; font-family:'Share Tech Mono', monospace;">
-                            <div>ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}</div>
-                            <div>REPORTED: ${timeStr}</div>
-                            ${alertData.address ? `<div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">LOC: ${alertData.address}</div>` : ''}
-                        </div>
-
-                        ${emCardHtml}
                     </div>
                 </div>
+
+                <!-- Row 2: Medical Info -->
+                <div style="display:flex; gap:10px; font-size:10px; background:rgba(255,255,255,0.01); padding:6px; border-radius:3px; border:1px solid rgba(255,255,255,0.03);">
+                    <div style="flex:1; min-width:0;">
+                        <div class="data-label" style="font-size:7px;">MEDICAL NOTES</div>
+                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            ${notes}
+                        </div>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div class="data-label" style="font-size:7px;">ALLERGIES</div>
+                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            ${allergies}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Live Vitals Grid -->
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; background:rgba(255,44,44,0.02); padding:8px; border-radius:4px; border:1px solid rgba(255,44,44,0.05);">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-battery-half" style="color:#00e676; font-size:9px;"></i>
+                        <div>
+                            <div class="data-label" style="font-size:7px; line-height:1;">BATTERY</div>
+                            <div style="font-size:10px; font-weight:bold;" data-vital="battery">${d.battery != null ? d.battery + '%' : '—'}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-tower-cell" style="color:#888; font-size:9px;"></i>
+                        <div>
+                            <div class="data-label" style="font-size:7px; line-height:1;">NETWORK</div>
+                            <div style="font-size:10px; font-weight:bold;" data-vital="network">${d.network || '—'}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-gauge-high" style="color:#00e676; font-size:9px;"></i>
+                        <div>
+                            <div class="data-label" style="font-size:7px; line-height:1;">SPEED</div>
+                            <div style="font-size:10px; font-weight:bold;" data-vital="speed">${d.speed != null ? (d.speed * 3.6).toFixed(1) + ' km/h' : '—'}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-location-crosshairs" style="color:#FF2C2C; font-size:9px;"></i>
+                        <div>
+                            <div class="data-label" style="font-size:7px; line-height:1;">ACCURACY</div>
+                            <div style="font-size:10px; font-weight:bold;" data-vital="accuracy">${d.gpsAccuracy != null ? d.gpsAccuracy.toFixed(1) + 'm' : '—'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Telemetry / Incident Data -->
+                <div style="font-size:8px; color:rgba(255,255,255,0.3); display:flex; flex-direction:column; gap:2px; font-family:'Share Tech Mono', monospace;">
+                    ${d.alertId ? `<div>ID: #EMRG-${d.alertId.substring(0, 8).toUpperCase()}</div>` : ''}
+                    ${d.address ? `<div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">LOC: ${d.address}</div>` : ''}
+                </div>
+
+                ${emCardHtml}
             `;
         }
 
-        // Render all profile cards one below another in left panel
+        // --- ROW IMAGE CLICK HANDLER ---
+        function selectProfileRowItem(alertId, uid, type) {
+            viewingProfileUid = uid;
+            
+            if (type === 'victim' || type === 'other_active') {
+                // Focus the active alert (updates activeAlertId and triggers map zoom)
+                loadAlertDirectly(alertId);
+            } else {
+                // Group member
+                const activeAlert = activeAlertsMap[activeAlertId];
+                if (activeAlert && activeAlert.group && activeAlert.group.members) {
+                    const mData = activeAlert.group.members.find(m => m.uid === uid);
+                    if (mData) {
+                        renderProfileDetails({
+                            uid: mData.uid,
+                            name: mData.name,
+                            phone: mData.phone,
+                            photo: mData.photo,
+                            bloodGroup: '—',
+                            notes: 'NONE (FAMILY GROUP MEMBER)',
+                            allergies: 'NONE',
+                            battery: null,
+                            network: mData.isOnline ? 'Online' : 'Offline',
+                            speed: null,
+                            gpsAccuracy: null,
+                            alertId: null,
+                            isOnline: mData.isOnline
+                        });
+                    }
+                }
+                renderAllProfileCards();
+            }
+        }
+        window.selectProfileRowItem = selectProfileRowItem;
+
+        // Render all profile photos in the single dashboard widget
         function renderAllProfileCards() {
-            const container = document.getElementById('active-profiles-container');
-            if (!container) return;
+            const widget = document.getElementById('active-profile-widget');
+            const placeholder = document.getElementById('no-emergencies-placeholder');
+            const btn = document.getElementById('close-profile-btn-el');
 
             if (Object.keys(activeAlertsMap).length === 0) {
-                container.innerHTML = `
-                    <div class="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
-                        <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
-                        <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
-                        <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
-                    </div>
-                `;
-                const btn = document.getElementById('close-profile-btn-el');
+                if (widget) widget.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'block';
                 if (btn) btn.style.display = 'none';
                 return;
             }
 
-            const btn = document.getElementById('close-profile-btn-el');
+            if (widget) widget.style.display = 'flex';
+            if (placeholder) placeholder.style.display = 'none';
             if (btn) btn.style.display = 'block';
 
-            // Clear placeholder/cards
-            container.innerHTML = '';
-            
-            // Sort active alerts descending by startedTime (newest first)
-            const sortedIds = Object.keys(activeAlertsMap).sort((a, b) => {
-                const tA = activeAlertsMap[a].startedTime;
-                const tB = activeAlertsMap[b].startedTime;
-                const msA = tA && tA.toMillis ? tA.toMillis() : 0;
-                const msB = tB && tB.toMillis ? tB.toMillis() : 0;
-                return msB - msA;
+            const rowContainer = document.getElementById('profile-photos-row');
+            if (!rowContainer) return;
+            rowContainer.innerHTML = '';
+
+            const items = [];
+            const focusedAlert = activeAlertsMap[activeAlertId];
+
+            if (focusedAlert) {
+                // Focused victim
+                items.push({
+                    id: activeAlertId,
+                    uid: focusedAlert.victimId,
+                    name: focusedAlert.victimName,
+                    photo: focusedAlert.victimPhoto,
+                    isActive: true,
+                    isFocused: true,
+                    type: 'victim',
+                    alertData: focusedAlert
+                });
+
+                // Group members
+                if (focusedAlert.group && focusedAlert.group.members) {
+                    focusedAlert.group.members.forEach(member => {
+                        if (member.uid !== focusedAlert.victimId) {
+                            items.push({
+                                id: null,
+                                uid: member.uid,
+                                name: member.name,
+                                photo: member.photo,
+                                isActive: false,
+                                isFocused: false,
+                                type: 'member',
+                                memberData: member
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Other active alerts
+            Object.keys(activeAlertsMap).forEach(id => {
+                if (id !== activeAlertId) {
+                    const other = activeAlertsMap[id];
+                    items.push({
+                        id: id,
+                        uid: other.victimId,
+                        name: other.victimName,
+                        photo: other.victimPhoto,
+                        isActive: true,
+                        isFocused: false,
+                        type: 'other_active',
+                        alertData: other
+                    });
+                }
             });
 
-            sortedIds.forEach(id => {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = buildProfileCardHtml(id, activeAlertsMap[id], id === activeAlertId);
-                container.appendChild(wrapper.firstElementChild);
+            items.forEach(item => {
+                const isSelected = (item.uid === viewingProfileUid);
+                
+                let border = '';
+                let borderClass = '';
+                if (item.isActive) {
+                    if (item.isFocused) {
+                        border = 'border: 2px solid #FF2C2C; box-shadow: 0 0 10px rgba(255, 44, 44, 0.8);';
+                        borderClass = 'siren-pulse';
+                    } else {
+                        border = 'border: 2px solid #ff5c5c;';
+                    }
+                } else {
+                    border = isSelected 
+                        ? 'border: 2px solid #00e676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);' 
+                        : 'border: 1.5px solid rgba(255,255,255,0.3);';
+                }
+
+                const photoHtml = `
+                    <div onclick="selectProfileRowItem('${item.id}', '${item.uid}', '${item.type}')" 
+                         style="cursor:pointer; position:relative; flex-shrink:0; text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px; padding:2px;">
+                        <img src="${item.photo || 'https://i.pravatar.cc/150?img=11'}" 
+                             style="width:44px; height:44px; object-fit:cover; border-radius:50%; ${border} transition: all 0.3s;"
+                             class="${borderClass}">
+                        <div style="font-size:7.5px; color:${item.isActive ? '#ff5c5c' : 'rgba(255,255,255,0.7)'}; max-width:55px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-transform:uppercase; font-weight:bold;">
+                            ${item.name ? item.name.split(' ')[0] : 'USER'}
+                        </div>
+                    </div>
+                `;
+                rowContainer.innerHTML += photoHtml;
             });
         }
 
@@ -2450,6 +2553,10 @@
             activeVictimName = alertData.victimName || "GoAround User";
             activeLat = alertData.victimGPS ? alertData.victimGPS.lat : 12.9716;
             activeLng = alertData.victimGPS ? alertData.victimGPS.lng : 77.5946;
+
+            if (isNewAlert || !viewingProfileUid) {
+                viewingProfileUid = alertData.victimId;
+            }
 
             if (alertData.currentStatus === 'active') {
                 if (isNewAlert && sessionStorage.getItem('goaround_auth') === 'true') {
@@ -2479,6 +2586,27 @@
             }
             currentAlertId = alertId;
             prevAlertStatus = alertData.currentStatus;
+
+            // Render profile details for the selected active victim if viewing them
+            if (viewingProfileUid === alertData.victimId) {
+                renderProfileDetails({
+                    uid: alertData.victimId,
+                    name: alertData.victimName,
+                    phone: alertData.victimPhone,
+                    photo: alertData.victimPhoto,
+                    bloodGroup: alertData.victimBlood,
+                    notes: alertData.victimNotes,
+                    allergies: alertData.victimAllergies,
+                    battery: alertData.battery,
+                    network: alertData.network,
+                    speed: alertData.speed,
+                    gpsAccuracy: alertData.gpsAccuracy,
+                    alertId: alertId,
+                    emergencyCard: alertData.emergencyCard,
+                    address: alertData.address,
+                    isOnline: true
+                });
+            }
 
             // ── CONSOLE TEXT — all new fields included ─────────────────────
             const consoleEl = document.querySelector('.console');
@@ -2615,21 +2743,18 @@
                         const coordEl = document.getElementById('hud-coords');
                         if (coordEl) coordEl.innerHTML = `${newLat.toFixed(4)}&deg; N, ${newLng.toFixed(4)}&deg; E`;
 
-
-
-                        // Update Live Vitals inside the selected profile card dynamically
-                        const card = document.getElementById(`profile-card-${alertId}`);
-                        if (card) {
-                            const batteryVal = card.querySelector('[data-vital="battery"]');
+                        // Update Live Vitals inside the selected profile card dynamically (if viewing the victim)
+                        if (viewingProfileUid === alertData.victimId) {
+                            const batteryVal = document.querySelector('[data-vital="battery"]');
                             if (batteryVal) batteryVal.textContent = `${liveData.battery || 100}%`;
 
-                            const netVal = card.querySelector('[data-vital="network"]');
+                            const netVal = document.querySelector('[data-vital="network"]');
                             if (netVal) netVal.textContent = liveData.network || 'Online';
 
-                            const speedVal = card.querySelector('[data-vital="speed"]');
+                            const speedVal = document.querySelector('[data-vital="speed"]');
                             if (speedVal) speedVal.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
 
-                            const accVal = card.querySelector('[data-vital="accuracy"]');
+                            const accVal = document.querySelector('[data-vital="accuracy"]');
                             if (accVal) accVal.textContent = `${(liveData.gpsAccuracy || 0.0).toFixed(1)}m`;
                         }
                     });
