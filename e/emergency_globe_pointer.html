@@ -2185,6 +2185,7 @@
         let prevAlertStatus = null;
         window._liveLocationUnsub = null;
         let viewingProfileUid = null;
+        let playedSirenAlertIds = new Set();
 
         // Toast container
         const toastContainer = document.createElement('div');
@@ -2590,8 +2591,9 @@
             }
 
             if (alertData.currentStatus === 'active') {
-                if (isNewAlert && sessionStorage.getItem('goaround_auth') === 'true') {
+                if (isNewAlert && sessionStorage.getItem('goaround_auth') === 'true' && !playedSirenAlertIds.has(alertId)) {
                     startSiren();
+                    playedSirenAlertIds.add(alertId);
                     // Auto-stop siren after 12 seconds so it doesn't loop forever
                     setTimeout(() => stopSiren(), 12000);
                 }
@@ -2930,9 +2932,10 @@
                     seenActiveAlertIds.add(id);
 
                     // If page is already active and this is a new incoming alert
-                    if (seenActiveAlertIds.size > 1 && sessionStorage.getItem('goaround_auth') === 'true') {
+                    if (seenActiveAlertIds.size > 1 && sessionStorage.getItem('goaround_auth') === 'true' && !playedSirenAlertIds.has(id)) {
                         // Play siren
                         startSiren();
+                        playedSirenAlertIds.add(id);
                         setTimeout(() => stopSiren(), 12000);
 
                         // Show on-screen toast notification
@@ -3027,8 +3030,9 @@
                     // Trigger siren immediately on login if an active emergency is already present
                     if (activeAlertId && activeAlertsMap[activeAlertId]) {
                         const alertData = activeAlertsMap[activeAlertId];
-                        if (alertData.currentStatus === 'active') {
+                        if (alertData.currentStatus === 'active' && !playedSirenAlertIds.has(activeAlertId)) {
                             startSiren();
+                            playedSirenAlertIds.add(activeAlertId);
                             setTimeout(() => stopSiren(), 12000);
                         }
                     }
