@@ -1817,7 +1817,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration Object
         const firebaseConfig = {
@@ -2159,6 +2159,8 @@
 
         // --- REAL-TIME FIRESTORE MONITORING ---
         let currentAlertId = null;
+        let prevAlertStatus = null;
+        window._liveLocationUnsub = null;
         const alertsQuery = query(
             collection(db, 'emergency_alerts'),
             orderBy('startedTime', 'desc'),
@@ -2171,9 +2173,9 @@
                 return;
             }
 
-            const doc = snapshot.docs[0];
-            const alertData = doc.data();
-            const alertId = doc.id;
+            const alertDoc = snapshot.docs[0];
+            const alertData = alertDoc.data();
+            const alertId = alertDoc.id;
 
             console.log("🔔 [Web UI] New emergency alert received:", alertData);
 
@@ -2369,26 +2371,19 @@
                 consoleEl.innerHTML = t;
             }
 
-            // Update Mapbox marker & fly camera dynamically based on alert status
+            // Update Mapbox marker & fly camera — only flyTo on a BRAND NEW alert
+            // (not on every 2-second GPS update from the alerts collection)
             const hasActivePointer = alertData.currentStatus === 'active' && alertData.victimGPS && alertData.victimGPS.lat && alertData.victimGPS.lng;
+            const isNewAlert = (currentAlertId !== alertId) || (prevAlertStatus !== 'active' && alertData.currentStatus === 'active');
 
             if (hasActivePointer) {
+                // Always keep marker position updated
                 updateMapMarker(activeLat, activeLng, activeVictimName);
                 if (map) {
                     try {
                         activeMarker.addTo(map);
-                        map.flyTo({
-                            center: [activeLng, activeLat],
-                            zoom: 14.5,
-                            pitch: 35,
-                            bearing: 0,
-                            duration: 3500,
-                            essential: true
-                        });
-                    } catch (e) {
-                        console.warn("Map not fully loaded yet, queuing camera animation:", e);
-                        map.once('load', () => {
-                            activeMarker.addTo(map);
+                        // Only fly camera on a genuinely new alert — not every 2s GPS ping
+                        if (isNewAlert) {
                             map.flyTo({
                                 center: [activeLng, activeLat],
                                 zoom: 14.5,
@@ -2397,10 +2392,81 @@
                                 duration: 3500,
                                 essential: true
                             });
+                        }
+                    } catch (e) {
+                        console.warn("Map not fully loaded yet, queuing camera animation:", e);
+                        map.once('load', () => {
+                            activeMarker.addTo(map);
+                            if (isNewAlert) {
+                                map.flyTo({
+                                    center: [activeLng, activeLat],
+                                    zoom: 14.5,
+                                    pitch: 35,
+                                    bearing: 0,
+                                    duration: 3500,
+                                    essential: true
+                                });
+                            }
                         });
                     }
                 }
+
+                // ── START LIVE LOCATION TRACKING on live_locations collection ─────────────
+                // Subscribe to victim's live_locations doc for smooth 2-second marker updates
+                if (isNewAlert && alertData.victimId) {
+                    // Cancel any previous live location subscription
+                    if (window._liveLocationUnsub) {
+                        window._liveLocationUnsub();
+                        window._liveLocationUnsub = null;
+                    }
+
+                    const liveLocRef = doc(db, 'live_locations', alertData.victimId);
+                    window._liveLocationUnsub = onSnapshot(liveLocRef, (liveSnap) => {
+                        if (!liveSnap.exists()) return;
+                        const liveData = liveSnap.data();
+                        const newLat = liveData.latitude;
+                        const newLng = liveData.longitude;
+                        if (!newLat || !newLng) return;
+
+                        // Update globals
+                        activeLat = newLat;
+                        activeLng = newLng;
+
+                        // Smoothly move marker to new position (no flyTo — let operator control camera)
+                        if (activeMarker) {
+                            activeMarker.setLngLat([newLng, newLat]);
+                        }
+
+                        // Update coordinate HUD label
+                        const coordEl = document.getElementById('hud-coords');
+                        if (coordEl) coordEl.innerHTML = `${newLat.toFixed(4)}&deg;&nbsp;N,&nbsp;${newLng.toFixed(4)}&deg;&nbsp;E`;
+
+                        // Update vitals from live_locations
+                        const lBattEl = document.querySelector('.vital-item:nth-child(1) .data-value');
+                        if (lBattEl && liveData.battery != null) lBattEl.textContent = `${liveData.battery}%`;
+
+                        const lNetEl = document.querySelector('.vital-item:nth-child(2) .data-value');
+                        if (lNetEl && liveData.network) lNetEl.textContent = liveData.network;
+
+                        const lSpdEl = document.querySelector('.vital-item:nth-child(3) .data-value');
+                        if (lSpdEl && liveData.speed != null) lSpdEl.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
+
+                        const lHdgEl = document.querySelector('.vital-item:nth-child(4) .data-value');
+                        if (lHdgEl && liveData.heading != null) lHdgEl.textContent = `${Math.round(liveData.heading || 0)}°`;
+
+                        console.log(`📍 [Live] Marker moved → ${newLat.toFixed(5)}, ${newLng.toFixed(5)}`);
+                    });
+
+                    console.log(`🛰️ [Live] Subscribed to live_locations/${alertData.victimId}`);
+                }
+
             } else {
+                // Emergency resolved — cancel live tracking subscription
+                if (window._liveLocationUnsub) {
+                    window._liveLocationUnsub();
+                    window._liveLocationUnsub = null;
+                    console.log("🛑 [Live] Unsubscribed from live_locations (alert resolved)");
+                }
                 if (map) {
                     try {
                         activeMarker.remove();
@@ -2426,6 +2492,9 @@
                     }
                 }
             }
+
+            // Track previous status for next comparison
+            prevAlertStatus = alertData.currentStatus;
 
 
 
