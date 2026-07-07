@@ -2182,23 +2182,23 @@
             activeLat = alertData.victimGPS ? alertData.victimGPS.lat : 12.9716;
             activeLng = alertData.victimGPS ? alertData.victimGPS.lng : 77.5946;
 
-            // Trigger siren if this is a new alert ID and status is active
+            // ── SIREN TRIGGER ──────────────────────────────────────────────
+            // Fire siren on: brand new alert (currentAlertId is null = first load)
+            // OR a completely different alertId comes in — both mean a fresh emergency
             if (alertData.currentStatus === 'active') {
-                if (currentAlertId !== null && currentAlertId !== alertId) {
+                const isNewAlert = currentAlertId !== alertId;
+                if (isNewAlert) {
                     startSiren();
-                    // Auto-stop siren after 10 seconds to avoid annoying the operator forever
-                    setTimeout(() => {
-                        stopSiren();
-                    }, 10000);
+                    // Auto-stop siren after 12 seconds so it doesn't loop forever
+                    setTimeout(() => stopSiren(), 12000);
                 }
                 // Push alert notification
-                const isNewAlert = currentAlertId !== alertId;
                 pushNotification({
                     type: 'alert',
                     icon: 'triangle-exclamation',
                     iconColor: 'red',
-                    title: `EMERGENCY: ${(alertData.victimName || 'UNKNOWN').toUpperCase()}`,
-                    desc: `> Status: ACTIVE | ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}${alertData.victimGPS ? ` | GPS: ${alertData.victimGPS.lat?.toFixed(4)}, ${alertData.victimGPS.lng?.toFixed(4)}` : ''}`,
+                    title: `🚨 EMERGENCY: ${(alertData.victimName || 'UNKNOWN').toUpperCase()}`,
+                    desc: `> Status: ACTIVE | ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}${alertData.victimGPS ? ` | GPS: ${alertData.victimGPS.lat?.toFixed(4)}, ${alertData.victimGPS.lng?.toFixed(4)}` : ''}${alertData.city ? ` | ${alertData.city}` : ''}`,
                     timestamp: alertData.startedTime || new Date()
                 });
             } else {
@@ -2214,8 +2214,7 @@
             }
             currentAlertId = alertId;
 
-
-            // Update HUD UI values
+            // ── UPDATE HUD UI VALUES ───────────────────────────────────────
             const vNameEl = document.getElementById('victim-name');
             if (vNameEl) vNameEl.textContent = activeVictimName.toUpperCase();
 
@@ -2225,7 +2224,7 @@
             const vPhotoEl = document.getElementById('victim-photo');
             if (vPhotoEl) vPhotoEl.src = alertData.victimPhoto || 'https://i.pravatar.cc/150?img=11';
 
-            // Medical & Blood - Only show stack if data is found and not default/empty
+            // Blood
             const vBloodEl = document.getElementById('victim-blood');
             if (vBloodEl) {
                 const blood = alertData.victimBlood;
@@ -2237,6 +2236,7 @@
                 }
             }
 
+            // Medical notes
             const vNotesEl = document.getElementById('victim-notes');
             if (vNotesEl) {
                 const notes = alertData.victimNotes;
@@ -2248,6 +2248,7 @@
                 }
             }
 
+            // Allergies
             const vAllergiesEl = document.getElementById('victim-allergies');
             if (vAllergiesEl) {
                 const allergies = alertData.victimAllergies;
@@ -2259,7 +2260,7 @@
                 }
             }
 
-            // Vitals
+            // ── VITALS GRID ───────────────────────────────────────────────
             const batteryEl = document.querySelector('.vital-item:nth-child(1) .data-value');
             if (batteryEl) batteryEl.textContent = `${alertData.battery || 100}%`;
 
@@ -2267,12 +2268,12 @@
             if (networkEl) networkEl.textContent = alertData.network || 'Online';
 
             const speedEl = document.querySelector('.vital-item:nth-child(3) .data-value');
-            if (speedEl) speedEl.textContent = `${(alertData.speed || 0).toFixed(1)} km/h`;
+            if (speedEl) speedEl.textContent = `${((alertData.speed || 0) * 3.6).toFixed(1)} km/h`;
 
             const headingEl = document.querySelector('.vital-item:nth-child(4) .data-value');
-            if (headingEl) headingEl.textContent = `${alertData.heading || 0}°`;
+            if (headingEl) headingEl.textContent = `${Math.round(alertData.heading || 0)}°`;
 
-            // Incident Header / Details
+            // ── INCIDENT HEADER DETAILS ───────────────────────────────────
             const incidentIdEl = document.querySelector('.alert-widget .data-value.small');
             if (incidentIdEl) incidentIdEl.textContent = `#EMRG-${alertId.substring(0, 8).toUpperCase()}`;
 
@@ -2283,6 +2284,89 @@
             if (timeEl && alertData.startedTime) {
                 const date = alertData.startedTime.toDate ? alertData.startedTime.toDate() : new Date();
                 timeEl.textContent = date.toLocaleString();
+            }
+
+            // ── CONSOLE TEXT — all new fields included ─────────────────────
+            const consoleEl = document.querySelector('.console');
+            if (consoleEl) {
+                let t = `> CONNECTION ESTABLISHED...<br>`;
+                t += `> ALERT ID: #EMRG-${alertId.substring(0, 8).toUpperCase()}<br>`;
+                t += `> STATUS: ${(alertData.currentStatus || 'ACTIVE').toUpperCase()}`;
+                if (alertData.escalatedFromMin) t += ` <span style="color:#ff9944;">[ESCALATED FROM MIN]</span>`;
+                t += `<br>`;
+                t += `> BATTERY: ${alertData.battery || 100}% | NETWORK: ${alertData.network || 'N/A'}<br>`;
+
+                // Location fields
+                if (alertData.address && alertData.address !== 'Unknown') {
+                    t += `> LOCATION: ${alertData.address}<br>`;
+                }
+                if (alertData.city && alertData.city !== 'Unknown') {
+                    t += `> CITY: ${alertData.city}${alertData.state && alertData.state !== 'Unknown' ? ', ' + alertData.state : ''}${alertData.country && alertData.country !== 'Unknown' ? ', ' + alertData.country : ''}<br>`;
+                }
+                if (alertData.altitude && alertData.altitude > 0) {
+                    t += `> ALTITUDE: ${alertData.altitude.toFixed(1)}m | GPS ACCURACY: ±${(alertData.gpsAccuracy || 0).toFixed(1)}m<br>`;
+                }
+
+                // Device & app info
+                if (alertData.deviceModel && alertData.deviceModel !== 'Unknown Device') {
+                    t += `> DEVICE: ${alertData.deviceModel} | OS: ${alertData.osVersion || 'N/A'}<br>`;
+                }
+                if (alertData.appVersion && alertData.appVersion !== 'unknown') {
+                    t += `> APP VERSION: ${alertData.appVersion}<br>`;
+                }
+
+                // Emergency card
+                if (alertData.emergencyCard) {
+                    const card = alertData.emergencyCard;
+                    t += `> EMERGENCY CARD LOCKED...<br>`;
+                    const identity = [];
+                    if (card.dob && card.dob.trim() !== '') identity.push(`DOB: ${card.dob}`);
+                    if (card.gender && card.gender.trim() !== '') identity.push(`GENDER: ${card.gender}`);
+                    if (identity.length > 0) t += `> ${identity.join(' | ')}<br>`;
+
+                    if (card.contact1Name && card.contact1Phone) {
+                        t += `> CONTACT 1: ${card.contact1Name} (${card.contact1Phone})${card.contact1Relation ? ' — ' + card.contact1Relation : ''}<br>`;
+                    }
+                    if (card.contact2Name && card.contact2Phone) {
+                        t += `> CONTACT 2: ${card.contact2Name} (${card.contact2Phone})${card.contact2Relation ? ' — ' + card.contact2Relation : ''}<br>`;
+                    }
+                    if (card.diseases && card.diseases.trim() !== '' && card.diseases !== 'Not set') {
+                        t += `> DISEASES: ${card.diseases.toUpperCase()}<br>`;
+                    }
+                    if (card.medicines && card.medicines.trim() !== '' && card.medicines !== 'Not set') {
+                        t += `> MEDICINES: ${card.medicines.toUpperCase()}<br>`;
+                    }
+                    if (card.allergies && card.allergies.trim() !== '' && card.allergies !== 'NONE' && card.allergies !== 'Not set') {
+                        t += `> ALLERGIES: ${card.allergies.toUpperCase()}<br>`;
+                    }
+                    if (card.notes && card.notes.trim() !== '' && card.notes !== 'NONE' && card.notes !== 'Not set') {
+                        t += `> MEDICAL NOTES: ${card.notes.toUpperCase()}<br>`;
+                    }
+                    if (card.doctorName && card.doctorName.trim() !== '') {
+                        t += `> DOCTOR: ${card.doctorName}${card.doctorPhone ? ' (' + card.doctorPhone + ')' : ''}<br>`;
+                    }
+                    if (card.vehicle && card.vehicle.number && card.vehicle.number.trim() !== '') {
+                        t += `> VEHICLE: ${card.vehicle.brand || ''} ${card.vehicle.model || ''} [${card.vehicle.number}]<br>`;
+                    }
+                    if (card.insurance && card.insurance.provider && card.insurance.provider.trim() !== '') {
+                        t += `> INSURANCE: ${card.insurance.provider} (POLICY: ${card.insurance.policyNumber || 'N/A'})<br>`;
+                    }
+                    if (card.organDonor === true) {
+                        t += `> ♥ ORGAN DONOR: YES<br>`;
+                    }
+                } else {
+                    t += `> NO EMERGENCY CARD FOUND<br>`;
+                }
+
+                // SMS contacts notified
+                if (alertData.smsContactsNotified && alertData.smsContactsNotified.length > 0) {
+                    t += `> SMS ALERTS SENT TO: `;
+                    t += alertData.smsContactsNotified.map(c => `${c.name} (${c.phone})`).join(', ');
+                    t += `<br>`;
+                }
+
+                t += `> LIVE TRACKING ACTIVE...`;
+                consoleEl.innerHTML = t;
             }
 
             // Update Mapbox marker & fly camera dynamically based on alert status
@@ -2343,55 +2427,7 @@
                 }
             }
 
-            // Update console text with details (only display fields that exist)
-            const consoleEl = document.querySelector('.console');
-            if (consoleEl) {
-                let consoleText = `> CONNECTION ESTABLISHED...<br>`;
-                consoleText += `> ALERT STATUS: ${(alertData.currentStatus || 'ACTIVE').toUpperCase()}<br>`;
-                consoleText += `> BATTERY LEVEL: ${alertData.battery || 100}% | NETWORK: ${alertData.network || 'N/A'}<br>`;
 
-                if (alertData.emergencyCard) {
-                    const card = alertData.emergencyCard;
-                    consoleText += `> EMERGENCY CARD LOCKED...<br>`;
-
-                    let identityText = [];
-                    if (card.dob && card.dob !== 'Not set' && card.dob.trim() !== '') identityText.push(`DOB: ${card.dob}`);
-                    if (card.gender && card.gender !== 'Not set' && card.gender.trim() !== '') identityText.push(`GENDER: ${card.gender}`);
-                    if (identityText.length > 0) {
-                        consoleText += `> ${identityText.join(' | ')}<br>`;
-                    }
-
-                    if (card.contact1Name && card.contact1Phone) {
-                        consoleText += `> CONTACT 1: ${card.contact1Name} (${card.contact1Phone})${card.contact1Relation ? ' - ' + card.contact1Relation : ''}<br>`;
-                    }
-                    if (card.contact2Name && card.contact2Phone) {
-                        consoleText += `> CONTACT 2: ${card.contact2Name} (${card.contact2Phone})${card.contact2Relation ? ' - ' + card.contact2Relation : ''}<br>`;
-                    }
-
-                    if (card.diseases && card.diseases !== 'Not set' && card.diseases.trim() !== '') {
-                        consoleText += `> DISEASES: ${card.diseases.toUpperCase()}<br>`;
-                    }
-                    if (card.medicines && card.medicines !== 'Not set' && card.medicines.trim() !== '') {
-                        consoleText += `> MEDICINES: ${card.medicines.toUpperCase()}<br>`;
-                    }
-                    if (card.allergies && card.allergies !== 'Not set' && card.allergies.trim() !== 'NONE' && card.allergies.trim() !== '') {
-                        consoleText += `> ALLERGIES: ${card.allergies.toUpperCase()}<br>`;
-                    }
-                    if (card.notes && card.notes !== 'Not set' && card.notes.trim() !== 'NONE' && card.notes.trim() !== '') {
-                        consoleText += `> MEDICAL NOTES: ${card.notes.toUpperCase()}<br>`;
-                    }
-                    if (card.vehicle && card.vehicle.number && card.vehicle.number.trim() !== '') {
-                        consoleText += `> VEHICLE: ${card.vehicle.brand || ''} ${card.vehicle.model || ''} [${card.vehicle.number}]<br>`;
-                    }
-                    if (card.insurance && card.insurance.provider && card.insurance.provider.trim() !== '') {
-                        consoleText += `> INS: ${card.insurance.provider} (POLICY: ${card.insurance.policyNumber || 'N/A'})<br>`;
-                    }
-                } else {
-                    consoleText += `> NO OFFLINE EMERGENCY CARD DETECTED...<br>`;
-                }
-                consoleText += `> LIVE TRACKING ACTIVE...`;
-                consoleEl.innerHTML = consoleText;
-            }
 
             // Group / Traveling Details - Only display if travel group data and members are found
             const grpWidget = document.getElementById('group-details-widget');
