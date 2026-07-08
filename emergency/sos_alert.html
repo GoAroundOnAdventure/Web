@@ -1471,9 +1471,7 @@
             <i class="fa-solid fa-bars menu-icon"></i>
             <div class="sys-title">GOAROUND SOS ALERT SYSTEM</div>
             <div class="live-badge">LIVE TRACKING ACTIVE</div>
-            <div class="live-badge" id="audio-armed-badge" style="display:none; background:rgba(255,44,44,0.12); border-color:#FF2C2C; color:#FF2C2C; animation: hud-pulse 1.8s ease-out infinite;">
-                <i class="fa-solid fa-volume-high" style="margin-right:4px;"></i>SIREN ARMED
-            </div>
+
         </div>
         <div class="header-center">
             SYSTEM STATUS: <span>ONLINE</span>
@@ -2111,9 +2109,7 @@
                 unlockOsc.stop(audioCtx.currentTime + 0.001);
                 console.log('🔊 [Audio] AudioContext unlocked. State:', audioCtx.state);
 
-                // Show AUDIO ARMED badge in header
-                const badge = document.getElementById('audio-armed-badge');
-                if (badge) badge.style.display = 'inline-flex';
+
             } catch (e) {
                 console.warn('Audio unlock failed:', e);
             }

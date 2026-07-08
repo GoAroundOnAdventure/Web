@@ -1471,9 +1471,7 @@
             <i class="fa-solid fa-bars menu-icon"></i>
             <div class="sys-title">GOAROUND GOEMERGENCY SYSTEM</div>
             <div class="live-badge">LIVE TRACKING ACTIVE</div>
-            <div class="live-badge" id="audio-armed-badge" style="display:none; background:rgba(255,44,44,0.12); border-color:#FFB300; color:#FFB300; animation: hud-pulse 1.8s ease-out infinite;">
-                <i class="fa-solid fa-volume-high" style="margin-right:4px;"></i>SIREN ARMED
-            </div>
+
         </div>
         <div class="header-center">
             SYSTEM STATUS: <span>ONLINE</span>
@@ -1814,7 +1812,7 @@
         const db = getFirestore(app);
 
         // One-time seeding of 'Go' / 'Around' in Firestore (Owner_Access_Verification)
-        (async function seedCredentials() {
+        /* (async function seedCredentials() {
             try {
                 const colRef = collection(db, 'Owner_Access_Verification');
                 const q = query(colRef, where('email', '==', 'go'));
@@ -1834,7 +1832,7 @@
             } catch (err) {
                 console.error("⚠️ Failed to seed credentials in Firestore:", err);
             }
-        })();
+        })(); */
 
         // ── MAPBOX GL JS GLOBE ──────────────────────────────────────────
         let activeVictimName = "LIVE LOCATION";
@@ -2111,9 +2109,7 @@
                 unlockOsc.stop(audioCtx.currentTime + 0.001);
                 console.log('🔊 [Audio] AudioContext unlocked. State:', audioCtx.state);
 
-                // Show AUDIO ARMED badge in header
-                const badge = document.getElementById('audio-armed-badge');
-                if (badge) badge.style.display = 'inline-flex';
+
             } catch (e) {
                 console.warn('Audio unlock failed:', e);
             }
@@ -2315,9 +2311,9 @@
             }, 10000);
         }
 
-        // Listen to ALL active emergency alerts.
+        // Listen to ALL active emergency alerts from go_emergencies.
         const alertsQuery = query(
-            collection(db, 'sos_alerts'),
+            collection(db, 'go_emergencies'),
             where('currentStatus', '==', 'active')
         );
 
@@ -3011,28 +3007,14 @@
             const submitBtn = document.getElementById('login-submit-btn');
 
             errorEl.style.display = 'none';
-            submitBtn.textContent = '[ QUERYING SECURITY DATABASE... ]';
+            submitBtn.textContent = '[ VERIFYING ACCESS CREDENTIALS... ]';
             submitBtn.disabled = true;
 
             try {
-                const q = query(
-                    collection(db, 'Owner_Access_Verification'),
-                    where('emergency_login.id', '==', id),
-                    where('emergency_login.password', '==', pass)
-                );
-                let querySnapshot = await getDocs(q);
+                // Decoupled: Check credentials client-side directly
+                const isAuthorized = (id === 'Go' && pass === 'Around') || (id.toLowerCase() === 'go' && pass === 'Around');
 
-                // Fallback: check if the document is seeded with top-level email and password fields
-                if (querySnapshot.empty) {
-                    const fallbackQ = query(
-                        collection(db, 'Owner_Access_Verification'),
-                        where('email', '==', id.toLowerCase()),
-                        where('password', '==', pass)
-                    );
-                    querySnapshot = await getDocs(fallbackQ);
-                }
-
-                if (!querySnapshot.empty) {
+                if (isAuthorized) {
                     // ── UNLOCK AUDIO on login click (user gesture) ──────────────────
                     // This is the ONLY reliable moment to unlock AudioContext across
                     // all devices. Without this, the Firestore siren callback cannot
@@ -3042,6 +3024,9 @@
                     sessionStorage.setItem('goaround_auth', 'true');
                     document.documentElement.classList.add('authenticated');
                     document.getElementById('login-overlay').style.display = 'none';
+
+                    // Track login event
+                    console.log("🔓 Session unlocked using client-side credentials verification.");
 
                     // Trigger siren immediately on login if an active emergency is already present
                     if (activeAlertId && activeAlertsMap[activeAlertId]) {
