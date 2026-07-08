@@ -1606,6 +1606,7 @@
 
             <div class="hud-map-controls">
                 <button class="hud-btn" id="btn-3d" onclick="toggle3D()">3D</button>
+                <button class="hud-btn" id="btn-rotate" onclick="toggleRotate()"><i class="fa-solid fa-rotate"></i></button>
                 <button class="hud-btn" id="btn-layer" onclick="toggleLayer()"><i class="fa-solid fa-layer-group"></i></button>
                 <button class="hud-btn" id="btn-locate" onclick="recenterMap()"><i class="fa-solid fa-location-crosshairs"></i></button>
             </div>
@@ -3421,9 +3422,43 @@
                 duration: 1500
             });
         }
+
+        let rotating = false;
+        let rotateAnimation = null;
+        function toggleRotate() {
+            if (!map) return;
+            rotating = !rotating;
+            
+            const btn = document.getElementById('btn-rotate');
+            if (rotating) {
+                btn.style.borderColor = 'var(--accent-green)';
+                btn.style.color = 'var(--accent-green)';
+                
+                // Automatically activate 3D view if not active
+                if (!is3D) {
+                    toggle3D();
+                }
+                
+                function rotateCamera(timestamp) {
+                    if (!rotating) return;
+                    const currentBearing = map.getBearing();
+                    map.setBearing((currentBearing + 0.3) % 360);
+                    rotateAnimation = requestAnimationFrame(rotateCamera);
+                }
+                rotateAnimation = requestAnimationFrame(rotateCamera);
+            } else {
+                btn.style.borderColor = 'rgba(255, 179, 0, 0.4)';
+                btn.style.color = 'var(--accent-red)';
+                if (rotateAnimation) {
+                    cancelAnimationFrame(rotateAnimation);
+                }
+            }
+        }
+
         window.toggle3D = toggle3D;
         window.toggleLayer = toggleLayer;
         window.recenterMap = recenterMap;
+        window.toggleRotate = toggleRotate;
 
         // Autofocus Operator ID field and input masking setup on load
         window.addEventListener('DOMContentLoaded', () => {
