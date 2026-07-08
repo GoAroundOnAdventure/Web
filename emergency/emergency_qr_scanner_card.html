@@ -692,7 +692,7 @@
             const trackBtn = document.getElementById('btn-view-tracking');
             
             const incQuery = query(
-                collection(db, "emergency_alerts"),
+                collection(db, "sos_alerts"),
                 where("victimId", "==", userId),
                 where("currentStatus", "==", "active"),
                 limit(1)
@@ -702,7 +702,10 @@
                 if (snapshot.empty) {
                     banner.classList.add('hidden');
                 } else {
-                    trackBtn.href = `./emergency_globe_pointer.html?id=${encodeURIComponent(emergencyId)}`;
+                    const alertDoc = snapshot.docs[0].data();
+                    const level = alertDoc.emergencyLevel || 'MIN';
+                    const targetPage = level === 'GO' ? 'goemergency.html' : 'sos_alert.html';
+                    trackBtn.href = `./${targetPage}?id=${encodeURIComponent(emergencyId)}`;
                     banner.classList.remove('hidden');
                 }
             });
