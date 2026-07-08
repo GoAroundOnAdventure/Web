@@ -1397,9 +1397,9 @@
 
         .hud-map-controls {
             position: absolute;
-            bottom: 85px; /* Above bottom-hud */
+            bottom: 300px; /* Positioned higher up on screen */
             right: 20px;
-            z-index: 10;
+            z-index: 20;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -1427,6 +1427,41 @@
             background: rgba(255, 179, 0, 0.15);
             border-color: var(--accent-red);
             box-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+        }
+
+        .hud-dropdown {
+            position: absolute;
+            bottom: 300px; /* Positioned higher up on screen */
+            right: 70px;
+            background: rgba(4, 6, 9, 0.95);
+            border: 1px solid rgba(255, 179, 0, 0.4);
+            border-radius: 4px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 30;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .dropdown-item {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            font-size: 10px;
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 2px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover, .dropdown-item.active {
+            background: rgba(255, 179, 0, 0.15);
+            color: var(--accent-red);
         }
     </style>
 </head>
@@ -1604,8 +1639,15 @@
         <div class="center-panel">
             <div id="globe-container"></div>
 
+            <div class="hud-dropdown" id="layer-dropdown" style="display: none;">
+                <button class="dropdown-item active" id="item-satellite" onclick="changeLayerStyle('satellite')">DEFAULT (SATELLITE)</button>
+                <button class="dropdown-item" id="item-dark" onclick="changeLayerStyle('dark')">DARK MODE</button>
+                <button class="dropdown-item" id="item-light" onclick="changeLayerStyle('light')">LIGHT MODE</button>
+            </div>
+
             <div class="hud-map-controls">
                 <button class="hud-btn" id="btn-3d" onclick="toggle3D()">3D</button>
+                <button class="hud-btn" id="btn-rotate" onclick="toggleRotate()"><i class="fa-solid fa-rotate"></i></button>
                 <button class="hud-btn" id="btn-layer" onclick="toggleLayer()"><i class="fa-solid fa-layer-group"></i></button>
                 <button class="hud-btn" id="btn-locate" onclick="recenterMap()"><i class="fa-solid fa-location-crosshairs"></i></button>
             </div>
@@ -3347,12 +3389,30 @@
             document.getElementById('btn-3d').style.color = is3D ? 'var(--accent-green)' : 'var(--accent-red)';
         }
 
-        let isSatellite = true;
         function toggleLayer() {
+            const dropdown = document.getElementById('layer-dropdown');
+            if (!dropdown) return;
+            if (dropdown.style.display === 'none' || !dropdown.style.display) {
+                dropdown.style.display = 'flex';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function changeLayerStyle(styleId) {
             if (!map) return;
-            isSatellite = !isSatellite;
-            const newStyle = isSatellite ? 'mapbox://styles/mapbox/satellite-streets-v12' : 'mapbox://styles/mapbox/dark-v11';
-            map.setStyle(newStyle);
+            
+            const dropdown = document.getElementById('layer-dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            
+            let styleUrl = 'mapbox://styles/mapbox/satellite-streets-v12';
+            if (styleId === 'dark') {
+                styleUrl = 'mapbox://styles/mapbox/dark-v11';
+            } else if (styleId === 'light') {
+                styleUrl = 'mapbox://styles/mapbox/light-v11';
+            }
+            
+            map.setStyle(styleUrl);
             
             map.once('style.load', () => {
                 map.setFog({
@@ -3409,15 +3469,29 @@
                     },
                     labelLayerId
                 );
+
+                // Force layout update for active markers
+                if (window._updateLocationMarker) {
+                    window._updateLocationMarker();
+                }
             });
             
+            // Update active dropdown items visually
+            const items = document.querySelectorAll('.dropdown-item');
+            items.forEach(item => item.classList.remove('active'));
+            const activeItem = document.getElementById('item-' + styleId);
+            if (activeItem) activeItem.classList.add('active');
+            
+            // Update btn-layer color
             const btn = document.getElementById('btn-layer');
-            if (isSatellite) {
-                btn.style.borderColor = 'rgba(255, 179, 0, 0.4)';
-                btn.style.color = 'var(--accent-red)';
-            } else {
-                btn.style.borderColor = 'var(--accent-green)';
-                btn.style.color = 'var(--accent-green)';
+            if (btn) {
+                if (styleId === 'satellite') {
+                    btn.style.borderColor = 'rgba(255, 179, 0, 0.4)';
+                    btn.style.color = 'var(--accent-red)';
+                } else {
+                    btn.style.borderColor = 'var(--accent-green)';
+                    btn.style.color = 'var(--accent-green)';
+                }
             }
         }
 
@@ -3432,6 +3506,44 @@
                 duration: 1500
             });
         }
+
+        let rotating = false;
+        let rotateAnimation = null;
+        function toggleRotate() {
+            if (!map) return;
+            rotating = !rotating;
+            
+            const btn = document.getElementById('btn-rotate');
+            if (rotating) {
+                btn.style.borderColor = 'var(--accent-green)';
+                btn.style.color = 'var(--accent-green)';
+                
+                // Automatically activate 3D view if not active
+                if (!is3D) {
+                    toggle3D();
+                }
+                
+                function rotateCamera(timestamp) {
+                    if (!rotating) return;
+                    const currentBearing = map.getBearing();
+                    map.setBearing((currentBearing + 0.3) % 360);
+                    rotateAnimation = requestAnimationFrame(rotateCamera);
+                }
+                rotateAnimation = requestAnimationFrame(rotateCamera);
+            } else {
+                btn.style.borderColor = 'rgba(255, 179, 0, 0.4)';
+                btn.style.color = 'var(--accent-red)';
+                if (rotateAnimation) {
+                    cancelAnimationFrame(rotateAnimation);
+                }
+            }
+        }
+
+        window.toggle3D = toggle3D;
+        window.toggleLayer = toggleLayer;
+        window.recenterMap = recenterMap;
+        window.toggleRotate = toggleRotate;
+        window.changeLayerStyle = changeLayerStyle;
 
         // Autofocus Operator ID field and input masking setup on load
         window.addEventListener('DOMContentLoaded', () => {
