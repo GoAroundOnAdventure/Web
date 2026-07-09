@@ -1169,7 +1169,8 @@
             pointer-events: none !important;
         }
 
-        header, .main-container {
+        header,
+        .main-container {
             transition: opacity 0.5s ease-in-out;
         }
 
@@ -1397,7 +1398,8 @@
 
         .hud-map-controls {
             position: absolute;
-            bottom: 300px; /* Positioned higher up on screen */
+            bottom: 300px;
+            /* Positioned higher up on screen */
             right: 20px;
             z-index: 20;
             display: flex;
@@ -1431,7 +1433,8 @@
 
         .hud-dropdown {
             position: absolute;
-            bottom: 300px; /* Positioned higher up on screen */
+            bottom: 300px;
+            /* Positioned higher up on screen */
             right: 70px;
             background: rgba(4, 6, 9, 0.95);
             border: 1px solid rgba(255, 179, 0, 0.4);
@@ -1459,7 +1462,8 @@
             transition: all 0.2s;
         }
 
-        .dropdown-item:hover, .dropdown-item.active {
+        .dropdown-item:hover,
+        .dropdown-item.active {
             background: rgba(255, 179, 0, 0.15);
             color: var(--accent-red);
         }
@@ -1565,37 +1569,60 @@
         <!-- LEFT PANEL -->
         <div class="side-panel" id="left-side-panel">
             <!-- INCIDENT ALERT WIDGET -->
-            <div id="incident-alert-widget" class="widget alert-widget" style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); flex-direction: column; width: 100%; margin-bottom: 12px;">
+            <div id="incident-alert-widget" class="widget alert-widget"
+                style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); flex-direction: column; width: 100%; margin-bottom: 12px;">
                 <div class="widget-header red">
                     <i class="fa-solid fa-triangle-exclamation"></i> INCIDENT ALERT
                 </div>
                 <div class="widget-content" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                     <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">INCIDENT ID</div>
-                        <div class="data-value small" id="inc-id" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">—</div>
+                        <div class="data-label"
+                            style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                            INCIDENT ID</div>
+                        <div class="data-value small" id="inc-id"
+                            style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">
+                            —</div>
                     </div>
                     <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">STATUS</div>
-                        <div class="data-value red" id="inc-status" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">—</div>
+                        <div class="data-label"
+                            style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                            STATUS</div>
+                        <div class="data-value red" id="inc-status"
+                            style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">
+                            —</div>
                     </div>
                     <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">SEVERITY</div>
-                        <div class="data-value red" id="inc-severity" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">MAXIMUM</div>
+                        <div class="data-label"
+                            style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                            SEVERITY</div>
+                        <div class="data-value red" id="inc-severity"
+                            style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #FF2C2C;">
+                            MAXIMUM</div>
                     </div>
                     <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">REPORTED TIME</div>
-                        <div class="data-value small" id="inc-reported" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">—</div>
+                        <div class="data-label"
+                            style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                            REPORTED TIME</div>
+                        <div class="data-value small" id="inc-reported"
+                            style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">
+                            —</div>
                     </div>
                     <div class="data-stack" style="display: flex; flex-direction: column; gap: 2px;">
-                        <div class="data-label" style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">LAST UPDATE</div>
-                        <div class="data-value small" id="inc-update" style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">— <span class="green">(LIVE)</span></div>
+                        <div class="data-label"
+                            style="font-size: 8px; color: rgba(255,255,255,0.4); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;">
+                            LAST UPDATE</div>
+                        <div class="data-value small" id="inc-update"
+                            style="font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; color: #fff;">
+                            — <span class="green">(LIVE)</span></div>
                     </div>
                 </div>
             </div>
 
-            <div id="active-profile-widget" class="widget" style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); display: flex; flex-direction: column; width: 100%;">
+            <div id="active-profile-widget" class="widget"
+                style="display:none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); display: flex; flex-direction: column; width: 100%;">
                 <!-- Widget Header -->
-                <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
+                <div class="widget-header red"
+                    style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; font-size:11px;">
                     <span><i class="fa-solid fa-user-shield" style="margin-right:6px;"></i>SOS ALERT PROFILE</span>
                     <span id="active-profile-badge" style="
                         background: rgba(255,44,44,0.15); 
@@ -1607,9 +1634,10 @@
                         letter-spacing: 1px;
                     ">ACTIVE</span>
                 </div>
-                
+
                 <!-- Active Members Row (Photos) -->
-                <div id="profile-photos-row" style="display:flex; gap:12px; padding:10px 12px; background:rgba(255,44,44,0.02); border-bottom:1px solid rgba(255,44,44,0.1); overflow-x:auto; align-items:center; scrollbar-width: none;">
+                <div id="profile-photos-row"
+                    style="display:flex; gap:12px; padding:10px 12px; background:rgba(255,44,44,0.02); border-bottom:1px solid rgba(255,44,44,0.1); overflow-x:auto; align-items:center; scrollbar-width: none;">
                     <!-- Circle photos of active alerts and group members -->
                 </div>
 
@@ -1620,13 +1648,18 @@
             </div>
 
             <!-- Placeholder when no alerts -->
-            <div id="no-emergencies-placeholder" style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
-                <i class="fa-solid fa-shield-halved" style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
-                <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE EMERGENCIES</div>
-                <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM STATUS: STANDBY</div>
+            <div id="no-emergencies-placeholder"
+                style="text-align:center; padding:40px 20px; color:rgba(255,44,44,0.3); font-family:'Share Tech Mono', monospace; border:1px dashed rgba(255,44,44,0.2); border-radius:4px; margin-top:20px; background:rgba(255,44,44,0.02);">
+                <i class="fa-solid fa-shield-halved"
+                    style="font-size:32px; margin-bottom:12px; color:rgba(255,44,44,0.2); animation: pulseWarning 2.5s infinite;"></i>
+                <div style="font-size:12px; letter-spacing:2px; font-weight:bold; color:rgba(255,44,44,0.6);">NO ACTIVE
+                    EMERGENCIES</div>
+                <div style="font-size:9px; letter-spacing:1px; margin-top:6px; color:rgba(255,255,255,0.25);">SYSTEM
+                    STATUS: STANDBY</div>
             </div>
 
-            <button class="close-profile-btn" onclick="showConfirmModal()" id="close-profile-btn-el" style="display:none; margin-top:auto; margin-bottom:10px;">
+            <button class="close-profile-btn" onclick="showConfirmModal()" id="close-profile-btn-el"
+                style="display:none; margin-top:auto; margin-bottom:10px;">
                 <i class="fa-solid fa-power-off"></i> CLOSE SOS ALERT PROFILE
             </button>
 
@@ -1640,16 +1673,20 @@
             <div id="globe-container"></div>
 
             <div class="hud-dropdown" id="layer-dropdown" style="display: none;">
-                <button class="dropdown-item active" id="item-satellite" onclick="changeLayerStyle('satellite')">DEFAULT (SATELLITE)</button>
+                <button class="dropdown-item active" id="item-satellite" onclick="changeLayerStyle('satellite')">DEFAULT
+                    (SATELLITE)</button>
                 <button class="dropdown-item" id="item-dark" onclick="changeLayerStyle('dark')">DARK MODE</button>
                 <button class="dropdown-item" id="item-light" onclick="changeLayerStyle('light')">LIGHT MODE</button>
             </div>
 
             <div class="hud-map-controls">
                 <button class="hud-btn" id="btn-3d" onclick="toggle3D()">3D</button>
-                <button class="hud-btn" id="btn-rotate" onclick="toggleRotate()"><i class="fa-solid fa-rotate"></i></button>
-                <button class="hud-btn" id="btn-layer" onclick="toggleLayer()"><i class="fa-solid fa-layer-group"></i></button>
-                <button class="hud-btn" id="btn-locate" onclick="recenterMap()"><i class="fa-solid fa-location-crosshairs"></i></button>
+                <button class="hud-btn" id="btn-rotate" onclick="toggleRotate()"><i
+                        class="fa-solid fa-rotate"></i></button>
+                <button class="hud-btn" id="btn-layer" onclick="toggleLayer()"><i
+                        class="fa-solid fa-layer-group"></i></button>
+                <button class="hud-btn" id="btn-locate" onclick="recenterMap()"><i
+                        class="fa-solid fa-location-crosshairs"></i></button>
             </div>
 
             <div class="hud-satellite">
@@ -1860,7 +1897,7 @@
                 transition: all 0.2s;
                 white-space: nowrap;
             " onmouseover="this.style.background='rgba(255,44,44,0.12)';this.style.borderColor='rgba(255,44,44,0.8)';"
-               onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,44,44,0.4)';">
+                onmouseout="this.style.background='transparent';this.style.borderColor='rgba(255,44,44,0.4)';">
                 <i class="fa-solid fa-clock-rotate-left" style="font-size:9px;"></i>
                 HISTORY
             </button>
@@ -2513,7 +2550,7 @@
         // --- ROW IMAGE CLICK HANDLER ---
         function selectProfileRowItem(alertId, uid, type) {
             viewingProfileUid = uid;
-            
+
             if (type === 'victim' || type === 'other_active') {
                 // Focus the active alert (updates activeAlertId and triggers map zoom)
                 loadAlertDirectly(alertId);
@@ -2622,7 +2659,7 @@
 
             items.forEach(item => {
                 const isSelected = (item.uid === viewingProfileUid);
-                
+
                 let border = '';
                 let borderClass = '';
                 if (item.isActive) {
@@ -2633,8 +2670,8 @@
                         border = 'border: 2px solid #ff5c5c;';
                     }
                 } else {
-                    border = isSelected 
-                        ? 'border: 2px solid #00e676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);' 
+                    border = isSelected
+                        ? 'border: 2px solid #00e676; box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);'
                         : 'border: 1.5px solid rgba(255,255,255,0.3);';
                 }
 
@@ -2701,7 +2738,7 @@
             const incWidget = document.getElementById('incident-alert-widget');
             if (incWidget) {
                 incWidget.style.display = 'flex';
-                
+
                 const incIdEl = document.getElementById('inc-id');
                 if (incIdEl) incIdEl.textContent = `#EMRG-${alertId.substring(0, 8).toUpperCase()}`;
 
@@ -2989,10 +3026,10 @@
             if (snapshot.empty) {
                 console.log('📭 [Web] No active emergency alerts in Firestore.');
                 if (activeMarker) activeMarker.remove();
-                
+
                 const footerActive = document.querySelector('.sys-footer div:nth-child(2) span');
                 if (footerActive) footerActive.textContent = '0';
-                
+
                 renderAllProfileCards();
                 return;
             }
@@ -3008,7 +3045,7 @@
             snapshot.docs.forEach(doc => {
                 const id = doc.id;
                 const data = doc.data();
-                
+
                 const isNew = !seenActiveAlertIds.has(id);
                 if (isNew) {
                     seenActiveAlertIds.add(id);
@@ -3401,19 +3438,19 @@
 
         function changeLayerStyle(styleId) {
             if (!map) return;
-            
+
             const dropdown = document.getElementById('layer-dropdown');
             if (dropdown) dropdown.style.display = 'none';
-            
+
             let styleUrl = 'mapbox://styles/mapbox/satellite-streets-v12';
             if (styleId === 'dark') {
                 styleUrl = 'mapbox://styles/mapbox/dark-v11';
             } else if (styleId === 'light') {
                 styleUrl = 'mapbox://styles/mapbox/light-v11';
             }
-            
+
             map.setStyle(styleUrl);
-            
+
             map.once('style.load', () => {
                 map.setFog({
                     color: 'rgb(2, 6, 18)',
@@ -3475,13 +3512,13 @@
                     window._updateLocationMarker();
                 }
             });
-            
+
             // Update active dropdown items visually
             const items = document.querySelectorAll('.dropdown-item');
             items.forEach(item => item.classList.remove('active'));
             const activeItem = document.getElementById('item-' + styleId);
             if (activeItem) activeItem.classList.add('active');
-            
+
             // Update btn-layer color
             const btn = document.getElementById('btn-layer');
             if (btn) {
@@ -3512,17 +3549,17 @@
         function toggleRotate() {
             if (!map) return;
             rotating = !rotating;
-            
+
             const btn = document.getElementById('btn-rotate');
             if (rotating) {
                 btn.style.borderColor = 'var(--accent-green)';
                 btn.style.color = 'var(--accent-green)';
-                
+
                 // Automatically activate 3D view if not active
                 if (!is3D) {
                     toggle3D();
                 }
-                
+
                 function rotateCamera(timestamp) {
                     if (!rotating) return;
                     const currentBearing = map.getBearing();
