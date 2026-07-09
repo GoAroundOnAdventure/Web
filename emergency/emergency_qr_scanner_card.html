@@ -685,29 +685,55 @@
         }
  
         let activeIncidentSub = null;
+        let activeGoSub = null;
         function listenForActiveEmergency(userId, emergencyId) {
             if (activeIncidentSub) activeIncidentSub();
+            if (activeGoSub) activeGoSub();
             
             const banner = document.getElementById('live-sos-banner');
             const trackBtn = document.getElementById('btn-view-tracking');
             
-            const incQuery = query(
+            let activeSos = null;
+            let activeGo = null;
+            
+            function updateBanner() {
+                const activeAlert = activeGo || activeSos;
+                if (activeAlert) {
+                    const level = activeAlert.emergencyLevel || (activeGo ? 'GO' : 'MIN');
+                    const targetPage = level === 'GO' ? 'goemergency.html' : 'sos_alert.html';
+                    trackBtn.href = `./${targetPage}?id=${encodeURIComponent(emergencyId)}`;
+                    banner.classList.remove('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                }
+            }
+            
+            const sosQuery = query(
                 collection(db, "sos_alerts"),
                 where("victimId", "==", userId),
                 where("currentStatus", "==", "active"),
                 limit(1)
             );
             
-            activeIncidentSub = onSnapshot(incQuery, (snapshot) => {
-                if (snapshot.empty) {
-                    banner.classList.add('hidden');
-                } else {
-                    const alertDoc = snapshot.docs[0].data();
-                    const level = alertDoc.emergencyLevel || 'MIN';
-                    const targetPage = level === 'GO' ? 'goemergency.html' : 'sos_alert.html';
-                    trackBtn.href = `./${targetPage}?id=${encodeURIComponent(emergencyId)}`;
-                    banner.classList.remove('hidden');
-                }
+            const goQuery = query(
+                collection(db, "go_emergencies"),
+                where("victimId", "==", userId),
+                where("currentStatus", "==", "active"),
+                limit(1)
+            );
+            
+            activeIncidentSub = onSnapshot(sosQuery, (snapshot) => {
+                activeSos = snapshot.empty ? null : snapshot.docs[0].data();
+                updateBanner();
+            }, (error) => {
+                console.error("Error listening to sos_alerts:", error);
+            });
+            
+            activeGoSub = onSnapshot(goQuery, (snapshot) => {
+                activeGo = snapshot.empty ? null : snapshot.docs[0].data();
+                updateBanner();
+            }, (error) => {
+                console.error("Error listening to go_emergencies:", error);
             });
         }
 

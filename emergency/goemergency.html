@@ -1728,6 +1728,26 @@
                     <button class="btn btn-red">
                         <i class="fa-solid fa-share-nodes"></i> SHARE LOCATION
                     </button>
+                    <button class="btn btn-green-glow" onclick="rebounceAreYouSafe()" style="background: rgba(46, 213, 115, 0.15); border: 1px solid #2ED573; color: #2ED573; justify-content: center; font-weight: bold; margin-top: 4px; box-shadow: 0 0 10px rgba(46, 213, 115, 0.2);">
+                        <i class="fa-solid fa-arrows-spin"></i> REBOUNCE: ARE U SAFE?
+                    </button>
+                </div>
+            </div>
+
+            <!-- GO EMERGENCY CHAT WIDGET -->
+            <div class="widget" id="chat-widget" style="display: none; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(4, 6, 9, 0.85); flex-direction: column; width: 100%;">
+                <div class="widget-header red" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-comments" style="margin-right:6px;"></i>GO EMERGENCY CHAT</span>
+                    <span id="chat-status-badge" class="live-badge" style="font-size: 8px; border-color: #00cc66; color: #00cc66; text-shadow: 0 0 5px rgba(0, 204, 102, 0.6);">ONLINE</span>
+                </div>
+                <div class="widget-content" style="padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+                    <div id="chat-messages" style="height: 180px; overflow-y: auto; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 8px; display: flex; flex-direction: column; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 11px;">
+                        <div style="color:rgba(255,255,255,0.3); text-align:center; padding-top:20px;">No messages yet. Send a message to start.</div>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="text" id="chat-message-input" placeholder="Type response to rider..." style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px; font-family: 'Share Tech Mono', monospace; font-size: 11px;" onkeydown="if(event.key === 'Enter') sendWebChatMessage()">
+                        <button onclick="sendWebChatMessage()" style="background: #FFB300; border: none; color: #000; padding: 6px 12px; font-family: 'Share Tech Mono', monospace; font-weight: bold; cursor: pointer; font-size: 11px;">SEND</button>
+                    </div>
                 </div>
             </div>
 
@@ -1875,7 +1895,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, query, where, getDocs, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, where, getDocs, addDoc, onSnapshot, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration Object
         const firebaseConfig = {
@@ -2398,6 +2418,137 @@
             where('currentStatus', '==', 'active')
         );
 
+        // --- CHAT CONVERSATION LOGIC ---
+        let chatListenerSub = null;
+        let currentChatAlertId = null;
+
+        function subscribeToIncidentChat(alertId) {
+            if (chatListenerSub && currentChatAlertId === alertId) return;
+            if (chatListenerSub) chatListenerSub();
+            currentChatAlertId = alertId;
+
+            const chatWidget = document.getElementById('chat-widget');
+            if (chatWidget) chatWidget.style.display = 'flex';
+
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            if (chatMessagesDiv) chatMessagesDiv.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center;">Connecting to chat...</div>';
+
+            const chatQuery = query(
+                collection(db, "go_emergencies", alertId, "chat"),
+                orderBy("timestamp", "asc")
+            );
+
+            chatListenerSub = onSnapshot(chatQuery, (snapshot) => {
+                if (!chatMessagesDiv) return;
+                chatMessagesDiv.innerHTML = '';
+                if (snapshot.empty) {
+                    chatMessagesDiv.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding-top:20px;">No messages yet. Send a message to start.</div>';
+                    return;
+                }
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const isMe = data.senderId === 'operator';
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.margin = '4px 0';
+                    msgDiv.style.display = 'flex';
+                    msgDiv.style.flexDirection = 'column';
+                    msgDiv.style.alignItems = isMe ? 'flex-end' : 'flex-start';
+
+                    const senderName = data.senderName || (isMe ? 'Office' : 'Rider');
+                    const bubble = document.createElement('div');
+                    bubble.style.padding = '6px 10px';
+                    bubble.style.borderRadius = '4px';
+                    bubble.style.maxWidth = '80%';
+                    bubble.style.wordBreak = 'break-word';
+
+                    const isSafeMsg = data.message === "I am safe" || (data.message && data.message.toLowerCase().includes("i am safe"));
+                    if (isSafeMsg) {
+                        bubble.style.background = 'rgba(46, 213, 115, 0.15)';
+                        bubble.style.color = '#2ED573';
+                        bubble.style.border = '1px solid rgba(46, 213, 115, 0.3)';
+                    } else if (isMe) {
+                        bubble.style.background = 'rgba(255, 179, 0, 0.15)';
+                        bubble.style.color = '#FFB300';
+                        bubble.style.border = '1px solid rgba(255, 179, 0, 0.3)';
+                    } else {
+                        bubble.style.background = 'rgba(255, 255, 255, 0.05)';
+                        bubble.style.color = '#fff';
+                        bubble.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                    }
+
+                    let iconHtml = '';
+                    const msgLower = (data.message || '').toLowerCase();
+                    if (msgLower.includes('tyre') || msgLower.includes('puncture')) {
+                        iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('petrol')) {
+                        iconHtml = '<i class="fa-solid fa-gas-pump" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('mechanical')) {
+                        iconHtml = '<i class="fa-solid fa-gears" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('medical')) {
+                        iconHtml = '<i class="fa-solid fa-kit-medical" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('accident')) {
+                        iconHtml = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('other') || msgLower.includes('assist')) {
+                        iconHtml = '<i class="fa-solid fa-circle-question" style="margin-right:6px;"></i>';
+                    }
+
+                    bubble.innerHTML = `
+                        <div style="font-size:7px; color:rgba(255,255,255,0.3); font-weight:bold; margin-bottom:2px;">${senderName.toUpperCase()}</div>
+                        <div style="display:flex; align-items:center;">
+                            ${iconHtml}
+                            <span>${data.message || ''}</span>
+                        </div>
+                    `;
+                    msgDiv.appendChild(bubble);
+                    chatMessagesDiv.appendChild(msgDiv);
+                });
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            }, (error) => {
+                console.error("Error listening to chat:", error);
+                if (chatMessagesDiv) {
+                    chatMessagesDiv.innerHTML = `<div style="color:#FFB300; text-align:center; padding-top:20px; font-weight:bold; font-size:10px;">Chat Error: ${error.message}</div>`;
+                }
+            });
+        }
+
+        async function sendWebChatMessage() {
+            const input = document.getElementById('chat-message-input');
+            if (!input || !currentChatAlertId) return;
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+
+            try {
+                await addDoc(collection(db, "go_emergencies", currentChatAlertId, "chat"), {
+                    senderId: "operator",
+                    senderName: "GoAround Office",
+                    message: text,
+                    timestamp: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("Error sending web chat message:", err);
+            }
+        }
+        async function rebounceAreYouSafe() {
+            if (!currentChatAlertId) {
+                alert("No active emergency profile selected.");
+                return;
+            }
+            try {
+                await addDoc(collection(db, "go_emergencies", currentChatAlertId, "chat"), {
+                    senderId: "operator",
+                    senderName: "GoAround Office",
+                    message: "Rebounce: Are you safe?",
+                    timestamp: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("Error sending rebounce message:", err);
+                alert("Failed to send rebounce query: " + err.message);
+            }
+        }
+        window.sendWebChatMessage = sendWebChatMessage;
+        window.rebounceAreYouSafe = rebounceAreYouSafe;
+
         // --- DYNAMIC PROFILE DETAILS PANELS ---
         function renderProfileDetails(d) {
             const content = document.getElementById('profile-details-content');
@@ -2405,6 +2556,21 @@
 
             const notes = d.notes && d.notes !== 'Not set' && d.notes !== 'None' && d.notes !== 'NONE' ? d.notes : 'NONE';
             const allergies = d.allergies && d.allergies !== 'Not set' && d.allergies !== 'None' && d.allergies !== 'NONE' ? d.allergies : 'NONE';
+
+            let issueBannerHtml = '';
+            if (d.selectedEmergencyType && d.selectedEmergencyType !== 'None') {
+                issueBannerHtml = `
+                    <div class="widget" style="border: 1px solid rgba(255, 179, 0, 0.3); background: rgba(255, 179, 0, 0.03); margin-bottom: 12px; width: 100%; display: flex; flex-direction: column;">
+                        <div class="widget-header" style="background: rgba(255, 179, 0, 0.1); border-bottom: 1px solid rgba(255, 179, 0, 0.2); padding: 6px 12px; font-size: 10px; font-weight: bold; color: #FFB300; letter-spacing: 1px; font-family: 'Share Tech Mono', monospace; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-triangle-exclamation" style="animation: pulseWarning 1.5s infinite;"></i>
+                            <span>REPORTED EMERGENCY TYPE</span>
+                        </div>
+                        <div class="widget-content" style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; color: #FFB300; letter-spacing: 1.5px;">
+                            ${d.selectedEmergencyType.toUpperCase()}
+                        </div>
+                    </div>
+                `;
+            }
 
             let emCardHtml = '';
             if (d.emergencyCard) {
@@ -2419,38 +2585,52 @@
                 `;
             }
 
-            content.innerHTML = `
-                <!-- Row 1: Victim Details + Photo + QR -->
-                <div style="display:flex; align-items:flex-start; gap:10px;">
-                    <img src="${d.photo || 'https://i.pravatar.cc/150?img=11'}" alt="Victim"
-                        style="width:58px; height:58px; object-fit:cover; border-radius:4px; flex-shrink:0; border:1px solid rgba(255,44,44,0.4);">
-                    
-                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
-                        <div>
-                            <div class="data-label" style="font-size:8px;">NAME</div>
-                            <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                ${(d.name || 'GoAround User').toUpperCase()}
+                    const showQrProfile = !d.selectedEmergencyType || d.selectedEmergencyType === 'None';
+                    content.innerHTML = `
+                        ${issueBannerHtml}
+                        <!-- Row 1: Victim Details + Photo + QR -->
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0;">
+                                <img src="${d.photo || 'https://i.pravatar.cc/150?img=11'}" alt="Victim"
+                                    style="width:58px; height:58px; object-fit:cover; border-radius:4px; ${d.safeCheck === 'safe' ? 'border:2px solid #2ed573; box-shadow:0 0 8px rgba(46,213,115,0.6);' : 'border:1px solid rgba(255,44,44,0.4);'} transition: all 0.3s;">
+                                ${d.safeCheck === 'safe' ? `
+                                    <div style="background: #2ed573; color: white; font-size: 7px; padding: 1.5px 5px; border-radius: 2px; font-weight: 900; font-family: 'Share Tech Mono', monospace; line-height: 1; border: 1px solid rgba(46, 213, 115, 0.4); box-shadow: 0 0 5px rgba(46, 213, 115, 0.4);"><i class="fa-solid fa-circle-check"></i> SAFE</div>
+                                ` : ''}
                             </div>
+                            
+                            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">NAME</div>
+                                    <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        ${(d.name || 'GoAround User').toUpperCase()}
+                                    </div>
+                                    ${d.safeCheck === 'safe' ? `
+                                        <div style="margin-top: 3px;">
+                                            <span style="background: #2ed573; color: white; padding: 2px 6px; font-size: 8.5px; border-radius: 3px; font-weight: 900; letter-spacing: 0.5px; font-family: 'Share Tech Mono', monospace; display: inline-block; border: 1px solid rgba(46, 213, 115, 0.4); box-shadow: 0 0 5px rgba(46, 213, 115, 0.4);"><i class="fa-solid fa-circle-check"></i> SAFE</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">PHONE</div>
+                                    <div class="data-value small" style="font-size:10px;">${d.phone || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <div class="data-label" style="font-size:8px;">BLOOD GROUP</div>
+                                    <div class="data-value" style="font-size:11px; color:#FFB300; font-weight:bold;">${d.bloodGroup || '—'}</div>
+                                </div>
+                            </div>
+        
+                            ${showQrProfile ? `
+                            <!-- QR Code -->
+                            <div style="flex-shrink:0; text-align:center;">
+                                <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
+                                <div style="background:#fff; padding:2px; border-radius:2px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,44,44,0.3);">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&color=000000&bgcolor=ffffff&data=${encodeURIComponent('https://goaround-safety.web.app/emergency?uid=' + d.uid)}" 
+                                         width="44" height="44" style="display:block; image-rendering:pixelated;">
+                                </div>
+                            </div>
+                            ` : ''}
                         </div>
-                        <div>
-                            <div class="data-label" style="font-size:8px;">PHONE</div>
-                            <div class="data-value small" style="font-size:10px;">${d.phone || 'N/A'}</div>
-                        </div>
-                        <div>
-                            <div class="data-label" style="font-size:8px;">BLOOD GROUP</div>
-                            <div class="data-value" style="font-size:11px; color:#FFB300; font-weight:bold;">${d.bloodGroup || '—'}</div>
-                        </div>
-                    </div>
-
-                    <!-- QR Code -->
-                    <div style="flex-shrink:0; text-align:center;">
-                        <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
-                        <div style="background:#fff; padding:2px; border-radius:2px; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,44,44,0.3);">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&color=000000&bgcolor=ffffff&data=${encodeURIComponent('https://goaround-safety.web.app/emergency?uid=' + d.uid)}" 
-                                 width="44" height="44" style="display:block; image-rendering:pixelated;">
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Row 2: Medical Info -->
                 <div style="display:flex; gap:10px; font-size:10px; background:rgba(255,255,255,0.01); padding:6px; border-radius:3px; border:1px solid rgba(255,255,255,0.03);">
@@ -2625,7 +2805,10 @@
                 
                 let border = '';
                 let borderClass = '';
-                if (item.isActive) {
+                const isSafe = item.safeCheck === 'safe';
+                if (isSafe) {
+                    border = 'border: 2px solid #2ed573; box-shadow: 0 0 8px rgba(46, 213, 115, 0.8);';
+                } else if (item.isActive) {
                     if (item.isFocused) {
                         border = 'border: 2px solid #FFB300; box-shadow: 0 0 10px rgba(255, 179, 0, 0.8);';
                         borderClass = 'siren-pulse';
@@ -2647,6 +2830,9 @@
                         <div style="font-size:7.5px; color:${item.isActive ? '#ff5c5c' : 'rgba(255,255,255,0.7)'}; max-width:55px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-transform:uppercase; font-weight:bold;">
                             ${item.name ? item.name.split(' ')[0] : 'USER'}
                         </div>
+                        ${isSafe ? `
+                            <div style="background: #2ed573; color: white; font-size: 7px; padding: 1.5px 5px; border-radius: 2px; font-weight: 900; font-family: 'Share Tech Mono', monospace; line-height: 1; border: 1px solid rgba(46, 213, 115, 0.4); box-shadow: 0 0 5px rgba(46, 213, 115, 0.4);"><i class="fa-solid fa-circle-check"></i> SAFE</div>
+                        ` : ''}
                     </div>
                 `;
                 rowContainer.innerHTML += photoHtml;
@@ -2738,9 +2924,13 @@
                     alertId: alertId,
                     emergencyCard: alertData.emergencyCard,
                     address: alertData.address,
+                    selectedEmergencyType: alertData.selectedEmergencyType || 'None',
                     isOnline: true
                 });
             }
+
+            // Subscribe to active support chat
+            subscribeToIncidentChat(alertId);
 
             // ── CONSOLE TEXT — all new fields included ─────────────────────
             const consoleEl = document.querySelector('.console');
