@@ -1719,9 +1719,14 @@
                     <button class="btn btn-green" onclick="toggleMapView()">
                         <i class="fa-regular fa-map"></i> VIEW ON MAP
                     </button>
-                    <button class="btn btn-blue">
-                        <i class="fa-solid fa-phone"></i> CALL VICTIM
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-red" style="flex: 1; justify-content: center;">
+                            <i class="fa-solid fa-phone-volume"></i> EMERGENCY
+                        </button>
+                        <button class="btn btn-blue" style="flex: 1; justify-content: center;">
+                            <i class="fa-solid fa-phone"></i> RIDER
+                        </button>
+                    </div>
                     <button class="btn btn-yellow">
                         <i class="fa-solid fa-location-arrow"></i> NAVIGATE
                     </button>
@@ -2479,11 +2484,11 @@
                     let iconHtml = '';
                     const msgLower = (data.message || '').toLowerCase();
                     if (msgLower.includes('tyre') || msgLower.includes('puncture')) {
-                        iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="margin-right:6px;"></i>';
+                        iconHtml = '<span style="margin-right:6px;">🛞</span>';
                     } else if (msgLower.includes('petrol')) {
                         iconHtml = '<i class="fa-solid fa-gas-pump" style="margin-right:6px;"></i>';
                     } else if (msgLower.includes('mechanical')) {
-                        iconHtml = '<i class="fa-solid fa-gears" style="margin-right:6px;"></i>';
+                        iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="margin-right:6px;"></i>';
                     } else if (msgLower.includes('medical')) {
                         iconHtml = '<i class="fa-solid fa-kit-medical" style="margin-right:6px;"></i>';
                     } else if (msgLower.includes('accident')) {
@@ -2553,12 +2558,34 @@
         function renderProfileDetails(d) {
             const content = document.getElementById('profile-details-content');
             if (!content) return;
+            
+            const fullData = activeAlertsMap[d.alertId] || {};
 
             const notes = d.notes && d.notes !== 'Not set' && d.notes !== 'None' && d.notes !== 'NONE' ? d.notes : 'NONE';
             const allergies = d.allergies && d.allergies !== 'Not set' && d.allergies !== 'None' && d.allergies !== 'NONE' ? d.allergies : 'NONE';
 
             let issueBannerHtml = '';
             if (d.selectedEmergencyType && d.selectedEmergencyType !== 'None') {
+                const types = d.selectedEmergencyType.split(', ');
+                const formattedTypes = types.map(type => {
+                    const msgLower = type.toLowerCase();
+                    let iconHtml = '<i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>';
+                    if (msgLower.includes('tyre') || msgLower.includes('puncture')) {
+                        iconHtml = '<span style="margin-right:6px;">🛞</span>';
+                    } else if (msgLower.includes('petrol')) {
+                        iconHtml = '<i class="fa-solid fa-gas-pump" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('mechanical')) {
+                        iconHtml = '<i class="fa-solid fa-screwdriver-wrench" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('medical')) {
+                        iconHtml = '<i class="fa-solid fa-kit-medical" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('accident')) {
+                        iconHtml = '<i class="fa-solid fa-car-burst" style="margin-right:6px;"></i>';
+                    } else if (msgLower.includes('other') || msgLower.includes('assist')) {
+                        iconHtml = '<i class="fa-solid fa-circle-question" style="margin-right:6px;"></i>';
+                    }
+                    return `<div style="margin-bottom: 4px;">${iconHtml}${type.toUpperCase()}</div>`;
+                }).join('');
+
                 issueBannerHtml = `
                     <div class="widget" style="border: 1px solid rgba(255, 179, 0, 0.3); background: rgba(255, 179, 0, 0.03); margin-bottom: 12px; width: 100%; display: flex; flex-direction: column;">
                         <div class="widget-header" style="background: rgba(255, 179, 0, 0.1); border-bottom: 1px solid rgba(255, 179, 0, 0.2); padding: 6px 12px; font-size: 10px; font-weight: bold; color: #FFB300; letter-spacing: 1px; font-family: 'Share Tech Mono', monospace; display: flex; align-items: center; gap: 6px;">
@@ -2566,7 +2593,7 @@
                             <span>REPORTED EMERGENCY TYPE</span>
                         </div>
                         <div class="widget-content" style="padding: 10px 12px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; color: #FFB300; letter-spacing: 1.5px;">
-                            ${d.selectedEmergencyType.toUpperCase()}
+                            ${formattedTypes}
                         </div>
                     </div>
                 `;
@@ -2575,17 +2602,35 @@
             let emCardHtml = '';
             if (d.emergencyCard) {
                 const c = d.emergencyCard;
+                
+                let vehicleStr = '';
+                if (c.vehicle && typeof c.vehicle === 'object' && Object.keys(c.vehicle).length > 0) {
+                    vehicleStr = Object.values(c.vehicle).filter(v => v).join(' | ');
+                } else if (typeof c.vehicle === 'string' && c.vehicle.trim() !== '') {
+                    vehicleStr = c.vehicle;
+                }
+                
+                let insuranceStr = '';
+                if (c.insurance && typeof c.insurance === 'object' && Object.keys(c.insurance).length > 0) {
+                    insuranceStr = Object.values(c.insurance).filter(v => v).join(' | ');
+                } else if (typeof c.insurance === 'string' && c.insurance.trim() !== '') {
+                    insuranceStr = c.insurance;
+                }
+
                 emCardHtml = `
-                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1); font-size:9px; color:rgba(255,255,255,0.4); line-height:1.4;">
-                        ${c.dob ? `<div>DOB: ${c.dob} | GENDER: ${c.gender}</div>` : ''}
-                        ${c.contact1Name ? `<div>CONTACT 1: ${c.contact1Name} (${c.contact1Phone})</div>` : ''}
-                        ${c.contact2Name ? `<div>CONTACT 2: ${c.contact2Name} (${c.contact2Phone})</div>` : ''}
-                        ${c.organDonor ? `<div style="color:#FFB300; font-weight:bold; font-size:8px; margin-top:2px;"><i class="fa-solid fa-heart"></i> DECLARED ORGAN DONOR</div>` : ''}
+                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:rgba(255,255,255,0.75); line-height:1.6; font-family:'Share Tech Mono', monospace;">
+                        <div style="color: #FFB300; font-weight: bold; margin-bottom: 4px; font-size: 10px; letter-spacing: 1px;">EMERGENCY CARD</div>
+                        ${c.dob ? `<div><strong>DOB:</strong> ${c.dob} | <strong>GENDER:</strong> ${c.gender}</div>` : ''}
+                        ${c.contact1Name ? `<div><strong>CONTACT 1:</strong> ${c.contact1Name} <span style="color:#2ed573;">(${c.contact1Phone})</span></div>` : ''}
+                        ${c.contact2Name ? `<div><strong>CONTACT 2:</strong> ${c.contact2Name} <span style="color:#2ed573;">(${c.contact2Phone})</span></div>` : ''}
+                        ${c.medicines ? `<div><strong>MEDICINES:</strong> <span style="color:#a8e6cf;">${c.medicines}</span></div>` : ''}
+                        ${vehicleStr ? `<div><strong>VEHICLE:</strong> <span style="color:#a8e6cf;">${vehicleStr}</span></div>` : ''}
+                        ${insuranceStr ? `<div><strong>INSURANCE:</strong> <span style="color:#a8e6cf;">${insuranceStr}</span></div>` : ''}
+                        ${c.organDonor ? `<div style="color:#FF4757; font-weight:bold; font-size:10px; margin-top:6px; background: rgba(255, 71, 87, 0.1); padding: 4px 6px; border-radius: 4px; display: inline-block; border: 1px solid rgba(255, 71, 87, 0.3);"><i class="fa-solid fa-heart"></i> DECLARED ORGAN DONOR</div>` : ''}
                     </div>
                 `;
             }
 
-                    const showQrProfile = !d.selectedEmergencyType || d.selectedEmergencyType === 'None';
                     content.innerHTML = `
                         ${issueBannerHtml}
                         <!-- Row 1: Victim Details + Photo + QR -->
@@ -2601,7 +2646,7 @@
                             <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
                                 <div>
                                     <div class="data-label" style="font-size:8px;">NAME</div>
-                                    <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                    <div class="data-value" style="font-size:12px; line-height:1.2; font-weight:bold; overflow:hidden; word-wrap: break-word;">
                                         ${(d.name || 'GoAround User').toUpperCase()}
                                     </div>
                                     ${d.safeCheck === 'safe' ? `
@@ -2620,7 +2665,6 @@
                                 </div>
                             </div>
         
-                            ${showQrProfile ? `
                             <!-- QR Code -->
                             <div style="flex-shrink:0; text-align:center;">
                                 <div class="data-label" style="font-size:7px; margin-bottom:2px;">QR PROFILE</div>
@@ -2629,20 +2673,19 @@
                                          width="44" height="44" style="display:block; image-rendering:pixelated;">
                                 </div>
                             </div>
-                            ` : ''}
                         </div>
 
                 <!-- Row 2: Medical Info -->
                 <div style="display:flex; gap:10px; font-size:10px; background:rgba(255,255,255,0.01); padding:6px; border-radius:3px; border:1px solid rgba(255,255,255,0.03);">
                     <div style="flex:1; min-width:0;">
                         <div class="data-label" style="font-size:7px;">MEDICAL NOTES</div>
-                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; word-wrap: break-word;">
                             ${notes}
                         </div>
                     </div>
                     <div style="flex:1; min-width:0;">
                         <div class="data-label" style="font-size:7px;">ALLERGIES</div>
-                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <div style="color:#fff; font-weight:bold; font-size:9px; text-transform:uppercase; word-wrap: break-word;">
                             ${allergies}
                         </div>
                     </div>
@@ -2681,9 +2724,11 @@
                 </div>
 
                 <!-- Row 4: Telemetry / Incident Data -->
-                <div style="font-size:8px; color:rgba(255,255,255,0.3); display:flex; flex-direction:column; gap:2px; font-family:'Share Tech Mono', monospace;">
-                    ${d.alertId ? `<div>ID: #EMRG-${d.alertId.substring(0, 8).toUpperCase()}</div>` : ''}
-                    ${d.address ? `<div style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">LOC: ${d.address}</div>` : ''}
+                <div style="font-size:10px; color:rgba(255,255,255,0.6); display:flex; flex-direction:column; gap:4px; font-family:'Share Tech Mono', monospace; margin-top: 10px; line-height: 1.4; word-break: break-word;">
+                    ${d.alertId ? `<div><strong style="color:rgba(255,255,255,0.8);">ID:</strong> #EMRG-${d.alertId.substring(0, 8).toUpperCase()}</div>` : ''}
+                    ${d.address ? `<div><strong style="color:rgba(255,255,255,0.8);">LOC:</strong> ${d.address}</div>` : ''}
+                    <div><strong style="color:rgba(255,255,255,0.8);">LAT/LNG:</strong> <span data-vital="latlng" style="color: #a8e6cf;">${(window.activeLat && window.activeLng) ? window.activeLat + ', ' + window.activeLng : (fullData.victimGPS && fullData.victimGPS.lat ? fullData.victimGPS.lat + ', ' + fullData.victimGPS.lng : 'Locating...')}</span></div>
+                    <div><strong style="color:rgba(255,255,255,0.8);">LIVE UPDATE:</strong> <span data-vital="liveupdate" style="color: #a8e6cf;">${new Date().toLocaleTimeString()}</span></div>
                 </div>
 
                 ${emCardHtml}
@@ -2839,7 +2884,60 @@
             });
         }
 
+        function subscribeToLiveLocation(victimId) {
+            if (!victimId) return;
+            // Cancel any previous live location subscription
+            if (window._liveLocationUnsub) {
+                window._liveLocationUnsub();
+                window._liveLocationUnsub = null;
+            }
 
+            const liveLocRef = doc(db, 'live_locations', victimId);
+            window._liveLocationUnsub = onSnapshot(liveLocRef, (liveSnap) => {
+                if (!liveSnap.exists()) return;
+                const liveData = liveSnap.data();
+                const newLat = liveData.latitude;
+                const newLng = liveData.longitude;
+                if (!newLat || !newLng) return;
+
+                // Update globals
+                activeLat = newLat;
+                activeLng = newLng;
+
+                // Smoothly move marker to new position
+                if (activeMarker) {
+                    activeMarker.setLngLat([newLng, newLat]);
+                }
+
+                // Update coordinate HUD label
+                const coordEl = document.getElementById('hud-coords');
+                if (coordEl) coordEl.innerHTML = `${newLat}&deg; N, ${newLng}&deg; E`;
+
+                // Update Live Vitals inside the selected profile card dynamically
+                if (viewingProfileUid === victimId) {
+                    const batteryVal = document.querySelector('[data-vital="battery"]');
+                    if (batteryVal) batteryVal.textContent = `${liveData.battery || 100}%`;
+
+                    const netVal = document.querySelector('[data-vital="network"]');
+                    if (netVal) netVal.textContent = liveData.network || 'Online';
+
+                    const speedVal = document.querySelector('[data-vital="speed"]');
+                    if (speedVal) speedVal.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
+
+                    const accVal = document.querySelector('[data-vital="accuracy"]');
+                    if (accVal) accVal.textContent = `${(liveData.gpsAccuracy || 0.0).toFixed(1)}m`;
+
+                    const latLngVal = document.querySelector('[data-vital="latlng"]');
+                    if (latLngVal) latLngVal.textContent = `${newLat}, ${newLng}`;
+
+                    const liveUpdateVal = document.querySelector('[data-vital="liveupdate"]');
+                    if (liveUpdateVal) {
+                        const updateTime = liveData.timestamp && liveData.timestamp.toDate ? liveData.timestamp.toDate() : new Date();
+                        liveUpdateVal.textContent = updateTime.toLocaleTimeString();
+                    }
+                }
+            });
+        }
 
         function renderActiveAlert(alertId, alertData, isNewAlert) {
             console.log('🔔 [Web] Rendering active alert details:', alertId, alertData);
@@ -2852,6 +2950,8 @@
             if (isNewAlert || !viewingProfileUid) {
                 viewingProfileUid = alertData.victimId;
             }
+            
+            subscribeToLiveLocation(viewingProfileUid);
 
             if (alertData.currentStatus === 'active') {
                 if (isNewAlert && sessionStorage.getItem('goaround_auth') === 'true' && !playedSirenAlertIds.has(alertId)) {
@@ -3038,51 +3138,6 @@
                     }
                 }
 
-                // ── START LIVE LOCATION TRACKING on live_locations collection ─────────────
-                if (isNewAlert && alertData.victimId) {
-                    // Cancel any previous live location subscription
-                    if (window._liveLocationUnsub) {
-                        window._liveLocationUnsub();
-                        window._liveLocationUnsub = null;
-                    }
-
-                    const liveLocRef = doc(db, 'live_locations', alertData.victimId);
-                    window._liveLocationUnsub = onSnapshot(liveLocRef, (liveSnap) => {
-                        if (!liveSnap.exists()) return;
-                        const liveData = liveSnap.data();
-                        const newLat = liveData.latitude;
-                        const newLng = liveData.longitude;
-                        if (!newLat || !newLng) return;
-
-                        // Update globals
-                        activeLat = newLat;
-                        activeLng = newLng;
-
-                        // Smoothly move marker to new position (no flyTo — let operator control camera)
-                        if (activeMarker) {
-                            activeMarker.setLngLat([newLng, newLat]);
-                        }
-
-                        // Update coordinate HUD label
-                        const coordEl = document.getElementById('hud-coords');
-                        if (coordEl) coordEl.innerHTML = `${newLat.toFixed(4)}&deg; N, ${newLng.toFixed(4)}&deg; E`;
-
-                        // Update Live Vitals inside the selected profile card dynamically (if viewing the victim)
-                        if (viewingProfileUid === alertData.victimId) {
-                            const batteryVal = document.querySelector('[data-vital="battery"]');
-                            if (batteryVal) batteryVal.textContent = `${liveData.battery || 100}%`;
-
-                            const netVal = document.querySelector('[data-vital="network"]');
-                            if (netVal) netVal.textContent = liveData.network || 'Online';
-
-                            const speedVal = document.querySelector('[data-vital="speed"]');
-                            if (speedVal) speedVal.textContent = `${((liveData.speed || 0) * 3.6).toFixed(1)} km/h`;
-
-                            const accVal = document.querySelector('[data-vital="accuracy"]');
-                            if (accVal) accVal.textContent = `${(liveData.gpsAccuracy || 0.0).toFixed(1)}m`;
-                        }
-                    });
-                }
             }
 
             // Group / Traveling Details — always visible, show empty state when no group
